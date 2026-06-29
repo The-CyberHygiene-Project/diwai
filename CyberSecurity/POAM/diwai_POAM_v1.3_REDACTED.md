@@ -11,12 +11,12 @@
 | **System Owner** | Donald [SYSTEM-OWNER] |
 | **Organization** | [DOMAIN.ORG] (Do It With AI) |
 | **Classification** | Controlled Unclassified Information (CUI) |
-| **Version** | 1.2 |
-| **Date** | June 12, 2026 |
-| **SSP Reference** | System_Security_Plan_v2.13.md (§10) |
+| **Version** | 1.3 |
+| **Date** | June 29, 2026 |
+| **SSP Reference** | System_Security_Plan_v2.16.md (§10) |
 | **SPRS Score** | 98 / 110 (89.1%) — see Summary Dashboard caveats |
 | **Compliance Framework** | NIST SP 800-171 Rev 2 / FIPS 140-2 |
-| **Supersedes** | [DOMAIN.ORG]_Unified_POAM_v1.1.md (2026-06-11) |
+| **Supersedes** | [DOMAIN.ORG]_Unified_POAM_v1.2.md (2026-06-12) |
 
 ---
 
@@ -26,6 +26,7 @@
 |---------|------|--------|-------------|
 | 1.1 | 2026-06-11 | [SYSTEM-OWNER] | Initial standalone document consolidating POA&M-001–008 (see that file for full lineage). |
 | 1.1 (corrected) | 2026-06-11 | [SYSTEM-OWNER] | Added POA&M-008 (security awareness training) per independence determination. |
+| **1.3** | **2026-06-29** | **[SYSTEM-OWNER]** | **Documentation-currency pass** aligned with SSP v2.16 and SBOM v3.1. Updated SSP cross-references (v2.13 → v2.16). Noted that the Nextcloud CUI repository now enforces application-layer TOTP 2FA (documented in SSP §4.5) — this does **not** alter POA&M-004/007 or the SPRS, since host-OS login and VM SSH remain single-factor. **No open/closed item status changes**; all items 001–010 carry forward unchanged. |
 | **1.2** | **2026-06-12** | **[SYSTEM-OWNER]** | **Independent gap assessment + remediation pass** (report: `Compliance/Assessment/RS2_Gap_Assessment_2026-06-12.md`). **POA&M-002 CLOSED** via SI-3 control substitution — ClamAV decommissioned (non-functional under FIPS); malicious-code protection rebased on YARA + VirusTotal + fapolicyd + SELinux + Suricata (evidence DIWAI-EV-SI3-002). Correction recorded: **YARA was in fact already deployed and Wazuh-integrated** on the VM (prior docs erroneously stated otherwise). Added closed items **POA&M-009** (host Wazuh agent restored) and **POA&M-010** (VM time-sync drift corrected). Minor config-hygiene fixes (reverse-proxy `trusted_proxies`, removal of `sshpass`/YubiKey tooling) recorded as closed with no SPRS impact. Carries forward open items 003, 004, 005, 006, 007, 008. |
 
 ---
@@ -34,7 +35,7 @@
 
 This Plan of Action and Milestones documents all open, closed, and planned security findings for the [DOMAIN.ORG] SecureMac Reference System (RS2). It is a living document, reviewed quarterly with the SSP. Findings are tracked from identification through remediation or formal risk acceptance.
 
-**Relationship to SSP:** `System_Security_Plan_v2.13.md` §10 references this document as the authoritative POA&M and reproduces a summary table of the same items.
+**Relationship to SSP:** `System_Security_Plan_v2.16.md` §10 references this document as the authoritative POA&M and reproduces a summary table of the same items.
 
 ---
 
@@ -124,8 +125,8 @@ This Plan of Action and Milestones documents all open, closed, and planned secur
 **Classification:** CONTROLLED UNCLASSIFIED INFORMATION (CUI) — Official Use Only — Need to Know.
 **Retention:** Current + 3 years.
 **Next Review:** 2026-09-30 (quarterly, aligned with SSP).
-**Canonical Copy:** Nextcloud `CUI/Compliance/POAM/[DOMAIN.ORG]_Unified_POAM_v1.2.md` (cloud.[DOMAIN.ORG]).
+**Canonical Copy:** Nextcloud `CUI/Compliance/POAM/[DOMAIN.ORG]_Unified_POAM_v1.3.md` (cloud.[DOMAIN.ORG]).
 
 ---
 
-**END OF POA&M v1.2** — supports NIST SP 800-171 Rev 2 / CMMC Level 2 for RS2; referenced by `System_Security_Plan_v2.13.md` §10.
+**END OF POA&M v1.3** — supports NIST SP 800-171 Rev 2 / CMMC Level 2 for RS2; referenced by `System_Security_Plan_v2.16.md` §10.
