@@ -7,7 +7,7 @@
 [SYSTEM-OWNER] LLC dba [ORGANIZATION]\
 **System Name:** [DOMAIN.ORG] SecureMac Reference System\
 **Domain:** [DOMAIN.ORG]\
-**Version:** 2.13 **Date:** June 12, 2026\
+**Version:** 2.14 **Date:** June 29, 2026\
 **Classification:** CONFIDENTIAL BUSINESS INFORMATION
 
 **Distribution Notice:** This document contains proprietary business information, trade secrets, and confidential system security details of [SYSTEM-OWNER] LLC. Unauthorized disclosure may cause competitive harm. Upon submission to U.S. Government agencies, this document shall be marked and protected as Controlled Unclassified Information (CUI) per 32 CFR Part 2002.
@@ -41,6 +41,7 @@
 | **2.12** | **06/06/2026** | **[SYSTEM-OWNER]** | **MFA STRATEGY CHANGE — YUBIKEY ABANDONED:** YubiKey Nano 5C FIPS PIV hardware-token approach abandoned for the Mac host after a second lockout incident confirmed the solution is too technically fragile for reliable production use (PIV PIN lockout, certificate-pairing brittleness — see 1.2 and 1.5 above). MFA strategy for the Mac host changed to **TOTP via Authenticator app (RFC 6238)** — the same approach already targeted for the services.[DOMAIN.ORG] VM, unifying the remediation path for 3.5.3/3.7.5 across the whole [DOMAIN.ORG] system. **POA&M-001 (YubiKey PIV re-pairing) closed — superseded by strategy change.** New item **POA&M-007** opened: TOTP Authenticator app enrollment on the Mac host (dshannon account). IA Policy (TCC-IAP-001) updated to v1.1 to reflect the unified TOTP approach. SPRS unchanged: 98/110 (89.1%) — gap remains open until POA&M-004 and POA&M-007 are both complete. |
 | **2.12 (finalized)** | **06/11/2026** | **[SYSTEM-OWNER]** | **FINALIZED FOR SIGNATURE.** Open Drafting Questions resolved: (1) POA&M numbering retained as [DOMAIN.ORG]-specific (POA&M-001 closed / POA&M-007 opened), not renumbered to the conflated CPN's POA&M-046/047; (2) shared CyberInABox controls (policy set §6, physical perimeter §4.10, NAS FIPS-boundary note §4.13) remain documented inline as common controls, not split into a separate document — **superseded by the "2.12 (corrected)" entry below**. DRAFT NOTE and Open Drafting Question callouts removed; **Document Status** changed to **Approved — Pending Signature**. **Document ID correction:** the Rev. 2.12 (06/06/2026) entry above cites "TCC-IAP-001" — this is incorrect. TCC-IAP-001 is a CyberInABox/CPN-scoped document (FreeIPA-based MFA, dated 02/15/2026) and does not describe [DOMAIN.ORG]. The [DOMAIN.ORG]-specific Identification and Authentication Policy is **DIWAI-IAP-001** (v1.0, 04/10/2026 — the document that actually documents the YubiKey approach abandoned 06/06/2026). **DIWAI-IAP-001 has now been updated to v1.1** (06/11/2026) to reflect the unified TOTP MFA strategy. `[DOMAIN.ORG]_Unified_POAM_v1.1.md` (POA&M-001 through POA&M-007) has also been authored, in `Compliance/POAM/`. Both companion-document items tracked in Appendix D during the initial finalization pass are now resolved; §6, Appendix C, and §4.5 below have been corrected from TCC-IAP-001 to DIWAI-IAP-001 accordingly. (A broader review of the remaining `TCC-*-001` citations in §6/Appendix C against the parallel `DIWAI-*-001` policy set is recommended — see Appendix D Review Focus Areas — but is out of scope for this finalization pass.) |
 | **2.12 (corrected)** | **06/11/2026** | **[SYSTEM-OWNER]** | **INDEPENDENCE DETERMINATION — FULL DOCUMENT-ID PURGE.** Per explicit direction: *"[DOMAIN.ORG] shares [no] company policies with another reference system. It is an independent system and it is a stand-alone."* This supersedes item (2) of the "2.12 (finalized)" entry above — [DOMAIN.ORG]'s policy set, controls, and evidence are NOT shared, common, or inherited with the CyberInABox/CPN reference system, even where physical co-location (shared rack) is a true underlying fact. Changes made: **(a)** all 10 remaining `TCC-*-001` policy citations in §6 and Appendix C corrected to their `DIWAI-*-001` equivalents (v1.0, 04/10/2026): DIWAI-IRP-001, DIWAI-RA-001, DIWAI-PS-001, DIWAI-PE-MP-001, DIWAI-SI-001, DIWAI-AUP-001, DIWAI-AAP-001, DIWAI-CMP-001, DIWAI-ATP-001, DIWAI-SCP-001 (DIWAI-IAP-001 v1.1 already corrected in the prior entry); **(b)** ~9 inline citations corrected throughout §3/§4 (3.1.21 AUP/USB → DIWAI-AUP-001 §4.2; 3.6.1/3.6.3 → DIWAI-IRP-001; 3.7.3-3.7.4 and media disposal → DIWAI-PE-MP-001 §4.5, correcting a stale "§2.6" section reference; 3.9.2 → DIWAI-PS-001; 3.11.1 → DIWAI-RA-001); **(c)** former §3.3 and §4.10 "shared physical security controls... inherited by both SSPs" notes rewritten — [DOMAIN.ORG]'s physical/media protection controls are now documented solely via DIWAI-PE-MP-001, independent of any physical co-location; **(d)** §4.2 (3.2.1, 3.2.2, 3.2.3) downgraded **IMPLEMENTED → PARTIAL** after removing the sole supporting citation, "TCC-SAT-FY2026" (a CyberInABox-specific training-completion record) — no [DOMAIN.ORG]-specific security-awareness training delivery/completion record exists. **New POA&M-008 opened** ([DOMAIN.ORG]-specific security awareness training delivery + records, target Q3 2026, SPRS impact **TBD — pending confirmation**, see §10/§11/§12). **`[DOMAIN.ORG]_Unified_POAM_v1.1.md` updated to v1.1 (corrected)** to add POA&M-008. The 98/110 (89.1%) SPRS figure appearing elsewhere in this document is the **last-confirmed score and does not yet reflect POA&M-008** — see §11 caveat. |
+| **2.14** | **06/29/2026** | **[SYSTEM-OWNER]** | **NEXTCLOUD CUI REPOSITORY DOCUMENTED — APPLICATION-LAYER MFA.** The Nextcloud private-cloud document repository (32.0.11.1), in production on the Mac host since 06/11/2026 as the canonical store for CUI/FCI documents (SSP, POA&M, SBOM, evidence), is now documented as an in-boundary system component. **(a)** §3.2 adds Nextcloud + its supporting services (Homebrew PHP-FPM 8.3, Redis, Collabora Online/`richdocuments` 9.1.0 loopback-bound) to the Mac host component; §3.3 adds the `cloud.[DOMAIN.ORG]` LAN-only endpoint. **(b)** §4.5 (3.5.3) records that **Nextcloud enforces TOTP 2FA (`twofactor_totp`) instance-wide** (operator enrolled with backup codes, confirmed 06/11/2026) — an implemented application-layer MFA control over the CUI repository, added to §1.4 Strengths. **This does not change the 3.5.3 SPRS scoring:** host-OS login and VM SSH remain single-factor (POA&M-004/007), so 3.5.3 stays **NOT MET** and the SPRS figure is unchanged at 98/110. **(c)** §4.1 (3.1.1/3.1.2) and §4.8/§4.13 (SC-28) updated for Nextcloud LDAPS group-based access control (`cn=cui-users`) and FileVault at-rest encryption of the Nextcloud data directory; §4.3 (AU) notes Nextcloud `admin_audit` is enabled (Wazuh log-forwarding for `nextcloud.log` pending — tracked as a deployment task, not a control gap). No control status other than the additions above changed; SBOM (v3.0) and POA&M (v1.2) already reflect Nextcloud. |
 | **2.13** | **06/12/2026** | **[SYSTEM-OWNER]** | **INDEPENDENT GAP ASSESSMENT — SI-3 SUBSTITUTION & ARCHITECTURE DIAGRAMS** (assessment: `Compliance/Assessment/RS2_Gap_Assessment_2026-06-12.md`). **(a) §3.14.2 (SI-3) rewritten:** ClamAV was found **non-functional under FIPS** (cannot download/load/verify any signature database) and has been **decommissioned**. Malicious-code protection is now provided by an already-operational, FIPS-native stack — **YARA 4.5.2 (5,972 rules, Wazuh-integrated on FIM 550/554) + a new weekly full-system YARA scan + VirusTotal + fapolicyd + SELinux + Suricata** (evidence **DIWAI-EV-SI3-002**, superseding RISK-2026-004). 3.14.2 raised **PARTIAL → IMPLEMENTED**; **POA&M-002 CLOSED**. *Correction: YARA was in fact already deployed on this VM — prior text stating otherwise was inaccurate.* **(b)** Two newly-found, now-closed items recorded: **POA&M-009** (Mac host Wazuh agent restored after ~12 days offline — config XML + ownership repair) and **POA&M-010** (VM time-sync drift, AU-8, corrected + made durable). **(c)** Architecture diagrams added as referenced figures (§3.3, §3.4, Appendix C): `RS2_Network_Schematic` and `RS2_CUI_DataFlow` in `Compliance/Architecture/`. POA&M companion updated to **v1.2**. |
 
 ---
@@ -90,6 +91,7 @@ The [DOMAIN.ORG] SecureMac Reference System is an Apple Silicon-based security r
 - Login banner confirmed on VM; pf firewall on Mac host (WAN/LAN/MGMT segregation)
 - Time Machine backup auto-mount resolved — 17-day gap root cause corrected (05/15/2026)
 - **MFA strategy unified (06/06/2026):** A single remediation path (TOTP via Authenticator app, RFC 6238) now covers both the Mac host and the VM, replacing the more fragile dual-track plan (YubiKey PIV + separate VM TOTP). See POA&M-004 and POA&M-007.
+- **CUI repository enforces MFA (06/11/2026):** The Nextcloud private-cloud document repository — the canonical store for all CUI/FCI documents — enforces TOTP two-factor authentication (`twofactor_totp`) instance-wide on every login, layered on LDAPS-backed identity. Application-layer MFA over the CUI store is therefore already in production, even though host-OS and VM-SSH MFA remain pending (POA&M-004/007). See §3.2 and §4.5.
 
 **Outstanding Deficits (see [DOMAIN.ORG] POA&M v1.2):**
 - 3.5.3 / 3.7.5 — No MFA currently active on either system component: VM has SSH pubkey only (no TOTP); Mac host authenticates by password only following the YubiKey abandonment. Unified remediation: POA&M-004 (VM) + POA&M-007 (Mac host).
@@ -183,6 +185,7 @@ The [DOMAIN.ORG] SecureMac Reference System provides secure information technolo
 **Primary Functions:**
 - WAN gateway and firewall (pf on Mac Mini host)
 - AI/ML inference server (MLX + Open Web UI — LAN-restricted via nginx reverse proxy)
+- CUI/FCI document management — Nextcloud private cloud (LAN-restricted via nginx reverse proxy; MFA-enforced) with Collabora Online in-browser office editing
 - Identity and access management (389-DS LDAP directory on VM)
 - Security monitoring and threat detection (Wazuh SIEM + Suricata on VM)
 - Web services and compliance dashboard (Apache httpd on VM)
@@ -232,6 +235,13 @@ The [DOMAIN.ORG] SecureMac Reference System provides secure information technolo
   - LaunchDaemon: `org.diwai.nginx`; config: `/opt/homebrew/etc/nginx/servers/ai.[DOMAIN.ORG].conf`
 - Open Web UI 0.9.5 (Python venv: `/opt/local/open-webui-venv`) — bound to 127.0.0.1:3000 (localhost only); ENABLE_SIGNUP=false; single admin account (dshannon); LaunchDaemon: `org.diwai.open-webui`
 - AI Model: Magistral-Small-2509-MLX-4bit (MLX native, Metal Performance Shaders — no Ollama dependency); location `/opt/local/models/Magistral-Small-2509-MLX-4bit`
+- **Nextcloud 32.0.11.1 private-cloud CUI/FCI document repository** (`/opt/local/nextcloud`, data dir `/opt/local/nextcloud/data` — FileVault-encrypted at rest) — the canonical store for CUI/FCI documents (SSP, POA&M, SBOM, evidence)
+  - Served at `https://cloud.[DOMAIN.ORG]` via the nginx reverse proxy on the LAN interface ([LAN-IP-REDACTED]:443) and loopback only — **never exposed to WAN**, no public DNS record (local resolution only)
+  - Runtime: Homebrew PHP-FPM 8.3 + local Redis (127.0.0.1:6379) cache/locking
+  - Identity: 389-DS via **LDAPS** (`ldaps://services.[DOMAIN.ORG]:636`, base `dc=diwai,dc=org`); database: MariaDB on the VM
+  - **MFA: TOTP two-factor authentication (`twofactor_totp`) enforced instance-wide** (operator enrolled with TOTP + backup codes, confirmed 06/11/2026); `admin_audit` enabled; `session_lifetime=1800`, `remember_login_cookie_lifetime=0`
+  - Group-based access control via 389-DS groups (`cn=cui-users` restricts the CUI groupfolder; `cn=users` for Operations/AI-Knowledge-Base)
+  - Office editing: Collabora Online (`richdocuments` 9.1.0) bound to loopback (127.0.0.1:9980), reached only by Nextcloud's PHP backend over the WOPI protocol — never exposed through nginx or the LAN; the nginx reverse proxy remains the sole CUI-bearing TLS boundary
 - Time Machine backup to dedicated SSD with auto-mount LaunchAgent (`org.diwai.mount-tm-drive`, script `/usr/local/sbin/mount-tm-drive.sh`) — RunAtLoad, fires 5 seconds after login; resolved a FileVault-encrypted-volume auto-mount failure that caused a 17-day backup gap (2026-04-28 to 2026-05-14)
 - mSCP compliance baseline: `diwai_phase1.yaml` — 126/134 rules passing (94%); weekly automated scan, results published to compliance dashboard (POA&M-003 tracks the 8 failing rules)
 
@@ -310,6 +320,7 @@ Mac Mini M4 Pro (pf firewall)
 DNS ([DOMAIN.ORG] zone):
   [DOMAIN.ORG] / www         -> [WAN-IP-REDACTED]
   ai.[DOMAIN.ORG]            -> [LAN-IP-REDACTED]   (LAN only, via nginx reverse proxy)
+  cloud.[DOMAIN.ORG]         -> [LAN-IP-REDACTED]   (LAN only, via nginx reverse proxy; Nextcloud)
   mail.[DOMAIN.ORG]          -> [WAN-IP-REDACTED]
   vpn.[DOMAIN.ORG]           -> [WAN-IP-REDACTED]
   securemac.[DOMAIN.ORG]     -> [LAN-IP-REDACTED]  (VM dashboard, LDAP-authenticated)
@@ -348,8 +359,8 @@ DNS ([DOMAIN.ORG] zone):
 
 | Control | Name | Status | Implementation |
 |:---|:---|:---|:---|
-| 3.1.1 | Limit access to authorized users | IMPLEMENTED | 389-DS LDAP directory (dc=diwai,dc=org) manages user identities for VM services. macOS account management for the Mac host. SSH key-based access only. nginx proxy restricts the AI interface to LAN-authorized users. |
-| 3.1.2 | Limit access to authorized functions | IMPLEMENTED | 389-DS group-based RBAC (cn=admins group required for dashboard access). sudo on the VM for privileged operations. macOS standard user + sudo for host admin. fapolicyd enforces application whitelisting on the VM. |
+| 3.1.1 | Limit access to authorized users | IMPLEMENTED | 389-DS LDAP directory (dc=diwai,dc=org) manages user identities for VM services. macOS account management for the Mac host. SSH key-based access only. nginx proxy restricts the AI and Nextcloud interfaces to LAN-authorized users. Nextcloud authenticates against 389-DS over LDAPS and enforces TOTP 2FA on every login (see 3.5.3). |
+| 3.1.2 | Limit access to authorized functions | IMPLEMENTED | 389-DS group-based RBAC (cn=admins group required for dashboard access). Nextcloud groupfolder access is group-restricted (cn=cui-users for the CUI groupfolder; cn=users for Operations/AI-Knowledge-Base). sudo on the VM for privileged operations. macOS standard user + sudo for host admin. fapolicyd enforces application whitelisting on the VM. |
 | 3.1.3 | Control flow of CUI | IMPLEMENTED | pf firewall (Mac host) enforces WAN/LAN/MGMT boundaries. firewalld on the VM restricts inter-service traffic. nginx proxies the AI interface — no direct WAN exposure. TLS/SSH for all data in transit. |
 | 3.1.4 | Separation of duties | N/A | Single-person organization. Separation enforced via audit logging, the break-glass account, and external review processes. |
 | 3.1.5 | Least privilege | IMPLEMENTED | Named user (dshannon) with sudo elevation for privileged operations. No service accounts hold unnecessary privileges. fapolicyd limits application execution on the VM. |
@@ -387,6 +398,7 @@ DNS ([DOMAIN.ORG] zone):
 - **AU-3 / 3.3.2:** All records include timestamp, source, event type, outcome, and user identity. The Wazuh indexer provides long-term searchable retention.
 - **AU-6 / 3.3.3:** The Wazuh Dashboard provides real-time audit review; Grafana provides metrics dashboards. The ISSO reviews Wazuh alerts daily.
 - **AU-9 / 3.3.8:** Wazuh indexer data is restricted to the wazuh-indexer service account. auditd logs are root-owned. FIPS-encrypted VM storage protects the audit partition.
+- **Nextcloud:** the `admin_audit` app is enabled, logging authentication, sharing, and file-access events to `/opt/local/nextcloud/data/nextcloud.log` (JSON). Forwarding this log into Wazuh (decoder + rule) is a pending deployment task, not a control gap — the audit data is captured locally on the FileVault-encrypted host volume in the interim.
 
 ### 4.4 Configuration Management (CM)
 
@@ -403,7 +415,7 @@ DNS ([DOMAIN.ORG] zone):
 |:---|:---|:---|:---|
 | 3.5.1 | Identify system users | IMPLEMENTED | 389-DS LDAP (dc=diwai,dc=org) manages all VM user identities. macOS directory services manage the host. |
 | 3.5.2 | Authenticate before access | IMPLEMENTED | SSH key authentication on the VM. macOS password authentication on the host. LDAP authentication for the web dashboard. |
-| 3.5.3 | Multi-factor authentication | **NOT MET** | **VM (services.[DOMAIN.ORG]):** SSH pubkey only — no TOTP or second factor configured. Remediation: **POA&M-004**. **Mac host (securemac.[DOMAIN.ORG]):** YubiKey Nano 5C FIPS PIV hardware-token approach was attempted twice and **abandoned 06/06/2026** after a second lockout incident demonstrated the solution is too fragile for production use (see 3.2, Component 1, "MFA Status"). The host now authenticates via password only. The MFA strategy has been changed to **TOTP via Authenticator app (RFC 6238)** — the same approach used on the VM and the CyberInABox Linux systems. Remediation: **POA&M-007**. POA&M-001 (YubiKey re-pairing) is **closed — superseded by this strategy change**. **SPRS deficit: -5 points** (unchanged — the gap is still open; the remediation *path* has been simplified and unified, not yet completed). |
+| 3.5.3 | Multi-factor authentication | **NOT MET** | **Nextcloud CUI repository (cloud.[DOMAIN.ORG]):** **MFA is IMPLEMENTED at the application layer** — Nextcloud enforces TOTP two-factor authentication (`twofactor_totp`) instance-wide on every login, over LDAPS-backed identity, with the operator enrolled (TOTP + backup codes, confirmed 06/11/2026). The canonical CUI/FCI document store therefore already requires MFA. **VM (services.[DOMAIN.ORG]):** SSH pubkey only — no TOTP or second factor configured. Remediation: **POA&M-004**. **Mac host (securemac.[DOMAIN.ORG]):** YubiKey Nano 5C FIPS PIV hardware-token approach was attempted twice and **abandoned 06/06/2026** after a second lockout incident demonstrated the solution is too fragile for production use (see 3.2, Component 1, "MFA Status"). The host now authenticates via password only. The MFA strategy has been changed to **TOTP via Authenticator app (RFC 6238)** — the same approach used on the VM and the CyberInABox Linux systems. Remediation: **POA&M-007**. POA&M-001 (YubiKey re-pairing) is **closed — superseded by this strategy change**. **Status rationale:** despite the Nextcloud application-layer MFA above, this control is scored **NOT MET** because the host-OS login and VM-SSH access paths to the system accounts remain single-factor. **SPRS deficit: -5 points** (unchanged). |
 | 3.5.4 | Replay-resistant authentication | IMPLEMENTED | SSH uses ephemeral key exchange (replay-resistant by design). TLS session tokens are not reusable. FIPS-approved algorithms on the VM. |
 | 3.5.5–3.5.11 | Password management controls | IMPLEMENTED | 389-DS enforces password complexity, history, aging, and lockout policies. FIPS-compliant password hashing on the VM. |
 
@@ -430,7 +442,7 @@ DNS ([DOMAIN.ORG] zone):
 ### 4.8 Media Protection (MP)
 
 **Status:** All MP controls **IMPLEMENTED**.
-- Storage encrypted: LUKS AES-256-XTS (VM); FileVault / Apple Secure Enclave (Mac host)
+- Storage encrypted: LUKS AES-256-XTS (VM); FileVault / Apple Secure Enclave (Mac host) — covers the Nextcloud CUI/FCI data directory (`/opt/local/nextcloud/data`) at rest
 - Removable media: USBGuard on the VM; custom USB Guard on the Mac host
 - Media disposal: DIWAI-PE-MP-001 §4.5 (cryptographic erase / shred)
 - Media transport: all CUI transmitted via encrypted channels (TLS/SSH)
@@ -475,7 +487,7 @@ The Mac Mini M4 Pro is housed in a locked 2U rack mount within a free-standing r
 - **3.13.1 (SC-7):** The pf firewall (Mac host) provides boundary protection between WAN, LAN, and MGMT interfaces. firewalld provides host-level boundary protection on the VM. Suricata provides network IDS/IPS on the VM.
 - **3.13.5:** The LAN ([LAN-IP-REDACTED]/24) is segregated from the WAN by pf. The VM and NAS are not directly reachable from the WAN. nginx is the sole WAN-accessible endpoint for internal services (and even it listens only on the LAN interface and loopback).
 - **3.13.6:** pf implements default-deny inbound on the WAN. firewalld implements default-deny on the VM.
-- **3.13.8 (SC-8):** All data in transit is protected by TLS 1.2/1.3 or SSH. nginx enforces HSTS. FIPS-approved cipher suites are enforced on the VM.
+- **3.13.8 (SC-8):** All data in transit is protected by TLS 1.2/1.3 or SSH. nginx enforces HSTS on both ai.[DOMAIN.ORG] and cloud.[DOMAIN.ORG] (Nextcloud). FIPS-approved cipher suites are enforced on the VM. Nextcloud↔389-DS identity traffic uses LDAPS (port 636); the Nextcloud↔Collabora editing hop stays on host loopback and never independently terminates TLS, so the nginx reverse proxy remains the sole CUI-bearing TLS boundary.
 - **3.13.10:** 389-DS provides PKI and key management for identity credentials. The Apple Secure Enclave manages cryptographic keys on the Mac host.
 - **3.13.11 (SC-13):** FIPS 140-2 mode is enabled on the Rocky Linux 9.7 VM (verified via `fips-mode-setup --check`). The Apple Secure Enclave (FIPS 140-2 Level 1) protects the Mac host.
 - **3.13.16:** TLS encryption is enforced on all CUI transmission paths.
@@ -642,7 +654,7 @@ The June 6, 2026 decision to abandon the YubiKey PIV approach (after two lockout
 **Authorization Period:** 3 years (through June 4, 2029)\
 **Authorizing Official:** /s/ [SYSTEM-OWNER], System Owner/ISSO\
 **[SYSTEM-OWNER] LLC dba [ORGANIZATION]**\
-**Date:** _____ (pending re-signature for v2.12)
+**Date:** _____ (pending re-signature for v2.14)
 
 ---
 
@@ -738,4 +750,4 @@ This SSP shall be reviewed and updated quarterly or upon significant system chan
 
 **Document Classification: CONTROLLED UNCLASSIFIED INFORMATION (CUI)**\
 **System: [DOMAIN.ORG] SecureMac Reference System**\
-**Version: 2.12 | Date: June 11, 2026**
+**Version: 2.14 | Date: June 29, 2026**
