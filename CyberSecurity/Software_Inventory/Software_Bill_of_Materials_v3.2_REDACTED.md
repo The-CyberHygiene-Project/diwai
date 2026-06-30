@@ -5,7 +5,7 @@
 **System:** [DOMAIN.ORG] SecureMac Reference System  
 **Organization:** [DOMAIN.ORG] (Do It With AI)  
 **Classification:** Controlled Unclassified Information (CUI)  
-**Version:** 3.1  
+**Version:** 3.2  
 **Date Generated:** 2026-06-29  
 **Scope:** 2 systems (1 combined firewall/DC/mail/SIEM/AI/Nextcloud server-host + 1 Rocky Linux service VM)  
 **Architectures:** ARM64 (Apple Silicon — both systems)  
@@ -62,6 +62,7 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 | 2.0 | 2026-04-23 | [SYSTEM-OWNER] | Verified all package versions against installed state. Updates: kernel 611.41→611.45, php-fpm 8.0→8.2 (Remi), roundcubemail 1.5.14→1.5.15, grafana 12.4.2→13.0.1, python3 minor rev, node-exporter 1.11.1 (proper package name), OpenSCAP/SSG versions added. macOS updated to 26.4.1 (25E253). Added Homebrew YubiKey tools (ykman 5.9.0, yubico-piv-tool 2.7.3, libfido2 1.16.0, openssh 10.3p1) and YubiKey PIV hardware to macOS section. Auth section updated to reflect PIV smartcard. |
 | 3.0 | 2026-06-11 | [SYSTEM-OWNER] | Major refresh. **Added:** Nextcloud 32.0.11.1 (private cloud / document management, `/opt/local/nextcloud`, instance-wide TOTP 2FA) as a new Mac mini subsystem; Local AI Inference moved from "Planned" to **operational** — Magistral-Small-2509-MLX-4bit via `mlx_lm.server` (port 8081) + Open WebUI (port 3000) behind `ai.[DOMAIN.ORG]`, plus Ollama (codestral, all-minilm). **Removed/Superseded:** YubiKey 5C Nano FIPS PIV retired as the macOS local-auth MFA mechanism (unpaired 2026-06-06, POA&M-001 closed-superseded) — Homebrew YubiKey/FIDO2 tooling remains installed but unused; unified TOTP MFA strategy (POA&M-004/007) now governs VM SSH and macOS. **Updated:** VM OpenSCAP re-verified 102/102 (2026-06-08); first-time inclusion of macOS mSCP compliance baseline (`diwai_phase1`, 129/134, 2026-06-11). **Corrected:** system title/header de-coupled from "CyberInABox Reference System #2" framing — [DOMAIN.ORG] is documented as an independent, stand-alone system per the 2026-06-11 SSP v2.12 independence determination. Document Control updated to reflect Nextcloud as the canonical CUI evidence repository. |
 | 3.1 | 2026-06-29 | [SYSTEM-OWNER] | **SI-3 reconciliation with SSP v2.13+.** This SBOM (v3.0, 2026-06-11) predated the 2026-06-12 SI-3 control substitution by one day and still listed ClamAV as the active malware-protection control. **Corrected:** ClamAV 1.4.3 (`clamav`/`clamd`) marked **decommissioned 2026-06-12** — non-functional under FIPS (could neither download nor load a signature database; OpenSSL verification failure); see SSP §3.14.2 / DIWAI-EV-SI3-002 (supersedes RISK-2026-004), POA&M-002 closed. **Added:** **YARA 4.5.2** (5,972 rules) as the operational SI-3 malware scanner — Wazuh active-response on FIM 550/554 + weekly full-system scan (`yara-fullscan.timer`); SI-3 control now YARA + VirusTotal + fapolicyd + SELinux + Suricata (all FIPS-native). YubiKey entries unchanged (already correctly marked retired, consistent with SSP). |
+| 3.2 | 2026-06-29 | [SYSTEM-OWNER] | **YubiKey tooling reconciliation with POA&M.** Corrected the Homebrew YubiKey/SSH table: `ykman` and `yubico-piv-tool` were **removed from the Mac host 2026-06-12** under least-functionality (CM-7) per POA&M-002's hygiene actions — the prior "installed, unused" listing was stale (this SBOM line predated/missed the removal). Removal confirmed absent via `brew list` (2026-06-29). `libfido2` and Homebrew `openssh` retained. No SPRS impact. |
 
 ---
 
@@ -299,16 +300,16 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 
 **Status (2026-06-06):** PIV smartcard MFA for macOS local auth/screen lock has been **retired** following repeated PIV lockouts (2026-04-15, 2026-05-15). PIV slots 9A/9C unpaired from macOS; the key remains physically installed but has no active SSH/auth role. POA&M-001 closed-superseded by a unified **TOTP (RFC 6238)** MFA strategy covering VM SSH (POA&M-004) and macOS (POA&M-007), target Q3 2026 — see DIWAI-IAP-001 v1.1. Nextcloud's own TOTP 2FA (see Nextcloud section above) is independent of this POA&M and already enforced.
 
-#### Homebrew Packages (YubiKey / SSH — installed, unused)
+#### Homebrew Packages (YubiKey / SSH)
 
 | Package | Version | Source | Purpose |
 |---------|---------|--------|---------|
-| **ykman** | 5.9.0 | Homebrew | YubiKey Manager — PIN management, device config |
-| **yubico-piv-tool** | 2.7.3 | Homebrew | PIV tool — certificate operations |
-| **libfido2** | 1.16.0_2 | Homebrew | FIDO2 library — dependency for Homebrew OpenSSH |
-| **openssh** | 10.3p1 | Homebrew | OpenSSH compiled with libfido2 support (FIDO2-SK key ops) |
+| ~~**ykman**~~ | ~~5.9.0~~ | Homebrew | YubiKey Manager — **REMOVED 2026-06-12** (CM-7, unused after YubiKey retirement; verified absent via `brew list`) |
+| ~~**yubico-piv-tool**~~ | ~~2.7.3~~ | Homebrew | PIV tool — **REMOVED 2026-06-12** (CM-7, unused after YubiKey retirement; verified absent via `brew list`) |
+| **libfido2** | 1.16.0_2 | Homebrew | FIDO2 library — dependency for Homebrew OpenSSH (retained) |
+| **openssh** | 10.3p1 | Homebrew | OpenSSH compiled with libfido2 support (FIDO2-SK key ops) — retained |
 
-**Note:** These packages remain installed from the original YubiKey PIV deployment but are not part of the current MFA strategy (see YubiKey Hardware above). macOS system OpenSSH (10.2p1/LibreSSL) does not include libfido2; Homebrew OpenSSH would be required if FIDO2-SK keys are reintroduced. Current admin SSH to VM uses RSA-4096 key (`~/.ssh/diwai_rsa`), password+key auth.
+**Note (updated 2026-06-29):** `ykman` and `yubico-piv-tool` were **removed from the Mac host on 2026-06-12** under least-functionality (CM-7) after the YubiKey PIV approach was retired — see POA&M-002 hygiene actions; confirmed absent by `brew list`. `libfido2` and Homebrew `openssh` are **retained** (Homebrew OpenSSH would be required if FIDO2-SK keys are ever reintroduced; macOS system OpenSSH 10.2p1/LibreSSL lacks libfido2). Current admin SSH to the VM uses an RSA-4096 key (`~/.ssh/diwai_rsa`), password+key auth.
 
 #### Admin Tools
 
@@ -572,7 +573,7 @@ All software sourced from US/European open source projects. No software of PRC o
 
 ---
 
-**END OF SBOM v3.1**
+**END OF SBOM v3.2**
 
 *This document supports NIST SP 800-171 CM-8, SR-2, and CMMC Level 2 compliance requirements for the [DOMAIN.ORG] SecureMac Reference System.*
 
