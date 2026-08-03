@@ -5,8 +5,8 @@
 **System:** [DOMAIN.ORG] SecureMac Reference System  
 **Organization:** [DOMAIN.ORG] (Do It With AI)  
 **Classification:** Controlled Unclassified Information (CUI)  
-**Version:** 3.2  
-**Date Generated:** 2026-06-29  
+**Version:** 3.3  
+**Date Generated:** 2026-08-03  
 **Scope:** 2 systems (1 combined firewall/DC/mail/SIEM/AI/Nextcloud server-host + 1 Rocky Linux service VM)  
 **Architectures:** ARM64 (Apple Silicon — both systems)  
 
@@ -62,6 +62,7 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 | 2.0 | 2026-04-23 | [SYSTEM-OWNER] | Verified all package versions against installed state. Updates: kernel 611.41→611.45, php-fpm 8.0→8.2 (Remi), roundcubemail 1.5.14→1.5.15, grafana 12.4.2→13.0.1, python3 minor rev, node-exporter 1.11.1 (proper package name), OpenSCAP/SSG versions added. macOS updated to 26.4.1 (25E253). Added Homebrew YubiKey tools (ykman 5.9.0, yubico-piv-tool 2.7.3, libfido2 1.16.0, openssh 10.3p1) and YubiKey PIV hardware to macOS section. Auth section updated to reflect PIV smartcard. |
 | 3.0 | 2026-06-11 | [SYSTEM-OWNER] | Major refresh. **Added:** Nextcloud 32.0.11.1 (private cloud / document management, `/opt/local/nextcloud`, instance-wide TOTP 2FA) as a new Mac mini subsystem; Local AI Inference moved from "Planned" to **operational** — Magistral-Small-2509-MLX-4bit via `mlx_lm.server` (port 8081) + Open WebUI (port 3000) behind `ai.[DOMAIN.ORG]`, plus Ollama (codestral, all-minilm). **Removed/Superseded:** YubiKey 5C Nano FIPS PIV retired as the macOS local-auth MFA mechanism (unpaired 2026-06-06, POA&M-001 closed-superseded) — Homebrew YubiKey/FIDO2 tooling remains installed but unused; unified TOTP MFA strategy (POA&M-004/007) now governs VM SSH and macOS. **Updated:** VM OpenSCAP re-verified 102/102 (2026-06-08); first-time inclusion of macOS mSCP compliance baseline (`diwai_phase1`, 129/134, 2026-06-11). **Corrected:** system title/header de-coupled from "CyberInABox Reference System #2" framing — [DOMAIN.ORG] is documented as an independent, stand-alone system per the 2026-06-11 SSP v2.12 independence determination. Document Control updated to reflect Nextcloud as the canonical CUI evidence repository. |
 | 3.1 | 2026-06-29 | [SYSTEM-OWNER] | **SI-3 reconciliation with SSP v2.13+.** This SBOM (v3.0, 2026-06-11) predated the 2026-06-12 SI-3 control substitution by one day and still listed ClamAV as the active malware-protection control. **Corrected:** ClamAV 1.4.3 (`clamav`/`clamd`) marked **decommissioned 2026-06-12** — non-functional under FIPS (could neither download nor load a signature database; OpenSSL verification failure); see SSP §3.14.2 / DIWAI-EV-SI3-002 (supersedes RISK-2026-004), POA&M-002 closed. **Added:** **YARA 4.5.2** (5,972 rules) as the operational SI-3 malware scanner — Wazuh active-response on FIM 550/554 + weekly full-system scan (`yara-fullscan.timer`); SI-3 control now YARA + VirusTotal + fapolicyd + SELinux + Suricata (all FIPS-native). YubiKey entries unchanged (already correctly marked retired, consistent with SSP). |
+| 3.3 | 2026-08-03 | [SYSTEM-OWNER] | **Least-functionality reconciliation — Grafana and ClamAV.** **Grafana** 13.1.1 marked **decommissioned/removed 2026-08-02** (`grafana`, `grafana-selinux`, `grafana-pcp`; 1.0 GB freed): not updatable — `rpm.grafana.com` failed GPG verification on `repomd.xml`, leaving an unpatchable component that also broke `dnf check-update` system-wide — against limited operational use. Prometheus + node-exporter **retained and verified running**, so metrics collection is unaffected; only visualization was retired. Inventory version corrected 13.0.1→13.1.1 (installed state had drifted from this SBOM before removal). License table and Security-Control summary updated. Authority `DIWAI-CR-2026-08-04`. **ClamAV** rows updated to record **package removal 2026-08-01** (`DIWAI-CR-2026-08-01` C14, 138 MB) — the June 2026 entry recorded the *decommissioning* but the software stayed installed and auto-upgrading until August (**F-2026-08-06**, now **closed**); FIPS 140 incompatibility stated explicitly as the root cause. No SPRS impact from either change: SI-3 was already rebased on the FIPS-native YARA stack, and no control named Grafana as its sole mechanism. |
 | 3.2 | 2026-06-29 | [SYSTEM-OWNER] | **YubiKey tooling reconciliation with POA&M.** Corrected the Homebrew YubiKey/SSH table: `ykman` and `yubico-piv-tool` were **removed from the Mac host 2026-06-12** under least-functionality (CM-7) per POA&M-002's hygiene actions — the prior "installed, unused" listing was stale (this SBOM line predated/missed the removal). Removal confirmed absent via `brew list` (2026-06-29). `libfido2` and Homebrew `openssh` retained. No SPRS impact. |
 
 ---
@@ -138,7 +139,7 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 |---------|---------|---------|
 | **suricata** | 7.0.13-1.el9.aarch64 | Network IDS (AF_PACKET, enp0s1) |
 | **wazuh-manager** | 4.14.4-1.aarch64 | SIEM — log collection, FIM, rootcheck |
-| **grafana** | 13.0.1-1.aarch64 | Metrics visualization dashboard |
+| ~~**grafana**~~ | ~~13.1.1-1.aarch64~~ | Metrics visualization dashboard — **DECOMMISSIONED 2026-08-02** |
 | **prometheus** | 3.10.0-1.el9.aarch64 | Time-series metrics collection |
 | **node-exporter** | 1.11.1-1.el9.aarch64 | Host metrics for Prometheus |
 | **audit** | 3.1.5-7.el9.aarch64 | Linux kernel audit subsystem |
@@ -147,15 +148,19 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 **Suricata Rules:** Emerging Threats ruleset (~49,521 rules)  
 **Wazuh Integrations:** syslog, auditd, httpd access logs, OpenVPN, Suricata EVE JSON  
 
+**Status (2026-08-02):** Grafana was **decommissioned and removed** (`grafana`, `grafana-selinux`, `grafana-pcp`; 1.0 GB freed). It was **not updatable** — `rpm.grafana.com` failed GPG verification on `repomd.xml`, so the installed 13.1.1 could not be patched, and the failing repository also broke `dnf check-update` system-wide. Its use was limited to metrics dashboards. **Metrics collection is unaffected:** Prometheus and node-exporter remain operational (verified running 2026-08-03), so the underlying telemetry and its retention are intact — only the visualization layer was retired. No control depended on Grafana as its sole mechanism; audit review (AU-6 / 3.3.3) and unauthorized-use identification (3.14.7) rest on the Wazuh Dashboard, auditd, and Suricata. Change record `DIWAI-CR-2026-08-04`; `/etc/grafana` backed up to `/root/grafana-removal-2026-08-02/`, `/var/lib/grafana` (49 MB) intentionally retained.
+
 #### Malicious-Code Protection (SI-3)
 
 | Package | Version | Purpose |
 |---------|---------|---------|
 | **yara** | 4.5.2 | Malicious-code pattern scanner — **active SI-3 control** (5,972 rules; Wazuh active-response on FIM 550/554 + weekly full-system scan via `yara-fullscan.timer`) |
-| ~~**clamav**~~ | ~~1.4.3-3.el9.aarch64~~ | ClamAV antivirus engine — **DECOMMISSIONED 2026-06-12** |
-| ~~**clamd**~~ | ~~1.4.3-3.el9.aarch64~~ | ClamAV daemon — **DECOMMISSIONED 2026-06-12** |
+| ~~**clamav**~~ | ~~1.4.3-3.el9.aarch64~~ | ClamAV antivirus engine — **DECOMMISSIONED 2026-06-12; PACKAGE REMOVED 2026-08-01** |
+| ~~**clamd**~~ | ~~1.4.3-3.el9.aarch64~~ | ClamAV daemon — **DECOMMISSIONED 2026-06-12; PACKAGE REMOVED 2026-08-01** |
 
-**Status (2026-06-12):** ClamAV was **decommissioned** — non-functional under FIPS (could neither download nor load any signature database; OpenSSL verification failure), so it provided no detection. Malicious-code protection (SI-3) is now provided by an already-operational, FIPS-native stack: **YARA 4.5.2** + VirusTotal reputation lookups + fapolicyd application allow-listing + SELinux enforcing + Suricata network IDS. Control substitution documented in SSP §3.14.2 / `DIWAI-EV-SI3-002` (supersedes RISK-2026-004); POA&M-002 closed.
+**Status (2026-06-12):** ClamAV was **decommissioned** — **incompatible with FIPS 140**. It could neither download nor load any signature database (OpenSSL verification failure under FIPS), so it provided no detection. Malicious-code protection (SI-3) is now provided by an already-operational, FIPS-native stack: **YARA 4.5.2** + VirusTotal reputation lookups + fapolicyd application allow-listing + SELinux enforcing + Suricata network IDS. Control substitution documented in SSP §3.14.2 / `DIWAI-EV-SI3-002` (supersedes RISK-2026-004); POA&M-002 closed.
+
+**Update (2026-08-01):** the packages themselves were **removed** (`clamav`, `clamav-filesystem`, `clamav-freshclam`, `clamav-lib`, `clamd`; 138 MB). Between 2026-06-12 and 2026-08-01 the software remained installed and was still being auto-upgraded while the SSP recorded it decommissioned — a configuration-management defect tracked as **F-2026-08-06**, never a protection gap, since the substituted SI-3 stack was carrying the control throughout. Inventory and reality now agree and **F-2026-08-06 is closed**. Change record `DIWAI-CR-2026-08-01` C14.
 
 #### DNS
 
@@ -351,7 +356,7 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 |---------|---------------|
 | SIEM | Wazuh 4.14.4 (log collection, FIM, rootcheck) |
 | Network IDS | Suricata 7.0.13 (Emerging Threats rules) |
-| Metrics | Grafana 13.0.1 + Prometheus 3.10.0 + node-exporter 1.11.1 |
+| Metrics | Prometheus 3.10.0 + node-exporter 1.11.1 — Grafana decommissioned 2026-08-02 (collection retained, visualization retired) |
 | Audit | auditd with comprehensive rules |
 | Malicious-code scanning | YARA 4.5.2 (5,972 rules; SI-3 active) — ClamAV decommissioned 2026-06-12 |
 | USB control | USBGuard (VM) + custom daemon (Mac) |
@@ -435,7 +440,7 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 | OpenVPN | GPL v2 | VPN |
 | Suricata | GPL v2 | IDS |
 | Wazuh | GPL v2 | SIEM |
-| Grafana | AGPLv3 | Dashboards |
+| ~~Grafana~~ | ~~AGPLv3~~ | Dashboards — decommissioned 2026-08-02 |
 | Prometheus | Apache 2.0 | Metrics |
 | YARA | BSD-3-Clause | Malicious-code scanner (SI-3 active) |
 | ~~ClamAV~~ | GPL v2 | Antivirus — decommissioned 2026-06-12 |
@@ -472,7 +477,7 @@ All software sourced from US/European open source projects. No software of PRC o
 - Primary: Rocky Linux official repositories (HTTPS, GPG verified)
 - EPEL: Extra Packages for Enterprise Linux (certbot, etc.)
 - Wazuh: Official Wazuh repository (GPG verified)
-- Grafana: Official Grafana repository (GPG verified)
+- ~~Grafana: Official Grafana repository (GPG verified)~~ — **repository retired 2026-08-02** (`DIWAI-CR-2026-08-04` C44). The "GPG verified" claim had become false: `rpm.grafana.com` was **failing** GPG verification on `repomd.xml`, which both blocked patching of the installed Grafana and broke `dnf check-update` system-wide until the repository was removed
 - Prometheus: Official release (GPG verified)
 - Integrity: SHA-256 checksums verified by dnf
 
@@ -520,7 +525,7 @@ All software sourced from US/European open source projects. No software of PRC o
 
 ### mSCP Compliance (macOS)
 
-- **Baseline:** `diwai_phase1` (macOS Security Compliance Project, `/Users/dshannon/macos_security/`)
+- **Baseline:** `diwai_phase1` (macOS Security Compliance Project, `/usr/local/libexec/`)
 - **Last result:** 129 pass / 5 fail / 1 N/A (2026-06-11)
 - **Report:** `services.[DOMAIN.ORG]:/var/www/securemac/docs/evidence/mSCP-securemac-latest.html`; evidence copy at Nextcloud `CUI/Compliance/Evidence/mscp-20260424.html`
 - **Open findings:** tracked under POA&M-003 (Q3 2026)
