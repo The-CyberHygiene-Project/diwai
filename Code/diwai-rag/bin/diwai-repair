@@ -1,0 +1,10 @@
+#!/Library/Developer/CommandLineTools/usr/bin/python3 -I
+# diwai-repair -- runs only YubiKey-approved repairs (owner decision 13).
+# Paths are fixed (PRODUCTION); nothing in the environment can redirect them.
+# -I: Python ignores PYTHONPATH, the user site folder and the current folder,
+# so no other repairkit can be put in front of the root-owned one.
+import sys
+sys.path.insert(0, "/usr/local/lib/diwai-repair")
+from repairkit.paths import PRODUCTION  # noqa: E402
+from repairkit.runner import main  # noqa: E402
+sys.exit(main(sys.argv[1:], PRODUCTION))

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ app_name }}</title>
+<script src="/static/htmx.min.js"></script>
+<style>
+:root { --bg:#ffffff; --fg:#111111; --muted:#3d3d3d; --rule:#767676; --panel:#f3f3f3;
+        --accent:#0b57d0; --ok:#0a6b2d; --bad:#a3121a; --warn-bg:#fff4e5; --warn-edge:#8a3b00; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#121212; --fg:#f2f2f2; --muted:#cfcfcf; --rule:#9a9a9a; --panel:#1f1f1f;
+          --accent:#8ab4f8; --ok:#7ee2a0; --bad:#ff9a9a; --warn-bg:#2e1f0f; --warn-edge:#ffb066; }
+}
+html { font-size: 20px; }
+body { background:var(--bg); color:var(--fg); margin:0; line-height:1.55;
+       font-family:-apple-system, "Helvetica Neue", Arial, sans-serif; }
+header { display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:space-between;
+         padding:.8rem 16px; border-bottom:4px solid var(--rule); }
+header h1 { font-size:1.4rem; margin:0; }
+main { max-width:52rem; margin:0 auto; padding:1rem 16px 4rem; }
+button, .button { font:inherit; font-size:1rem; min-height:48px; padding:.4rem 1.1rem; border-radius:8px;
+         border:3px solid var(--fg); background:var(--bg); color:var(--fg); cursor:pointer; }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible
+       { outline:4px solid var(--accent); outline-offset:3px; }
+.tabs { display:flex; gap:.6rem; margin:1rem 0 1.4rem; }
+.tabs button[aria-selected="true"] { background:var(--fg); color:var(--bg); }
+#drop { border:5px dashed var(--rule); border-radius:14px; padding:2.4rem 1rem; text-align:center;
+        font-size:1.25rem; cursor:pointer; background:var(--panel); }
+#drop.over { border-color:var(--accent); }
+.note { padding:.6rem 1rem; border-left:6px solid var(--rule); background:var(--panel); }
+.warn { border:4px solid var(--warn-edge); background:var(--warn-bg); }
+ol.activity { list-style:none; padding:0; }
+ol.activity li { border-bottom:1px solid var(--rule); padding:.6rem 0; }
+.file { color:var(--muted); }
+summary { cursor:pointer; min-height:44px; display:flex; align-items:center; }
+table { border-collapse:collapse; width:100%; }
+th, td { text-align:left; padding:.55rem .4rem; border-bottom:1px solid var(--rule); vertical-align:top; }
+th button { border:none; min-height:44px; padding:0; font-weight:bold; text-decoration:underline; }
+input[type=search] { font:inherit; font-size:1.1rem; width:100%; max-width:30rem; min-height:48px;
+         padding:.3rem .6rem; border:3px solid var(--fg); border-radius:8px; background:var(--bg); color:var(--fg); }
+.status-up { color:var(--ok); } .status-down { color:var(--bad); }
+.sr { position:absolute; left:-9999px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📚 {{ app_name }}</h1>
+  <div id="status" hx-get="/status" hx-trigger="every 5s" hx-swap="innerHTML">{% include "_status.html" %}</div>
+  <div>
+    <button hx-post="/quit" hx-target="#quit-msg" hx-swap="innerHTML">Quit</button>
+  </div>
+</header>
+<main>
+  <div id="quit-msg" aria-live="polite"></div>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-add" aria-selected="true" onclick="showTab('add')">➕ Add documents</button>
+    <button role="tab" id="tab-lib" aria-selected="false" onclick="showTab('lib')"
+            hx-get="/library" hx-target="#library" hx-swap="innerHTML">📚 Library</button>
+  </div>
+
+  <section id="panel-add" role="tabpanel" aria-labelledby="tab-add">
+    <div id="drop" tabindex="0" role="button" aria-describedby="drop-help">
+      Drop documents here, or click to choose files
+      <div id="drop-help" class="file">PDF, Word, PowerPoint, text, Markdown, HTML, DITA · up to {{ (max_bytes // 1048576) }} MB each</div>
+    </div>
+    <input type="file" id="picker" multiple class="sr" aria-hidden="true" tabindex="-1">
+    <div id="client-msg" aria-live="polite"></div>
+    <h2>Activity</h2>
+    {% include "_activity.html" %}
+  </section>
+
+  <section id="panel-lib" role="tabpanel" aria-labelledby="tab-lib" hidden>
+    <div id="library"></div>
+  </section>
+</main>
+<script>
+const MAX = {{ max_bytes }}, BATCH = 50;
+function showTab(which) {
+  document.getElementById('panel-add').hidden = which !== 'add';
+  document.getElementById('panel-lib').hidden = which !== 'lib';
+  document.getElementById('tab-add').setAttribute('aria-selected', which === 'add');
+  document.getElementById('tab-lib').setAttribute('aria-selected', which === 'lib');
+}
+function say(text) { document.getElementById('client-msg').innerHTML =
+  '<p class="note warn" role="alert"></p>'; document.querySelector('#client-msg p').textContent = text; }
+function refreshActivity() { htmx.ajax('GET', '/activity', {target: '#activity', swap: 'outerHTML'}); }
+async function send(files) {
+  const ok = [], big = [];
+  for (const f of files) (f.size > MAX ? big : ok).push(f);
+  if (big.length) say('Too large to add (over ' + Math.round(MAX / 1048576) + ' MB): ' + big.map(f => f.name).join(', '));
+  else document.getElementById('client-msg').innerHTML = '';
+  for (let i = 0; i < ok.length; i += BATCH) {
+    const form = new FormData();
+    ok.slice(i, i + BATCH).forEach(f => form.append('files', f, f.name));
+    await fetch('/upload', {method: 'POST', body: form});
+    refreshActivity();
+  }
+}
+const drop = document.getElementById('drop'), picker = document.getElementById('picker');
+drop.addEventListener('click', () => picker.click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); picker.click(); } });
+picker.addEventListener('change', () => { send([...picker.files]); picker.value = ''; });
+['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(t => drop.addEventListener(t, () => drop.classList.remove('over')));
+drop.addEventListener('drop', e => {
+  e.preventDefault();
+  const items = [...(e.dataTransfer.items || [])];
+  if (items.some(it => it.webkitGetAsEntry && it.webkitGetAsEntry() && it.webkitGetAsEntry().isDirectory)) {
+    say("Folders can't be dropped. Open the folder and drop the files themselves.");
+    return;
+  }
+  send([...e.dataTransfer.files]);
+});
+// After a removal, refresh the library list once the queue is empty.
+async function refreshLibraryWhenIdle() {
+  for (let i = 0; i < 300; i++) {
+    const jobs = await (await fetch('/api/jobs')).json();
+    if (!jobs.some(j => j.state !== 'done')) break;
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  htmx.ajax('GET', '/library', {target: '#library', swap: 'innerHTML'});
+}
+document.body.addEventListener('htmx:afterRequest', e => {
+  if (e.detail.pathInfo && e.detail.pathInfo.requestPath === '/remove') refreshLibraryWhenIdle();
+});
+</script>
+</body>
+</html>

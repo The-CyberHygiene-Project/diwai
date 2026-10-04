@@ -1,0 +1,15 @@
+  <ruleset>
+    <!-- Restored 2026-09-13: ABSENT from every known copy of this file, so only the stock
+         ruleset loaded: etc/rules and etc/decoders were never read (YARA, incident and 3.3.4
+         rules could not fire) and list-based stock rules were silently ignored. -->
+    <decoder_dir>ruleset/decoders</decoder_dir>
+    <rule_dir>ruleset/rules</rule_dir>
+    <rule_exclude>0215-policy_rules.xml</rule_exclude>
+    <list>etc/lists/audit-keys</list>
+    <list>etc/lists/amazon/aws-eventnames</list>
+    <list>etc/lists/security-eventchannel</list>
+    <list>etc/lists/malicious-ioc/malicious-ip</list>
+    <list>etc/lists/malicious-ioc/malicious-domains</list>
+    <decoder_dir>etc/decoders</decoder_dir>
+    <rule_dir>etc/rules</rule_dir>
+  </ruleset>

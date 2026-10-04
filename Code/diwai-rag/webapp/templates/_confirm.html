@@ -1,0 +1,5 @@
+<div class="note warn" role="alertdialog" aria-label="Confirm removal">
+<p>Remove <strong>{{ doc.source if doc else doc_id }}</strong> from the library? The stored copy is kept, so dropping the file again restores it.</p>
+<button hx-post="/remove" hx-vals='{"doc_id": {{ doc_id | tojson }}}' hx-target="closest div">Yes, remove it</button>
+<button onclick="this.closest('div').remove()">No, keep it</button>
+</div>

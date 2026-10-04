@@ -1,0 +1,2 @@
+{% if lm_up %}<span class="status-up">🟢 LM Studio running</span>{% else %}<span class="status-down">🔴 LM Studio not running</span>{% endif %}
+ · {% if index_error %}<span class="status-down">⚠️ The library could not be opened. Ask the administrator to run the repair tool.</span>{% elif index_ready %}{{ docs }} document{{ "" if docs == 1 else "s" }} · {{ chunks }} chunk{{ "" if chunks == 1 else "s" }}{% else %}loading the library…{% endif %}

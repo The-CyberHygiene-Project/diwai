@@ -1,0 +1,25 @@
+Repair library: signing check (Task 1), 2026-10-04
+YubiKey: standard YubiKey 5 (FIDO 2.0; options rk, up, noplat, clientPin; no built-in uv).
+OpenSSH sk keys: Apple ssh-keygen 10.3p1 has no FIDO provider; Homebrew 10.5p1 has one, but the key rejects
+  "-O verify-required" ("requested feature not supported"; -vvv shows it before any PIN). Without verify-required
+  sk enrollment reaches FIDO_ERR_PIN_REQUIRED, i.e. works, but would give touch-only signatures.
+Owner chose (option A): libfido2 tools directly, PIN + touch on every signature.
+Credential: fido2-cred -M (es256, rp "diwai-repair", user "diwai-isso"), owner PIN + touch, attestation checked
+  with fido2-cred -V. Files: ~/.config/diwai/repair-approver.credid and .pem (P-256 public key; nothing secret).
+Signing: fido2-assert -G -p -v over sha256(file) (owner PIN + touch).
+Verification with root-owned tools only (/usr/bin/python3 3.9.6 + /usr/bin/openssl LibreSSL 3.3.6):
+  rpIdHash == sha256("diwai-repair"): True
+  clientDataHash == sha256(test file): True
+  flags 0x05: UP (touch) True, UV (PIN) True; counter 1
+  openssl dgst -sha256 -verify pem -signature sig (authData || clientDataHash): Verified OK
+  same with a one-character-changed file: Error Verifying Data
+
+Task 8 Step 1: live VM facts (2026-10-04, owner's ControlMaster session open)
+- <ruleset> block present (restored 2026-09-13) and includes <decoder_dir>etc/decoders</decoder_dir> and
+  <rule_dir>etc/rules</rule_dir>; saved verbatim to repairs/wazuh_ruleset_missing.data/ruleset.xml (15 lines).
+- Test rule: 100230 (local_rules.xml), <program_name>diwai-incident</program_name>, level 10, mail:false.
+- Test line: logger -t diwai-incident '<marker>' -> alert in /var/ossec/logs/alerts/alerts.json within 2 s
+  (rule "id":"100230"). Proven 07:47:19 -0600 with a marker labelled "not an incident".
+- FINDING: /etc/sudoers.d/[USERNAME] grants [USERNAME] ALL=(ALL) NOPASSWD: ALL (also matched in /etc/sudoers).
+  VM sudo never asks for a password, so anything reaching the VM through the owner's SSH session gets root.
+  Reported to the owner; not changed.

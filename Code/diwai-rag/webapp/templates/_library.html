@@ -1,0 +1,28 @@
+{% if not index_ready %}<p class="note">Loading the library…</p>{% else %}
+<label for="filter"><strong>Filter by name</strong></label><br>
+<input type="search" id="filter" name="q" value="{{ q }}" autocomplete="off"
+       hx-get="/library" hx-trigger="input changed delay:300ms, search" hx-target="#library"
+       hx-include="this" hx-vals='{"sort": "{{ sort }}", "dir": "{{ dir }}"}'>
+<p role="status">Showing {{ shown }} of {{ matched }} matches{% if q %} · {{ total }} documents in the library{% endif %}</p>
+<table>
+<thead><tr>
+{% for key, label in [("name", "Name"), ("chunks", "Chunks"), ("added", "Added")] %}
+  <th scope="col"><button hx-get="/library" hx-target="#library"
+      hx-vals='{"q": {{ q | tojson }}, "sort": "{{ key }}", "dir": "{{ "desc" if sort == key and dir == "asc" else "asc" }}"}'>{{ label }}{% if sort == key %} {{ "▲" if dir == "asc" else "▼" }}{% endif %}</button></th>
+{% endfor %}
+  <th scope="col"><span class="sr">Actions</span></th>
+</tr></thead>
+<tbody>
+{% for r in rows %}
+<tr>
+  <td><details hx-get="/library/detail?doc_id={{ r.doc_id | urlencode }}" hx-trigger="toggle once" hx-target="find .detail">
+      <summary>{{ r.source }}</summary><div class="detail">…</div></details></td>
+  <td>{{ r.chunks }}</td>
+  <td>{{ r.added_at[:10] if r.added_at else "earlier" }}</td>
+  <td><button hx-get="/library/confirm?doc_id={{ r.doc_id | urlencode }}" hx-target="#confirm-{{ loop.index }}">Remove…</button>
+      <div id="confirm-{{ loop.index }}"></div></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}

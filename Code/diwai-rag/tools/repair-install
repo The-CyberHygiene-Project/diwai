@@ -1,0 +1,15 @@
+#!/bin/bash
+# repair-install -- install the repair library from the last COMMIT of ~/diwai-rag
+# (uncommitted edits are never installed). Asks for the Mac password (sudo) and,
+# on the very first install, for the YubiKey (PIN + touch) to prove the approver key.
+cd /Users/[USERNAME]/diwai-rag || exit 1
+/Library/Developer/CommandLineTools/usr/bin/python3 -I -c "
+import sys; sys.path.insert(0, '/Users/[USERNAME]/diwai-rag')
+from pathlib import Path
+from repairkit import admin
+from repairkit.paths import PRODUCTION
+from repairkit.shell import Shell
+sys.exit(admin.install(Path('/Users/[USERNAME]/diwai-rag'), PRODUCTION, Shell()))"
+rc=$?
+/usr/bin/sudo -k
+exit $rc

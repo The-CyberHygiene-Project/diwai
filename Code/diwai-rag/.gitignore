@@ -1,0 +1,12 @@
+venv/
+data/
+documents/
+documents-*/
+logs/
+__pycache__/
+.pytest_cache/
+.DS_Store
+webapp/activity*.db
+.superpowers/
+webapp/activity-*.db.lock
+cases/

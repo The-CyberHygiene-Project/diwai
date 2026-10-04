@@ -1,0 +1,3 @@
+{% if doc %}<p><strong>Stored at:</strong> {{ doc.file_path }}</p>
+<p><strong>Added:</strong> {{ doc.added_at or "earlier" }} · {{ doc.chunks }} chunks</p>
+<p><strong>Begins:</strong> {{ opening }}</p>{% else %}<p class="note">Not in the library any more.</p>{% endif %}

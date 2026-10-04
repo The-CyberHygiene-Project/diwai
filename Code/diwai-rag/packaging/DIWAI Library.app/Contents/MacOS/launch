@@ -1,0 +1,36 @@
+#!/bin/bash
+# DIWAI Library launcher: reuse a running browser manager, or start one,
+# then open it in the browser. Never restarts a running server (it may be
+# mid-ingest). Listens on 127.0.0.1 only.
+PROJECT="/Users/[USERNAME]/diwai-rag"
+PORT="${DIWAI_LIBRARY_PORT:-8766}"
+OPEN="${DIWAI_LIBRARY_OPEN:-open}"
+LOG="${DIWAI_LIBRARY_LOG:-$HOME/Library/Logs/DIWAILibrary.log}"
+URL="http://127.0.0.1:${PORT}/"
+
+note() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
+healthy() { /usr/bin/curl -s -m 2 "${URL}healthz" | /usr/bin/grep -q '"ok"'; }
+
+if healthy; then
+    note "server already running on ${PORT}: reusing it"
+    "$OPEN" "$URL"
+    exit 0
+fi
+
+note "starting server on ${PORT}"
+cd "$PROJECT" || { note "project folder missing: $PROJECT"; exit 1; }
+nohup /usr/bin/arch -arm64 "$PROJECT/venv/bin/python" -m uvicorn --factory webapp.main:create_app \
+    --host 127.0.0.1 --port "$PORT" >> "$LOG" 2>&1 &
+
+for _ in $(seq 1 60); do
+    sleep 1
+    if healthy; then
+        note "server up"
+        "$OPEN" "$URL"
+        exit 0
+    fi
+done
+
+note "server did not answer within 60 s"
+/usr/bin/osascript -e "display alert \"DIWAI Library did not start\" message \"See ${LOG}\"" >/dev/null 2>&1
+exit 1

@@ -1,0 +1,27 @@
+# (host, check id) -> finding code (= a runbook card name in runbooks/) and severity.
+# VM check ids are diwai-control-health's own section numbers (see the plan's facts file).
+# A failed check NOT listed here is reported as a gap ("no runbook card yet").
+
+[[map]]
+host = "mac"
+check = "owui-cors"
+finding = "OPEN_WEBUI_ACCEPTS_ANY_ORIGIN"
+severity = "warn"
+
+[[map]]
+host = "services"
+check = "5"
+finding = "VULNERABILITY_SCAN_NOT_RUN"
+severity = "fail"
+
+[[map]]
+host = "services"
+check = "5c"
+finding = "CRITICAL_SECURITY_FIX_OVERDUE"
+severity = "fail"
+
+[[map]]
+host = "services"
+check = "13"
+finding = "INACTIVE_ACCOUNT_NOT_DISABLED"
+severity = "warn"

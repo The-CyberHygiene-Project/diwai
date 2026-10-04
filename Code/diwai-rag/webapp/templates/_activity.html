@@ -1,0 +1,9 @@
+<div id="activity" {% if active %}hx-get="/activity" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+{% if not jobs %}<p class="note">Nothing yet. Dropped files appear here.</p>{% endif %}
+<ol class="activity">
+{% for j in jobs %}
+  <li>{% if j.detail %}<details><summary>{{ j.message }}</summary><p class="file">{{ j.detail }}</p></details>{% else %}<div>{{ j.message }}</div>{% endif %}
+      <div class="file">{{ j.filename }}{% if j.kind == "remove" %} (remove){% endif %}</div></li>
+{% endfor %}
+</ol>
+</div>
