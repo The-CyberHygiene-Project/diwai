@@ -1,6 +1,8 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # INCIDENT RESPONSE PLAN
-**Organization:** [ORGANIZATION] ([SYSTEM-OWNER] LLC)
-**System:** CyberHygiene Production Network ([DOMAIN.ORG])
+**Organization:** [DOMAIN.ORG] (Do It With AI)
+**System:** SecureMac Reference System #2 ([DOMAIN.ORG])
 **Version:** 1.0 - APPROVED
 **Effective Date:** December 22, 2025
 **Classification:** CONTROLLED UNCLASSIFIED INFORMATION (CUI)
@@ -24,13 +26,13 @@
 ## 1. PURPOSE AND SCOPE
 
 ### 1.1 Purpose
-This Incident Response Plan (IRP) establishes procedures for detecting, responding to, reporting, and recovering from cybersecurity incidents affecting [ORGANIZATION]'s CyberHygiene Production Network. This plan ensures compliance with NIST SP 800-171 incident response requirements and DFARS 252.204-7012 cyber incident reporting obligations.
+This Incident Response Plan (IRP) establishes procedures for detecting, responding to, reporting, and recovering from cybersecurity incidents affecting [DOMAIN.ORG]'s SecureMac Reference System #2. This plan ensures compliance with NIST SP 800-171 incident response requirements and DFARS 252.204-7012 cyber incident reporting obligations.
 
 ### 1.2 Scope
 This plan applies to:
 - All systems within the [DOMAIN.ORG] domain
-- Domain controller (dc1.[DOMAIN.ORG])
-- All workstations (ws1, ws2, ws3)
+- Domain controller (services.[DOMAIN.ORG])
+- All workstations (mac-mini.[DOMAIN.ORG])
 - Network infrastructure (pfSense firewall)
 - All data classified as CUI or FCI
 - System owner and authorized users
@@ -69,31 +71,30 @@ For a single-person organization, the Incident Response Team consists of:
 **Internal Contact:**
 - Name: [SYSTEM-OWNER]
 - Title: Owner/Principal, ISSO
-- Phone: 505-259-8485
+- Phone: [PHONE-REDACTED]
 - Email: [EMAIL-REDACTED]
-- Alternate: [REDACTED-PERSONAL-EMAIL]
 
 **External Emergency Contacts:**
 
 **FBI Cyber Division:**
 - Phone: 1-855-292-3937 (1-855-CYBER-37)
-- Email: cywatch@fbi.gov
+- Email: [EMAIL-REDACTED]
 - Website: https://www.ic3.gov
 
 **DoD Cyber Crime Center (DC3):**
 - Defense Industrial Base (DIB) Cybersecurity Program
 - Phone: 410-981-0096
-- Email: dibcac@dc3.mil
+- Email: [EMAIL-REDACTED]
 - Portal: https://dibnet.dod.mil
 
 **US-CERT (CISA):**
 - Phone: 1-888-282-0870
-- Email: central@us-cert.gov
+- Email: [EMAIL-REDACTED]
 - Website: https://www.us-cert.gov
 
 **Rocky Linux Security:**
-- Email: secalert@rockylinux.org
-- Mailing List: rocky-security-announce@lists.resf.org
+- Email: [EMAIL-REDACTED]
+- Mailing List: [EMAIL-REDACTED]
 
 ---
 
@@ -194,7 +195,7 @@ For a single-person organization, the Incident Response Team consists of:
 - Network capture: tcpdump, Wireshark
 - Forensic imaging: dd, dc3dd
 - Hash verification: sha256sum
-- FreeIPA logs: /var/log/dirsrv/, /var/log/krb5kdc.log
+- 389-DS LDAP logs: /var/log/dirsrv/
 
 ### 4.2 Phase 2: DETECTION AND ANALYSIS
 
@@ -229,7 +230,7 @@ For a single-person organization, the Incident Response Team consists of:
 
 **Incident Log Template:**
 ```
-Incident ID: INC-YYYY-MM-DD-###
+Incident ID: IR-{DOD|GSA|FBI}-YYYYMMDD-NNN
 Detection Time: [Date/Time]
 Reported By: [Source]
 Category: [Category]
@@ -237,6 +238,8 @@ Severity: [P1/P2/P3/P4]
 Affected Systems: [List]
 Initial Description: [Brief summary]
 ```
+
+> **Note:** Use the admin portal IR report forms at `https://securemac.[DOMAIN.ORG]/docs/` to generate pre-populated incident reports with the correct ID format for each reporting authority (DoD/GSA/FBI).
 
 ### 4.3 Phase 3: CONTAINMENT
 
@@ -251,17 +254,21 @@ Initial Description: [Brief summary]
 - [ ] Block malicious IPs at firewall
 - [ ] Disable compromised user accounts
   ```bash
-  ipa user-disable <username>
+  sudo ldapmodify -Y EXTERNAL -H ldapi://%2Frun%2Fslapd-diwai.socket <<EOF
+  dn: uid=<username>,ou=people,dc=diwai,dc=org
+  changetype: modify
+  replace: nsAccountLock
+  nsAccountLock: TRUE
+  EOF
   ```
 - [ ] Take memory dump if needed for forensics
 - [ ] Document all containment actions with timestamps
 
 **For Unauthorized Access:**
 - [ ] Force password resets for affected accounts
-- [ ] Revoke Kerberos tickets
   ```bash
-  ipa user-mod <username> --password-expiration=now
-  kdestroy
+  sudo ldappasswd -Y EXTERNAL -H ldapi://%2Frun%2Fslapd-diwai.socket \
+    -s '<new-temp-password>' 'uid=<username>,ou=people,dc=diwai,dc=org'
   ```
 - [ ] Block source IP addresses at firewall
 - [ ] Review and close unauthorized access paths
@@ -316,11 +323,12 @@ Initial Description: [Brief summary]
 
 2. **Restore from Backup (if needed)**
    ```bash
-   # Restore from last known clean backup
-   sudo ipa-restore /var/lib/ipa/backup/ipa-full-YYYY-MM-DD-HH-MM-SS
-
-   # Or restore specific files
+   # Restore system files from last known clean backup
    sudo restic restore latest --target /
+
+   # Or restore a specific snapshot by ID
+   sudo restic snapshots          # list available snapshots
+   sudo restic restore <snap-id> --target /
    ```
 
 3. **System Hardening**
@@ -386,66 +394,80 @@ Conduct within 7 days of incident closure.
 
 ## 5. EXTERNAL REPORTING REQUIREMENTS
 
-### 5.1 DFARS 252.204-7012 Reporting
+> **Admin Portal:** Use the pre-populated IR report forms at `https://securemac.[DOMAIN.ORG]/docs/` (Incident Reporting section) to generate, review, and email reports to each authority. Forms auto-populate system owner, IP addresses, hostnames, and OS details.
+
+### 5.1 DoD — DFARS 252.204-7012 Reporting
 
 **When Required:**
-Cyber incidents affecting covered defense information (CDI) or affecting contractor's ability to perform on DoD contract.
+Cyber incidents affecting covered defense information (CDI) or affecting contractor's ability to perform on a DoD contract.
 
 **Reporting Timeline:** Within **72 hours** of discovery
 
 **Reporting Method:**
-- DoD Cyber Crime Center (DC3) at https://dibnet.dod.mil
-- Submit incident report with:
-  - Description of incident
-  - Type of information compromised
-  - Systems/networks affected
-  - Timeframe of incident
-  - Actions taken to respond
+- Primary: DoD Cyber Crime Center (DC3) portal at https://dibnet.dod.mil
+- Notify contracting officer (CO) simultaneously
+- Use the **DoD Incident Report** form in the admin portal to generate a pre-populated report
 
-**Report Template Elements:**
-```
-1. Contractor Information
-   - Company name, CAGE code, POC
+**Key Fields Required:**
+- Contractor name, CAGE code, and POC contact
+- Contract number(s) affected and contracting activity
+- Date/time of discovery; incident type; systems and data affected
+- Impact assessment (scope, data at risk, operational impact)
+- Containment and mitigation actions taken
 
-2. Contract Information
-   - Contract number(s) affected
-   - Contracting activity
+**Incident ID format:** `IR-DOD-YYYYMMDD-NNN`
 
-3. Incident Details
-   - Date/time of discovery
-   - Type of incident
-   - Systems affected
-   - Data compromised (CDI/CUI)
+### 5.2 GSA — FISMA / GSA CIO P 2100.1 Reporting
 
-4. Impact Assessment
-   - Scope of breach
-   - Data at risk
-   - Operational impact
+**When Required:**
+Incidents involving GSA contract work, GSA systems, or GSA-handled CUI/FCI.
 
-5. Response Actions
-   - Containment steps taken
-   - Mitigation measures
-   - Evidence preservation
-```
+**Reporting Timeline:**
+- **CAT 1–3** (Unauthorized Access, Malicious Code, Improper Usage at high severity): Within **1 hour**
+- **CAT 4–7** (Scans/Probes, Misuse, Investigation, Exercises): Within **24 hours**
 
-### 5.2 Other Reporting Requirements
+**GSA Incident Categories:**
+| CAT | Type | Deadline |
+|-----|------|----------|
+| 1 | Unauthorized Access | 1 hour |
+| 2 | Denial of Service | 1 hour |
+| 3 | Malicious Code | 1 hour |
+| 4 | Improper Usage | 24 hours |
+| 5 | Scans/Probes/Attempted Access | 24 hours |
+| 6 | Investigation | 24 hours |
+| 7 | Explain Anomaly | 24 hours |
 
-**FBI Cyber Division (IC3):**
-- Major cyber crimes
-- Significant financial fraud
-- Organized cybercrime activity
-- Report via: https://www.ic3.gov
+**Reporting Method:**
+- Email GSA SecOps: [EMAIL-REDACTED] (CC: contracting officer)
+- Use the **GSA FISMA Incident Report** form in the admin portal
 
-**US-CERT (CISA):**
+**Incident ID format:** `IR-GSA-YYYYMMDD-NNN`
+
+### 5.3 FBI — Serious Incidents / CyWatch
+
+**When Required:**
+- Ransomware or extortion attempts
+- Nation-state or advanced persistent threat (APT) activity
+- Significant financial fraud or business email compromise
+- Incidents with potential for criminal prosecution
+
+**Reporting Method:**
+- **Phone:** 1-855-292-3937 (1-855-CYBER-37) — 24/7
+- **Email:** [EMAIL-REDACTED]
+- **Online:** https://www.ic3.gov (Internet Crime Complaint Center)
+- Use the **FBI CyWatch Incident Report** form in the admin portal
+
+**Incident ID format:** `IR-FBI-YYYYMMDD-NNN`
+
+### 5.4 US-CERT / CISA
+
+**When Required:**
 - Significant incidents affecting critical infrastructure
-- Novel attack methods
-- Widespread vulnerabilities
-- Email: central@us-cert.gov
+- Novel attack methods or widespread vulnerabilities
 
-**Law Enforcement:**
-- Physical theft of equipment
-- Criminal activity observed
-- Contact local FBI field office
+**Reporting Method:**
+- Phone: 1-888-282-0870
+- Email: [EMAIL-REDACTED]
 
 ---
 
@@ -705,93 +727,69 @@ Since this is a single-person organization, formal internal notification is not 
 **Print and keep near workstation:**
 
 ```
-┌─────────────────────────────────────────────────┐
-│     INCIDENT RESPONSE QUICK REFERENCE           │
-├─────────────────────────────────────────────────┤
-│ INTERNAL CONTACT:                               │
-│   Donald Shannon: 505-259-8485                  │
-│   [EMAIL-REDACTED]                         │
-│                                                 │
-│ FBI CYBER: 1-855-292-3937 (cywatch@fbi.gov)    │
-│ DoD DC3: 410-981-0096 (dibcac@dc3.mil)         │
-│ US-CERT: 1-888-282-0870                        │
-│                                                 │
-│ CRITICAL INCIDENT STEPS:                        │
-│  1. Isolate affected system                    │
-│  2. Document incident details                  │
-│  3. Preserve evidence                          │
-│  4. Report within 72 hours (if CUI/CDI)        │
-│  5. Begin containment actions                  │
-└─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│        INCIDENT RESPONSE QUICK REFERENCE             │
+├──────────────────────────────────────────────────────┤
+│ INTERNAL CONTACT:                                    │
+│   [SYSTEM-OWNER]: [PHONE-REDACTED]                       │
+│   [EMAIL-REDACTED]                               │
+│                                                      │
+│ DoD REPORT (72 hr):  dibnet.dod.mil                  │
+│   DC3: 410-981-0096  [EMAIL-REDACTED]                  │
+│                                                      │
+│ GSA REPORT (1/24 hr): [EMAIL-REDACTED]             │
+│                                                      │
+│ FBI CYWATCH: 1-855-292-3937  [EMAIL-REDACTED]         │
+│   IC3 online: ic3.gov                                │
+│                                                      │
+│ US-CERT/CISA: 1-888-282-0870  [EMAIL-REDACTED]    │
+│                                                      │
+│ ADMIN PORTAL FORMS: securemac.[DOMAIN.ORG]/docs/        │
+│   (pre-populated DoD / GSA / FBI report templates)  │
+│                                                      │
+│ CRITICAL INCIDENT STEPS:                             │
+│  1. Isolate affected system                         │
+│  2. Document incident — use portal IR form          │
+│  3. Preserve evidence                               │
+│  4. Report per deadline:                            │
+│     DoD CUI/CDI → 72 hr                             │
+│     GSA CAT1-3  → 1 hr  | CAT4-7 → 24 hr           │
+│     FBI serious → immediately                       │
+│  5. Complete containment & recovery                 │
+└──────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## APPENDIX C: INCIDENT REPORT TEMPLATE
+## APPENDIX C: INCIDENT REPORT FORMS
 
-**Incident ID:** INC-YYYY-MM-DD-###
-**Report Date:** ___________________
-**Reported By:** [SYSTEM-OWNER]
+Incident report templates are maintained as interactive forms in the SecureMac admin portal. Access them at:
 
-### INCIDENT SUMMARY
-**Detection Date/Time:** ___________________
-**Incident Category:** [ ] Unauthorized Access [ ] Malware [ ] DoS [ ] Data Breach [ ] Physical [ ] Policy Violation
-**Severity Level:** [ ] Critical [ ] High [ ] Medium [ ] Low
-**Affected Systems:** ___________________
-**CUI/FCI Impact:** [ ] Yes [ ] No [ ] Unknown
+**`https://securemac.[DOMAIN.ORG]/docs/`** → Incident Reporting section
 
-### INCIDENT DESCRIPTION
-[Detailed description of what happened, when discovered, and initial indicators]
+Three pre-populated forms are available, one per reporting authority:
 
-### AFFECTED SYSTEMS AND DATA
-**Systems:**
--
--
+| Form | Authority | Deadline | Incident ID Format |
+|------|-----------|----------|--------------------|
+| **DoD Incident Report** | DC3 / DIBNet (DFARS 252.204-7012) | 72 hours | `IR-DOD-YYYYMMDD-NNN` |
+| **GSA FISMA Incident Report** | GSA SecOps / Contracting Officer | 1 hr (CAT 1–3) / 24 hr (CAT 4–7) | `IR-GSA-YYYYMMDD-NNN` |
+| **FBI CyWatch Incident Report** | FBI CyWatch / IC3 | Immediately (serious incidents) | `IR-FBI-YYYYMMDD-NNN` |
 
-**Data:**
--
--
+Each form auto-populates:
+- System owner name, title, and contact information
+- Organization name and domain
+- System names and IP addresses (services.[DOMAIN.ORG], nas.[DOMAIN.ORG])
+- Host OS and FIPS status
+- Auto-generated incident ID with today's date
 
-### TIMELINE OF EVENTS
-| Date/Time | Event | Action Taken |
-|---|---|---|
-|  |  |  |
-|  |  |  |
+After completing the form narrative fields, use:
+- **Email** button — opens a pre-addressed email with the report in the body
+- **Copy to Clipboard** — copies the report for pasting into DIBNet or IC3 web forms
 
-### RESPONSE ACTIONS
-**Containment:**
-
-**Eradication:**
-
-**Recovery:**
-
-### ROOT CAUSE ANALYSIS
-**Cause:**
-**Contributing Factors:**
-**Vulnerabilities Exploited:**
-
-### IMPACT ASSESSMENT
-**Confidentiality:** [ ] None [ ] Minor [ ] Moderate [ ] Severe
-**Integrity:** [ ] None [ ] Minor [ ] Moderate [ ] Severe
-**Availability:** [ ] None [ ] Minor [ ] Moderate [ ] Severe
-
-### LESSONS LEARNED
-**What went well:**
-
-**What needs improvement:**
-
-**Corrective actions:**
-
-### EXTERNAL REPORTING
-**DoD Reported:** [ ] Yes [ ] No [ ] N/A - Date: _______
-**FBI Reported:** [ ] Yes [ ] No [ ] N/A - Date: _______
-**Customer Notified:** [ ] Yes [ ] No [ ] N/A - Date: _______
-
-### CLOSURE
-**Incident Resolved:** [ ] Yes [ ] No
-**Closure Date:** ___________________
-**Approved By:** ___________________
+**Incident log:** Record the Incident ID, date reported, and reporting authority in the Version Control table in Section 10 of this plan for each incident filed.
 
 ---
 
 **END OF INCIDENT RESPONSE PLAN**
+
+---

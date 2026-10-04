@@ -1,25 +1,48 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Acceptable Use Policy
 
-**Document ID:** TCC-AUP-001
-**Version:** 1.0
+**Document ID:** DIWAI-AUP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-AUP-001` to `DIWAI-AUP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually
 **Next Review:** November 2, 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
-**Distribution:** All CPN users (employees and contractors)
+**Distribution:** All SecureMac users (employees and contractors)
 **Classification:** Controlled Unclassified Information (CUI)
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** Inherited from
+Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG]. Corrections:
+
+- RS#1 workstations (`LabRat`, `Engineering`, `Accounting`) removed; the actual two-host boundary and the NAS stated, with the Mac mini's concentration of roles noted (SSP §3.2.1).
+- **pfSense** replaced with macOS `pf` (perimeter) and `firewalld` (VM); Suricata correctly located on the VM.
+- **ClamAV** replaced with the YARA stack (SI-3 since 2026-06-12) and Apple XProtect/MRT/Gatekeeper on the host.
+- **Encryption corrected** — the policy claimed LUKS for all systems; the Mac uses **FileVault**, LUKS2 applies to the VM.
+- **"Automatic security updates enabled (dnf-automatic)" was inaccurate.** `dnf-automatic` was set **download-only** on 2026-08-01 (`DIWAI-CR-2026-08-01` C3) after an unattended upgrade disabled the SIEM for ~21 hours (POA&M-011). Updates are staged automatically and applied under change control. The policy described the configuration that caused the incident.
+- **Password policy cited `CLAUDE.md` as its authority.** That is an assistant instruction file, not a controlled document, and is not part of the compliance artefact set. Replaced with a citation to **`DIWAI-IAP-001`**.
+- Screen-lock shortcut corrected for macOS (Ctrl+Cmd+Q); the inherited value was Linux-only.
+
+**Left deliberately unchanged:** references to *windows* in §§ on privacy filters
+mean glass windows, not the operating system. **§13 "Solopreneur Applicability"**
+already scopes employee and HR references correctly and is retained as written —
+it is the pattern the rest of this correction effort adopts.
+
+Raised as **POA&M-058**; no control changed.
+
+
 ## Overview
 
-[ORGANIZATION] is committed to protecting the organization, employees, contractors, and clients from illegal or damaging actions by individuals, either knowingly or unknowingly. The CyberHygiene Production Network (CPN) and all associated systems, including computer equipment, mobile devices, software, operating systems, storage media, and network accounts are the property of [ORGANIZATION]. These systems shall be used for business purposes in serving the interests of the company and our clients, particularly in fulfillment of government contracts requiring protection of Controlled Unclassified Information (CUI) and Federal Contract Information (FCI).
+[DOMAIN.ORG] is committed to protecting the organization, employees, contractors, and clients from illegal or damaging actions by individuals, either knowingly or unknowingly. The SecureMac Reference System #2 and all associated systems, including computer equipment, mobile devices, software, operating systems, storage media, and network accounts are the property of [DOMAIN.ORG]. These systems shall be used for business purposes in serving the interests of the company and our clients, particularly in fulfillment of operational requirements requiring protection of Controlled Unclassified Information (CUI) and Federal Contract Information (FCI).
 
-Effective security is a team effort involving the participation and support of every person who accesses CPN systems. It is the responsibility of every user to know these guidelines and to conduct their activities accordingly.
+Effective security is a team effort involving the participation and support of every person who accesses SecureMac systems. It is the responsibility of every user to know these guidelines and to conduct their activities accordingly.
 
 ## Purpose
 
-The purpose of this policy is to outline the acceptable use of computer equipment, network resources, and other electronic devices within [ORGANIZATION]'s CyberHygiene Production Network. These rules are in place to protect users, the organization, our clients, and the confidentiality, integrity, and availability of CUI and FCI. Inappropriate use exposes [ORGANIZATION] to cyber risks including malware attacks (viruses, ransomware), compromise of network systems and services, data breaches, loss of CUI, contract termination, and legal liability under FAR 52.204-21 and DFARS 252.204-7012.
+The purpose of this policy is to outline the acceptable use of computer equipment, network resources, and other electronic devices within [DOMAIN.ORG]'s SecureMac Reference System #2. These rules are in place to protect users, the organization, our clients, and the confidentiality, integrity, and availability of CUI and FCI. Inappropriate use exposes [DOMAIN.ORG] to cyber risks including malware attacks (viruses, ransomware), compromise of network systems and services, data breaches, loss of CUI, contract termination, and legal liability under FAR 52.204-21 and DFARS 252.204-7012.
 
 This policy supports compliance with NIST SP 800-171 Rev 2 (AC-1, PS-6, PL-4) and CMMC Level 2 requirements.
 
@@ -28,36 +51,37 @@ This policy supports compliance with NIST SP 800-171 Rev 2 (AC-1, PS-6, PL-4) an
 This policy applies to:
 
 **Systems and Equipment:**
-- Domain controller: dc1.[DOMAIN.ORG] ([LAN-IP-REDACTED])
-- All workstations (LabRat, Engineering, Accounting)
-- Network infrastructure (pfSense firewall, switches)
-- File shares (Samba shares on /srv/samba)
-- All information, electronic devices, and network resources used to conduct [ORGANIZATION] business
+- Mac mini host: `securemac.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — perimeter firewall, hypervisor, Nextcloud CUI store, AI stack, and sole management workstation
+- Directory / service VM: `services.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — 389-DS, Wazuh, mail, Nextcloud database
+- Workstations: none presently deployed; where a deployment adds them, they are in scope (see §13)
+- Network infrastructure: macOS `pf` (perimeter, on the Mac mini), `firewalld` (VM), switches
+- File shares (NAS shares on nas.[DOMAIN.ORG])
+- All information, electronic devices, and network resources used to conduct [DOMAIN.ORG] business
 
 **Personnel:**
 - Owner/Principal ([SYSTEM-OWNER])
 - All employees
-- Contractors and consultants with CPN access
+- Contractors and consultants with SecureMac access
 - Temporary workers
-- Third parties accessing CPN resources
+- Third parties accessing SecureMac resources
 
 **Information:**
-- All data on CPN systems (CUI, FCI, proprietary business information)
+- All data on SecureMac systems (CUI, FCI, proprietary business information)
 - Email, documents, databases, backups
 - System configurations and credentials
 
-This policy applies to all equipment and accounts, whether owned or leased by [ORGANIZATION], owned by employees or contractors, or provided by third parties.
+This policy applies to all equipment and accounts, whether owned or leased by [DOMAIN.ORG], owned by employees or contractors, or provided by third parties.
 
 ## Policy
 
 ### 1. General Use and Ownership
 
 #### 1.1 Information Ownership
-[ORGANIZATION] proprietary information and Government FCI/CUI stored on electronic and computing devices, whether owned or leased by [ORGANIZATION] or by individuals, remains the sole property of [ORGANIZATION]. Users must ensure through technical and procedural means that proprietary information and CUI/FCI are protected in accordance with this policy and all referenced security policies.
+[DOMAIN.ORG] proprietary information and Government FCI/CUI stored on electronic and computing devices, whether owned or leased by [DOMAIN.ORG] or by individuals, remains the sole property of [DOMAIN.ORG]. Users must ensure through technical and procedural means that proprietary information and CUI/FCI are protected in accordance with this policy and all referenced security policies.
 
 #### 1.2 Reporting Requirements
 Users have a responsibility to promptly report (within 1 hour of discovery):
-- Theft, loss, or unauthorized disclosure of [ORGANIZATION] proprietary information or CUI/FCI
+- Theft, loss, or unauthorized disclosure of [DOMAIN.ORG] proprietary information or CUI/FCI
 - Security incidents or suspected incidents
 - Malware infections or suspected infections
 - System malfunctions that could affect CUI protection
@@ -65,15 +89,15 @@ Users have a responsibility to promptly report (within 1 hour of discovery):
 - Policy violations observed
 
 **Reporting Contact:**
-- ISSO: Don Shannon
-- Email: Don@contractcoach.com
+- ISSO: [SYSTEM-OWNER]
+- Email: [EMAIL-REDACTED]
 - Phone: [REDACTED-PHONE]
 
 #### 1.3 Access Authorization
-Users may access, use, or share [ORGANIZATION] proprietary information or CUI/FCI only to the extent it is authorized and necessary to fulfill assigned job duties. Access is granted based on least privilege principles and documented business need.
+Users may access, use, or share [DOMAIN.ORG] proprietary information or CUI/FCI only to the extent it is authorized and necessary to fulfill assigned job duties. Access is granted based on least privilege principles and documented business need.
 
 #### 1.4 Personal Use
-Limited personal use of CPN systems is permitted provided it:
+Limited personal use of SecureMac systems is permitted provided it:
 - Does not interfere with business operations
 - Does not violate any provision of this policy
 - Does not involve storage of personal CUI or sensitive personal information
@@ -81,9 +105,9 @@ Limited personal use of CPN systems is permitted provided it:
 - Occurs during non-business hours when possible
 
 **Examples of Acceptable Personal Use:**
-- Checking personal email during breaks (not on CPN email system)
+- Checking personal email during breaks (not on SecureMac email system)
 - Brief personal research or online shopping during lunch
-- Personal financial management (not on CPN systems processing CUI)
+- Personal financial management (not on SecureMac systems processing CUI)
 
 **Examples of Unacceptable Personal Use:**
 - Personal business activities or operating a business
@@ -93,16 +117,16 @@ Limited personal use of CPN systems is permitted provided it:
 #### 1.5 Monitoring
 For security, incident response, and network maintenance purposes, authorized individuals (ISSO, system administrators) may monitor equipment, systems, network traffic, and user activities at any time. Monitoring includes but is not limited to:
 - Audit log review (auditd, rsyslog)
-- Network traffic analysis (Suricata IDS on pfSense)
+- Network traffic analysis (Suricata IDS on the service VM)
 - Security information and event management (Wazuh SIEM)
 - File integrity monitoring (Wazuh FIM)
-- Authentication logging (FreeIPA)
-- File access logging (Samba VFS audit module)
+- Authentication logging (389-DS LDAP)
+- File access logging (NAS VFS audit module)
 
-**Users have no expectation of privacy** when using CPN systems. All activities may be logged, monitored, and reviewed.
+**Users have no expectation of privacy** when using SecureMac systems. All activities may be logged, monitored, and reviewed.
 
 #### 1.6 Compliance Audits
-[ORGANIZATION] reserves the right to audit networks, systems, and user activities on a periodic basis or in response to security incidents to ensure compliance with this policy and all security policies. Audits may include:
+[DOMAIN.ORG] reserves the right to audit networks, systems, and user activities on a periodic basis or in response to security incidents to ensure compliance with this policy and all security policies. Audits may include:
 - Quarterly access reviews
 - Annual security assessments
 - Incident-driven forensic investigations
@@ -112,16 +136,16 @@ For security, incident response, and network maintenance purposes, authorized in
 ### 2. Security and CUI/FCI Protection
 
 #### 2.1 Device Security
-All computing devices that connect to CPN must comply with:
+All computing devices that connect to SecureMac must comply with:
 - FIPS 140-2 mode enabled (all systems)
-- Full-disk encryption (LUKS) for all systems processing or storing CUI
+- Full-disk encryption on all systems processing or storing CUI: **FileVault** (Mac host), **LUKS2** (service VM)
 - SELinux enforcing mode
 - Wazuh agent installed and operational
-- Automatic security updates enabled (dnf-automatic)
-- ClamAV anti-malware installed and current
+- `dnf-automatic` configured **download-only** on the VM (`apply_updates = no`, `DIWAI-CR-2026-08-01` C3) — updates are staged automatically and applied under change control, not unattended
+- Malicious-code protection operating: **YARA** with Wazuh active response and a weekly full scan (VM); **XProtect/MRT/Gatekeeper** (Mac host)
 
 #### 2.2 Password Requirements
-System-level and user-level passwords must comply with FreeIPA password policy (documented in CLAUDE.md):
+System-level and user-level passwords must comply with the 389-DS directory password policy, as specified in **`DIWAI-IAP-001`** (Identification and Authentication Policy):
 - Minimum 14 characters
 - At least 3 character classes (uppercase, lowercase, numbers, special characters)
 - 90-day expiration
@@ -133,7 +157,7 @@ System-level and user-level passwords must comply with FreeIPA password policy (
 - Passwords must never be written down or stored in plaintext
 - Passwords must not be stored in browser password managers (use password manager software if needed: KeePassXC recommended)
 - Providing access to another individual, either deliberately or through failure to secure your account, is strictly prohibited
-- Family and household members must never use your CPN credentials or systems
+- Family and household members must never use your SecureMac credentials or systems
 
 #### 2.3 Screen Lock
 All computing devices must be secured with a password-protected lock screen:
@@ -143,9 +167,9 @@ All computing devices must be secured with a password-protected lock screen:
 - Screens visible from windows must use privacy filters
 
 #### 2.4 Email and External Communication
-- CPN email system (when deployed) for business use only
+- SecureMac email system (when deployed) for business use only
 - External email from personal accounts discussing CUI must use encryption
-- Postings from a Contract Coach email address to public forums must include disclaimer: "Opinions expressed are my own and not necessarily those of [ORGANIZATION]"
+- Postings from a [ORGANIZATION] email address to public forums must include disclaimer: "Opinions expressed are my own and not necessarily those of [DOMAIN.ORG]"
 - Email signature should not reveal sensitive business information
 
 #### 2.5 Email Security
@@ -161,7 +185,7 @@ Users must exercise extreme caution with email:
 Users must properly mark and handle CUI per 32 CFR Part 2002:
 - Mark documents with "CUI" header and footer
 - Include CUI in email subject lines when applicable
-- Store CUI only on encrypted CPN systems
+- Store CUI only on encrypted SecureMac systems
 - Do not send CUI via unencrypted channels
 - Do not store CUI on personal devices, cloud services, or unencrypted media
 - Refer to CUI marking guide for detailed requirements
@@ -170,7 +194,7 @@ Users must properly mark and handle CUI per 32 CFR Part 2002:
 
 The following activities are prohibited. Users may NOT be exempted from these restrictions except as explicitly documented and approved by Owner/Principal for legitimate business purposes.
 
-**Under no circumstances is any user authorized to engage in any activity that is illegal under local, state, federal, or international law while utilizing [ORGANIZATION]-owned resources.**
+**Under no circumstances is any user authorized to engage in any activity that is illegal under local, state, federal, or international law while utilizing [DOMAIN.ORG]-owned resources.**
 
 The lists below provide a framework for activities which constitute unacceptable use.
 
@@ -180,7 +204,7 @@ The following activities are **strictly prohibited** with **no exceptions**:
 
 1. **Intellectual Property Violations:** Violations of the rights of any person or company protected by copyright, trade secret, patent, or other intellectual property, including installation or distribution of "pirated" or unlicensed software
 
-2. **Unauthorized Copying:** Unauthorized copying of copyrighted material including digitization and distribution of photographs, music, videos, books, or software for which [ORGANIZATION] or the user does not have an active license
+2. **Unauthorized Copying:** Unauthorized copying of copyrighted material including digitization and distribution of photographs, music, videos, books, or software for which [DOMAIN.ORG] or the user does not have an active license
 
 3. **Unauthorized Access:** Accessing data, a server, or an account for any purpose other than conducting authorized business, even if you have authorized access to the system
 
@@ -190,9 +214,9 @@ The following activities are **strictly prohibited** with **no exceptions**:
 
 6. **Password Sharing:** Revealing your account password to others or allowing use of your account by others, including family and household members
 
-7. **Harassment:** Using CPN systems to actively engage in procuring or transmitting material that violates sexual harassment or hostile workplace laws
+7. **Harassment:** Using SecureMac systems to actively engage in procuring or transmitting material that violates sexual harassment or hostile workplace laws
 
-8. **Fraudulent Offers:** Making fraudulent offers of products, items, or services originating from any Contract Coach account
+8. **Fraudulent Offers:** Making fraudulent offers of products, items, or services originating from any [ORGANIZATION] account
 
 9. **Unauthorized Data Collection:** Effecting security breaches or disruptions of network communication, including but not limited to:
    - Port scanning
@@ -230,9 +254,9 @@ The following activities are **strictly prohibited** with **no exceptions**:
 
 1. **Unauthorized Disclosure:** Blogging or posting on social media about CUI, FCI, contract-specific information, or proprietary business information
 
-2. **Impersonation:** Employees and contractors are prohibited from posting to blogging or social media sites using [ORGANIZATION] name without explicit authorization
+2. **Impersonation:** Employees and contractors are prohibited from posting to blogging or social media sites using [DOMAIN.ORG] name without explicit authorization
 
-3. **Company Representation:** Representing yourself as speaking for [ORGANIZATION] without authorization
+3. **Company Representation:** Representing yourself as speaking for [DOMAIN.ORG] without authorization
 
 4. **Client Information:** Discussing clients, contracts, or business relationships on social media without authorization
 
@@ -240,7 +264,7 @@ The following activities are **strictly prohibited** with **no exceptions**:
 
 The following personal activities are acceptable provided they comply with Section 1.4 (limited, non-interfering personal use):
 
-1. **Checking Personal Email:** During breaks or non-business hours (not using CPN email system)
+1. **Checking Personal Email:** During breaks or non-business hours (not using SecureMac email system)
 
 2. **Brief Personal Research:** Online shopping, news reading, personal finance (during breaks)
 
@@ -249,7 +273,7 @@ The following personal activities are acceptable provided they comply with Secti
 4. **Emergency Personal Business:** Handling personal emergencies (doctor appointments, family emergencies)
 
 **Not Acceptable Even as Personal Use:**
-- Storing personal CUI or sensitive personal information on CPN
+- Storing personal CUI or sensitive personal information on SecureMac
 - Operating a personal business
 - Excessive gaming
 - Streaming entertainment content (bandwidth consumption)
@@ -258,10 +282,27 @@ The following personal activities are acceptable provided they comply with Secti
 ### 5. Removable Media and Data Transfer
 
 #### 5.1 USB Drives and Removable Media
-- Only authorized, encrypted (LUKS) USB drives may be used
-- USB drives must be scanned for malware before connecting to CPN
+
+**Correction 2026-09-15 (`DIWAI-CR-2026-09-09` C128, finding F-2026-09-02).** The
+prior wording required "encrypted (LUKS)" drives. LUKS is Linux-specific and
+**cannot be satisfied by a Mac-attached APFS volume**, so the clause was unmeetable
+on the host that holds the CUI repository. It also drew no distinction between
+portable media and fixed attached storage, which on Apple Silicon is unavoidable.
+
+- Portable USB drives used for CUI must be **authorized and encrypted with
+  platform-appropriate full-disk encryption** — **LUKS** on Linux, **FileVault /
+  APFS encryption** on macOS
+- **Fixed attached storage is not portable media.** On Apple Silicon, capacity
+  beyond the internal SSD is *necessarily* Thunderbolt- or USB-attached. Such
+  volumes report `Removable Media: Fixed`, remain inside the locked rack cabinet,
+  carry drive marking, and must be **full-disk encrypted**. They are inventoried in
+  the SBOM and in SSP §2.5, and the transport and custody requirements for portable
+  media (3.8.5, 3.8.6) do not apply to them
+- USB drives must be scanned for malware before connecting to SecureMac
 - Personal USB drives must not be used for CUI
-- USBGuard restrictions will be implemented (future enhancement)
+- **USBGuard enforces a UUID allowlist** for connected devices
+  (`CUI_USBGuard_Configuration_Evidence.md`, enforced 2026-06-12) — previously
+  recorded here as a "future enhancement", corrected 2026-09-15
 
 #### 5.2 Cloud Storage
 - **Prohibited:** CUI must never be stored in commercial cloud services (Dropbox, Google Drive, OneDrive, iCloud, etc.)
@@ -269,10 +310,10 @@ The following personal activities are acceptable provided they comply with Secti
 - Government-approved cloud services (e.g., approved FedRAMP providers) may be used only with explicit authorization for specific contracts
 
 #### 5.3 Mobile Devices
-- Personal mobile devices (smartphones, tablets) may not access CPN systems (until mobile device management implemented)
+- Personal mobile devices (smartphones, tablets) may not access SecureMac systems (until mobile device management implemented)
 - CUI must not be stored on mobile devices
 - Do not photograph or screenshot CUI on mobile devices
-- Mobile devices must not be used to photograph CPN systems or configurations
+- Mobile devices must not be used to photograph SecureMac systems or configurations
 
 ### 6. Software Installation
 
@@ -301,7 +342,7 @@ To request software installation:
 ### 7. Physical Security Responsibilities
 
 Users must:
-- Lock workstations when leaving workspace (Ctrl+Alt+L)
+- Lock the screen when leaving the workspace — macOS: **Ctrl+Cmd+Q**; Linux console: **Ctrl+Alt+L**
 - Log off at end of workday
 - Never leave systems logged in and unattended
 - Protect printouts containing CUI (retrieve immediately, shred when done)
@@ -332,7 +373,7 @@ Users must report the following incidents immediately (within 1 hour):
    - Encryption errors
 
 **Reporting Procedure:**
-- Email: Don@contractcoach.com
+- Email: [EMAIL-REDACTED]
 - Phone: [REDACTED-PHONE]
 - Document what you observed, when, and any evidence
 - Do not investigate security incidents yourself (unless you are the ISSO)
@@ -346,17 +387,17 @@ Users must report the following incidents immediately (within 1 hour):
 - VPN required for all remote connections
 - Multi-factor authentication (MFA) required
 - No storage of CUI on remote devices
-- Remote devices must meet same security requirements as CPN systems
+- Remote devices must meet same security requirements as SecureMac systems
 - Remote access sessions monitored and logged
 
 ### 10. Bring Your Own Device (BYOD)
 
-**Current Policy:** BYOD not permitted for CPN access
+**Current Policy:** BYOD not permitted for SecureMac access
 
 **Personal Devices:**
-- Personal laptops, tablets, and smartphones may not connect to CPN
+- Personal laptops, tablets, and smartphones may not connect to SecureMac
 - Personal devices may not process or store CUI
-- Personal devices may not access Samba file shares
+- Personal devices may not access NAS file shares (nas.[DOMAIN.ORG])
 - Future BYOD program may be developed with mobile device management (MDM)
 
 ### 11. Training and Awareness
@@ -380,13 +421,13 @@ Violations of this policy may result in:
 
 #### 12.2 Contractor-Specific Enforcement
 Contractors who violate this policy may have:
-- FreeIPA account disabled immediately
+- 389-DS LDAP account disabled immediately
 - Contract terminated for cause
-- Company barred from future Contract Coach engagements
+- Company barred from future [ORGANIZATION] engagements
 - Government contracting officer notified (if contract-related violation)
 
 #### 12.3 Sanctions Process
-Follows Personnel Security Policy (TCC-PS-001), Section PS-8:
+Follows Personnel Security Policy (DIWAI-PS-001), Section PS-8:
 - Minor violations: Counseling, remedial training
 - Moderate violations: Written warning, access suspension
 - Major violations: Termination, legal action
@@ -415,13 +456,13 @@ All users must sign an acknowledgment form indicating they have read, understood
 
 ---
 
-**[ORGANIZATION] Acceptable Use Policy Acknowledgment**
+**[DOMAIN.ORG] Acceptable Use Policy Acknowledgment**
 
-I, _________________________ (print name), acknowledge that I have received, read, and understood [ORGANIZATION] Acceptable Use Policy (TCC-AUP-001). I understand that:
+I, _________________________ (print name), acknowledge that I have received, read, and understood [DOMAIN.ORG] Acceptable Use Policy (DIWAI-AUP-001). I understand that:
 
-- CPN systems are for authorized business use
-- All activity on CPN systems may be monitored and logged
-- I have no expectation of privacy when using CPN systems
+- SecureMac systems are for authorized business use
+- All activity on SecureMac systems may be monitored and logged
+- I have no expectation of privacy when using SecureMac systems
 - I must protect CUI and FCI in accordance with this policy
 - I must report security incidents and policy violations immediately
 - Violations of this policy may result in access revocation, termination, and legal action
@@ -430,7 +471,7 @@ I agree to comply with all provisions of this policy and all referenced security
 
 Signature: _______________________________ Date: _______________
 
-FreeIPA Username: _______________________________
+389-DS LDAP Username: _______________________________
 
 Role: [ ] Employee [ ] Contractor [ ] Consultant
 
@@ -439,7 +480,7 @@ Role: [ ] Employee [ ] Contractor [ ] Consultant
 **For Official Use:**
 - Acknowledgment received by: _______________________
 - Date filed: _______________________
-- FreeIPA account: _______________________
+- 389-DS LDAP account: _______________________
 - Access granted date: _______________________
 
 ## References
@@ -449,10 +490,10 @@ Role: [ ] Employee [ ] Contractor [ ] Consultant
 - DFARS 252.204-7012 (Safeguarding Covered Defense Information)
 - 32 CFR Part 2002 (Controlled Unclassified Information)
 - System Security Plan (SSP)
-- Personnel Security Policy (TCC-PS-001)
-- Incident Response Policy (TCC-IRP-001)
-- Physical and Media Protection Policy (TCC-PE-MP-001)
-- FreeIPA Password Policy (documented in CLAUDE.md)
+- Personnel Security Policy (DIWAI-PS-001)
+- Incident Response Policy (DIWAI-IRP-001)
+- Physical and Media Protection Policy (DIWAI-PE-MP-001)
+- 389-DS directory password policy — see `DIWAI-IAP-001` (Identification and Authentication Policy)
 
 ---
 
@@ -464,7 +505,7 @@ Role: [ ] Employee [ ] Contractor [ ] Consultant
 ✓ Report security incidents immediately
 ✓ Mark CUI documents properly ("CUI" header/footer)
 ✓ Verify email sender before opening attachments
-✓ Store CUI only on encrypted CPN systems
+✓ Store CUI only on encrypted SecureMac systems
 ✓ Complete security training annually
 ✓ Ask ISSO if you're unsure about policy
 
@@ -500,7 +541,7 @@ Role: [ ] Employee [ ] Contractor [ ] Consultant
 - Immediate actions you took: _______________________
 - Who else was notified: _______________________
 
-**Submit to:** Don@contractcoach.com or call [REDACTED-PHONE]
+**Submit to:** [EMAIL-REDACTED] or call [REDACTED-PHONE]
 
 ---
 
@@ -511,7 +552,7 @@ Role: [ ] Employee [ ] Contractor [ ] Consultant
 
 **Approved By:**
 /s/ [SYSTEM-OWNER]
-Owner/Principal, [ORGANIZATION]
+Owner/Principal, [DOMAIN.ORG]
 
 **Date:** November 2, 2025
 
@@ -523,8 +564,11 @@ Owner/Principal, [ORGANIZATION]
 
 **Revision History:**
 - Version 1.0 - November 2, 2025 - Initial policy establishment
+- Version 1.1 correction - September 15, 2026 - §5.1 rewritten (`DIWAI-CR-2026-09-09` C128): platform-appropriate full-disk encryption replaces the LUKS-only requirement, which was unmeetable on macOS; fixed rack-resident attached storage distinguished from portable media; USBGuard recorded as **enforced** rather than a future enhancement. Raised by F-2026-09-02, an unencrypted attached SSD holding CUI and private keys, encrypted the same day
 
 **Distribution:**
-- All CPN users
+- All SecureMac users
 - Signed acknowledgment required before account activation
 - Filed in: `/backup/personnel-security/policies/`
+
+---

@@ -1,8 +1,13 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Identification and Authentication Policy
 
-**Document ID:** TCC-IAP-001
-**Version:** 1.0
-**Effective Date:** February 15, 2026
+**Document ID:** DIWAI-IAP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-IAP-001` to `DIWAI-IAP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.2
+**Effective Date:** June 6, 2026
+**Previous Version:** 1.0 (February 15, 2026) — YubiKey PIV hardware token as primary MFA
+**Change Summary:** MFA strategy updated. YubiKey PIV hardware token abandoned (technically fragile; lockout incident 2026-05-15). Primary MFA method changed to TOTP via Authenticator app (RFC 6238).
 **Review Schedule:** Annually
 **Next Review:** December 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
@@ -11,9 +16,42 @@
 
 ---
 
+
+**Version 1.2 (2026-08-04) — technical accuracy correction.** v1.1 (June 2026)
+updated the MFA *strategy* but did not revisit the inherited technical content.
+This revision does.
+
+**Kerberos removed — it is not deployed.** Nine references described Kerberos
+tickets, keytabs, principals and service principals as the authentication
+mechanism. Verified 2026-08-04: **`krb5-server` and `krb5-workstation` are not
+installed, `krb5kdc` is inactive, and no keytab exists.** That content came from
+Reference System #1, which ran **FreeIPA** (a suite bundling 389-DS with Kerberos
+and DNS). This system runs **389-DS alone**; the glossary entry describing it as
+"LDAP + Kerberos + DNS" described FreeIPA, not the directory in use.
+
+Replaced with the mechanisms actually in use: **LDAPS** for directory binds,
+**LDAPI with EXTERNAL SASL** for local administrative tooling, **SSH public-key**
+for host access, and scoped directory service accounts for automated processes.
+The transmission clause now records that the directory **refuses insecure binds**
+(`nsslapd-require-secure-binds: on`, 2026-08-03).
+
+**MFA status stated explicitly.** The policy required MFA for privileged accounts
+and remote access — correctly — under an implementation timeline of **Q4 2025 /
+Q1 2026** that had elapsed without delivery, with nothing recording that it
+remains undelivered. **MFA is not deployed for OS-level access**: the VM is SSH
+public-key only (`pam_google_authenticator` installed but unconfigured); the Mac
+host is password only. **Nextcloud's TOTP is the only second factor in the
+system.** Tracked as POA&M-004 and POA&M-007; **3.5.3 and 3.7.5 each score −5**.
+The requirement stands; the elapsed timeline is removed in favour of the POA&M,
+which is the tracking record.
+
+Also corrected: RS#1 hosts `ws1`/`ws2` and the pfSense appliance; `ipa user-find`
+→ `dsidm`; `sys-dc1` naming example. Raised as **POA&M-058**.
+
+
 ## 1. Purpose
 
-This policy establishes [ORGANIZATION]'s requirements for user identification and authentication on the CyberHygiene Production Network (CPN). It ensures only authorized individuals access systems and Controlled Unclassified Information (CUI) in compliance with NIST SP 800-171 Rev 2 (IA-1 through IA-11) and CMMC Level 2.
+This policy establishes [DOMAIN.ORG]'s requirements for user identification and authentication on the SecureMac Reference System #2. It ensures only authorized individuals access systems and Controlled Unclassified Information (CUI) in compliance with NIST SP 800-171 Rev 2 (IA-1 through IA-11) and CMMC Level 2.
 
 ---
 
@@ -21,11 +59,13 @@ This policy establishes [ORGANIZATION]'s requirements for user identification an
 
 This policy applies to:
 
-- **All CPN Systems:**
-  - dc1.[DOMAIN.ORG] - Domain Controller / FreeIPA
-  - ai.[DOMAIN.ORG] - AI/ML Server
-  - ws1, ws2, ws3.[DOMAIN.ORG] - Workstations
-  - pfSense firewall - Network infrastructure
+- **All SecureMac Systems:**
+  - services.[DOMAIN.ORG] - LDAP Directory Server (389-DS)
+  - services.[DOMAIN.ORG] - AI/ML Server
+  - `securemac.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — Mac mini M4 Pro host and sole management workstation
+  - `services.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — Rocky Linux VM: 389-DS directory
+  - `nas.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — Synology NAS (authenticates against the directory over LDAPS)
+  - Network: `pf` (Mac mini) and `firewalld` (VM) — software firewalls, no appliance
   - All services (email, file sharing, web applications)
 
 - **All Users:**
@@ -38,7 +78,7 @@ This policy applies to:
   - Password/passphrase
   - SSH keys
   - Multi-factor authentication (MFA)
-  - Kerberos tickets
+  - Directory bind credentials and session tokens
 
 ---
 
@@ -54,7 +94,7 @@ This policy applies to:
    - Generic accounts prohibited (e.g., "admin", "user", "test")
 
 2. **Authentication Required:**
-   - Users authenticate before accessing any CPN resource
+   - Users authenticate before accessing any SecureMac resource
    - Re-authentication required after session timeout (15 minutes idle)
    - No "remember me" or saved password features on production systems
 
@@ -65,18 +105,23 @@ This policy applies to:
      - Non-organizational users (contractors, vendors) - POA&M-SPRS-1
 
    - **MFA Methods:**
-     - Hardware tokens (YubiKey - preferred)
-     - Time-based One-Time Password (TOTP) via FreeIPA OTP
+     - TOTP via Authenticator app (primary) — e.g., Microsoft Authenticator, Google Authenticator (RFC 6238-compliant)
      - SMS/email (least preferred, emergency backup only)
 
-   - **Implementation Timeline:**
-     - Organizational users: Q4 2025
-     - Contractors: Q1 2026 (POA&M-SPRS-1)
+   - **Current implementation status — MFA is NOT deployed for OS-level access.**
+     Stated plainly because the requirement above is a requirement, not a
+     description of the present state:
+     - **VM (`services.[DOMAIN.ORG]`):** SSH is public-key only. `pam_google_authenticator` is installed but **not configured** in any PAM stack. A key file without a passphrase is a single factor.
+     - **Mac host:** password only. YubiKey PIV was abandoned after the 2026-05-15 lockout; `pam_smartcard.so` entries are Apple stock and fall through.
+     - **Nextcloud:** TOTP 2FA **is** enforced instance-wide — the only service with a second factor.
+     - Tracked as **POA&M-004** (VM) and **POA&M-007** (Mac host). **3.5.3 and 3.7.5 are each scored −5** on this basis.
+     - The inherited timeline (Q4 2025 / Q1 2026) had elapsed without delivery and is removed; target dates are held in the POA&M, which is the tracking record.
 
 4. **Service Accounts:**
    - Dedicated service accounts for automated processes
    - No interactive login permitted
-   - Kerberos keytab authentication (no passwords stored in scripts)
+   - **LDAPI with EXTERNAL SASL** for local administrative tooling (`dsidm`, `dashboard-refresh`) — authenticates by Unix socket peer credentials, so no password is stored in scripts
+   - **SSH public-key authentication** for host access (`PasswordAuthentication no`)
    - Annual review and re-authorization
 
 ### 3.2 Device Identification and Authentication (IA-3)
@@ -88,10 +133,10 @@ This policy applies to:
    - MAC address filtering on critical VLANs
    - 802.1X authentication (future enhancement)
 
-2. **Hardware Token Authentication:**
-   - YubiKeys for MFA
-   - Device serial numbers tracked in asset inventory
-   - Lost/stolen tokens immediately revoked
+2. **Software Token Authentication:**
+   - TOTP via RFC 6238-compliant Authenticator app (primary MFA method)
+   - Enrollment records (account username + enrollment date) tracked in ISSO log
+   - Compromised TOTP secret immediately revoked and re-enrolled
 
 ### 3.3 Identifier Management (IA-4, IA-5)
 
@@ -104,9 +149,9 @@ This policy applies to:
    - Supervisor/sponsor approval
 
 2. **Account Provisioning:**
-   - Unique username assigned (First.Last@[DOMAIN.ORG])
-   - Created in FreeIPA directory
-   - Kerberos principal generated
+   - Unique username assigned ([EMAIL-REDACTED])
+   - Created in 389-DS LDAP directory
+   - Directory entry created under `ou=people,dc=diwai,dc=org`
    - Initial groups assigned (ipausers minimum)
    - Home directory created with proper permissions
 
@@ -118,12 +163,12 @@ This policy applies to:
 **Authenticator Management (IA-5):**
 
 1. **Password Requirements (IA-5(1)):**
-   - **Length:** 14 characters minimum (FreeIPA policy enforced)
+   - **Length:** 14 characters minimum (389-DS LDAP policy enforced)
    - **Complexity:** At least 3 character classes (upper, lower, number, special)
    - **Expiration:** 90 days (configurable per user role)
    - **History:** Cannot reuse last 24 passwords
    - **Lockout:** 5 failed attempts = 30-minute lockout
-   - **Transmission:** Never transmitted in clear text (Kerberos/TLS only)
+   - **Transmission:** Never transmitted in clear text. The directory **refuses insecure binds** (`nsslapd-require-secure-binds: on`, enforced 2026-08-03 — `DIWAI-CR-2026-08-10`); all binds occur over **LDAPS** or the local **LDAPI** socket
 
 2. **Initial Password:**
    - System-generated temporary password (complexity enforced)
@@ -141,7 +186,7 @@ This policy applies to:
    - **Key Generation:**
      - RSA 3072-bit minimum or Ed25519
      - Generated on user's local system (private key never transmitted)
-   - **Public Key Registration:** Uploaded to FreeIPA or added to `~/.ssh/authorized_keys`
+   - **Public Key Registration:** Uploaded to 389-DS LDAP or added to `~/.ssh/authorized_keys`
    - **Private Key Protection:**
      - Encrypted with passphrase (required)
      - File permissions: 0600 (read/write owner only)
@@ -179,9 +224,9 @@ This policy applies to:
 
 2. **Multi-Factor Authentication (IA-8(1)):**
    - **Required:** MFA for all non-organizational users (POA&M-SPRS-1)
-   - **Method:** YubiKey hardware tokens
-   - **Enrollment:** Before system access granted
-   - **Backup:** TOTP as fallback
+   - **Method:** TOTP via Authenticator app (RFC 6238)
+   - **Enrollment:** Before system access granted; ISSO provisions TOTP token via `ipa otptoken-add`
+   - **Backup codes:** Printed and secured by user at enrollment
 
 3. **Enhanced Monitoring:**
    - All contractor activity logged
@@ -193,14 +238,14 @@ This policy applies to:
 **The organization shall:**
 
 1. **Service-to-Service Authentication:**
-   - Kerberos service principals for automated processes
+   - Dedicated directory service accounts for automated processes (e.g. `uid=svc-nas,ou=services,dc=diwai,dc=org`), scoped by ACI to least privilege
    - TLS client certificates for API authentication
    - API keys rotated annually minimum
 
 2. **Service Account Security:**
    - No shared service accounts between systems
    - Least privilege principle applied
-   - Dedicated Kerberos keytabs (not passwords)
+   - LDAPI/EXTERNAL SASL where the process is local; otherwise a scoped service account over LDAPS with the credential held root-only
    - Documented ownership and purpose
 
 ### 3.8 Adaptive Authentication (IA-10)
@@ -251,16 +296,16 @@ This policy applies to:
 
 - Manage user account lifecycle
 - Enforce password and authentication policies
-- Configure FreeIPA password policies
+- Configure 389-DS LDAP password policies
 - Approve contractor account requests
 - Conduct quarterly account reviews
 - Investigate authentication anomalies
-- Maintain authenticator inventory (YubiKeys)
+- Maintain TOTP enrollment log (username, enrollment date, app used)
 
 ### 4.3 System Administrator
 
 - Implement technical authentication controls
-- Configure FreeIPA and Kerberos
+- Configure the 389-DS directory
 - Provision and deprovision user accounts
 - Monitor authentication logs
 - Respond to account lockouts
@@ -279,7 +324,7 @@ This policy applies to:
 
 ## 5. Implementation Details
 
-### 5.1 FreeIPA Password Policy
+### 5.1 389-DS LDAP Password Policy
 
 **Global Policy:**
 ```
@@ -310,7 +355,7 @@ ipa pwpolicy-add --desc="Admin Policy" --maxlife=60 --minlife=1 \
 PermitRootLogin no
 PasswordAuthentication no (key-based only)
 PubkeyAuthentication yes
-AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys (FreeIPA integration)
+AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys (389-DS LDAP integration)
 ChallengeResponseAuthentication yes (for OTP)
 UsePAM yes
 ```
@@ -321,7 +366,7 @@ UsePAM yes
 - **Employees:** firstname.lastname (e.g., daniel.shannon)
 - **Contractors:** contractor.firstname.lastname (e.g., contractor.john.doe)
 - **Service Accounts:** svc-purpose (e.g., svc-backup, svc-wazuh)
-- **System Accounts:** sys-hostname (e.g., sys-dc1)
+- **System Accounts:** `sys-<hostname>` (e.g. `sys-services`)
 
 **Restrictions:**
 - No special characters except hyphen and period
@@ -331,24 +376,27 @@ UsePAM yes
 
 ### 5.4 Multi-Factor Authentication Enrollment
 
-**YubiKey Enrollment Process:**
+**Authenticator App (TOTP) Enrollment Process:**
 
-1. **User receives YubiKey:**
-   - Serial number recorded in asset inventory
-   - User signs acknowledgment form
+1. **User installs an RFC 6238-compliant Authenticator app:**
+   - Approved apps: Microsoft Authenticator, Google Authenticator, Authy
+   - App installed on user's personal or company mobile device
 
-2. **Enrollment in FreeIPA:**
+2. **ISSO provisions TOTP token in 389-DS LDAP:**
    ```bash
-   ipa otptoken-add --type=totp --owner=username --desc="YubiKey SN:12345"
+   ipa otptoken-add --type=totp --owner=username --desc="Authenticator App - YYYY-MM-DD"
    ```
+   - QR code displayed to user for scanning into app
+   - Enrollment date recorded in ISSO TOTP log
 
-3. **User Tests MFA:**
-   - SSH login with password + OTP
-   - Web UI login with password + OTP
+3. **User verifies enrollment:**
+   - SSH login: password + 6-digit OTP from app
+   - Web UI login: password + 6-digit OTP from app
 
-4. **Backup TOTP Configured:**
-   - QR code generated for mobile app (Google Authenticator, Authy)
-   - Backup codes printed and secured
+4. **Backup codes:**
+   - Generated and provided to user at enrollment
+   - User prints and stores in secure location (not digitally)
+   - Backup codes revoked and re-generated if compromised
 
 ### 5.5 Account Review Process
 
@@ -356,7 +404,7 @@ UsePAM yes
 
 1. **Generate Account List:**
    ```bash
-   ipa user-find --all --raw | grep uid:
+   dsidm diwai user list
    ```
 
 2. **Review Checklist:**
@@ -411,9 +459,10 @@ Violations of this policy may result in:
    - Written reprimand
    - Potential termination of employment/contract
 
-3. **Lost/Stolen Tokens (Unreported):**
-   - Written warning (first offense)
-   - Suspension of access (subsequent offenses)
+3. **Compromised or Lost MFA Device (Unreported):**
+   - TOTP secret immediately revoked by ISSO upon report
+   - Re-enrollment required before access restored
+   - Written warning if failure to report promptly
 
 4. **Circumventing Authentication Controls:**
    - Immediate account termination
@@ -438,9 +487,9 @@ Violations of this policy may result in:
 ## 9. Related Documents
 
 - System Security Plan (SSP) - Section IA (Identification and Authentication)
-- Acceptable Use Policy (TCC-AUP-001)
+- Acceptable Use Policy (DIWAI-AUP-001)
 - Access Control Policy (future)
-- Personnel Security Policy (TCC-PSP-001)
+- Personnel Security Policy (DIWAI-PS-001)
 - NIST SP 800-171 Rev 2
 - NIST SP 800-63B (Digital Identity Guidelines - Authentication)
 
@@ -449,8 +498,9 @@ Violations of this policy may result in:
 ## 10. Definitions
 
 - **Authenticator:** Means of confirming identity (password, token, biometric, SSH key)
-- **FreeIPA:** Open-source identity management system (LDAP + Kerberos + DNS)
-- **Kerberos:** Network authentication protocol using tickets
+- **389-DS:** Open-source LDAP directory server. *(It is a directory server only — it does not bundle Kerberos or DNS. The inherited description was of FreeIPA, which this system does not run; `ipa-server` and `krb5-server` are not installed.)*
+- **LDAPS:** LDAP over TLS — the required transport for directory binds
+- **LDAPI / EXTERNAL SASL:** Authentication over a local Unix socket using peer credentials, used by administrative tooling on the directory host
 - **MFA (Multi-Factor Authentication):** Two or more authentication factors (something you know + something you have)
 - **SSH Key:** Public-key cryptography for SSH authentication
 - **TOTP:** Time-based One-Time Password (6-digit code rotates every 30 seconds)
@@ -480,3 +530,5 @@ Signature: /s/ [SYSTEM-OWNER]                Date: February 15, 2026
 ---
 
 **END OF DOCUMENT**
+
+---

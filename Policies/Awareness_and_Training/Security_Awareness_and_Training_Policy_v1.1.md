@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Security Awareness and Training Policy
 
-**Document ID:** TCC-ATP-001
-**Version:** 1.0
+**Document ID:** DIWAI-ATP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-ATP-001` to `DIWAI-ATP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
 **Next Review:** December 2026
@@ -11,9 +14,23 @@
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction; closes F-2026-08-33.**
+Inherited from Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG].
+
+- **`/srv/hr/training-records/` does not exist** on either host — verified 2026-08-03 and again 2026-08-04. It was template text describing a multi-employee HR function this organisation does not have, and it was the storage location this policy mandated for the records evidencing 3.2.1–3.2.3. Records are held in the canonical CUI store at **`Compliance/Evidence/Training/`**, which is where the 2026-08-03 training artefacts were in fact filed. **This closes F-2026-08-33.**
+- **Annual cadence reconciled.** The policy required refresher training in **January**, deadline **31 January**. Actual training was completed **2026-08-03**, and `DIWAI-TRR-001` sets anniversary-based due dates (2027-08-03 insider threat; 2028-08-03 CUI, biennial per DoD). Rather than leave a policy and a signed register in disagreement, the cadence is now **anniversary-based per individual**, with a nominated fixed training month available to organisations that prefer one. The current cycle is stated explicitly.
+- **Two controls claimed but absent, corrected rather than restated:** "Monthly report of training compliance rates" and "Automated reminders 30 days before annual deadline". Neither mechanism exists. The policy now states that reminders are not implemented and points to **POA&M-059**, where the intended mechanism is a due-date check in `diwai-control-health` beside the existing certificate-expiry check.
+- HR-function references scoped: access restricted to the ISSO, and to an HR function only where an organisation has one.
+
+Employee and onboarding provisions are **retained in full** — this is a reference
+model intended for adoption by very small businesses with staff. Raised as
+**POA&M-058**.
+
+
 ## 1. Purpose
 
-This policy establishes [ORGANIZATION]'s requirements for security awareness and training on the CyberHygiene Production Network (CPN). It ensures all personnel understand their security responsibilities and are equipped to protect Controlled Unclassified Information (CUI) in compliance with NIST SP 800-171 Rev 2 (AT-1 through AT-4) and CMMC Level 2.
+This policy establishes [DOMAIN.ORG]'s requirements for security awareness and training on the SecureMac Reference System #2. It ensures all personnel understand their security responsibilities and are equipped to protect Controlled Unclassified Information (CUI) in compliance with NIST SP 800-171 Rev 2 (AT-1 through AT-4) and CMMC Level 2.
 
 ---
 
@@ -25,7 +42,7 @@ This policy applies to:
   - Employees
   - Contractors and subcontractors
   - Temporary staff
-  - Third-party service providers with CPN access
+  - Third-party service providers with SecureMac access
 
 - **Training Topics:**
   - CUI handling and protection
@@ -51,7 +68,8 @@ This policy applies to:
 
 2. **Annual Refresher Training:**
    - All personnel complete refresher training annually
-   - Training deadline: January 31 each year
+   - **Due on the anniversary of the individual's last completion**, tracked per person in the training record register (`DIWAI-TRR-001`). Organisations preferring a fixed cycle may nominate a training month instead; where they do, the nominated month governs.
+   - *Current cycle in this deployment: initial training completed **2026-08-03**; insider-threat refresher due **2027-08-03**, CUI refresher due **2028-08-03** (biennial per DoD).*
    - Covers updates to threats, policies, and procedures
 
 3. **Training Content:**
@@ -82,7 +100,7 @@ This policy applies to:
    - **Physical Security:**
      - Visitor escort requirements
      - Clean desk policy
-     - Screen lock when leaving workstation (15 minutes automatic)
+     - Screen lock when leaving the workstation (automatic after 15 minutes; manual lock on leaving — macOS Ctrl+Cmd+Q)
      - Secure disposal of CUI (shredding, degaussing)
 
    - **Mobile Device and Removable Media:**
@@ -153,13 +171,13 @@ This policy applies to:
    - Acknowledgment signature
 
 2. **Record Retention:**
-   - Maintain for duration of employment + 3 years
-   - Stored securely in `/srv/hr/training-records/` (encrypted)
-   - Access restricted to ISSO and HR function
+   - Maintain for duration of engagement + 3 years
+   - Stored in the canonical CUI store at **`Compliance/Evidence/Training/`**, on encrypted storage with group-folder access control. *(The inherited path `/srv/hr/training-records/` exists on neither host — see F-2026-08-33.)*
+   - Access restricted to the ISSO; where an organisation has an HR function, to that function as well
 
 3. **Compliance Tracking:**
-   - Monthly report of training compliance rates
-   - Automated reminders 30 days before annual deadline
+   - Review of training currency against the register (`DIWAI-TRR-001`) at least quarterly
+   - **Automated reminders are not yet implemented.** No mechanism currently surfaces an approaching training due-date; currency depends on manual review of the register. Tracked under **POA&M-059** (recurring obligations with no execution record), where the intended mechanism is a due-date check in `diwai-control-health` alongside the existing certificate-expiry check.
    - Non-compliance escalated to System Owner
 
 4. **Training Audit Trail:**
@@ -227,10 +245,10 @@ This policy applies to:
 ### 5.2 Annual Training Program
 
 **Training Schedule:**
-- **Month:** January (annual training month)
-- **Duration:** 1 hour refresher
-- **Format:** Online module + in-person Q&A session (if needed)
-- **Deadline:** January 31
+- **Timing:** On the anniversary of each individual's last completion (see §3.3), or in a nominated training month where the organisation elects a fixed cycle
+- **Duration:** approximately 1 hour refresher
+- **Format:** Online module (e.g. CDSE Security Awareness Hub) + discussion where more than one person is involved
+- **Deadline:** within 30 days of the anniversary date
 
 **Annual Training Topics:**
 - Review of previous year's security incidents (anonymized lessons learned)
@@ -376,9 +394,9 @@ This policy applies to:
 
 ## 11. Related Documents
 
-- Acceptable Use Policy (TCC-AUP-001)
-- Incident Response Policy (TCC-IRP-001)
-- Personnel Security Policy (TCC-PSP-001)
+- Acceptable Use Policy (DIWAI-AUP-001)
+- Incident Response Policy (DIWAI-IRP-001)
+- Personnel Security Policy (DIWAI-PS-001)
 - System Security Plan (SSP) - Section AT (Awareness and Training)
 - NIST SP 800-171 Rev 2
 - NIST SP 800-50 (Building an Information Technology Security Awareness and Training Program)
@@ -418,3 +436,5 @@ Signature: /s/ [SYSTEM-OWNER]                Date: February 15, 2026
 ---
 
 **END OF DOCUMENT**
+
+---

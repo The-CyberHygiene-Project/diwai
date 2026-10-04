@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Physical and Environmental Protection and Media Protection Policy
 
-**Document ID:** TCC-PE-MP-001
-**Version:** 1.0
+**Document ID:** DIWAI-PE-MP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-PE-MP-001` to `DIWAI-PE-MP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon facility/infrastructure changes
 **Next Review:** November 2, 2026
@@ -11,29 +14,54 @@
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** Inherited from
+Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG]. Corrections:
+
+- **The equipment list gave the Mac mini the VM's identity** — "Mac mini M4 Pro (services.[DOMAIN.ORG], [LAN-IP-REDACTED])". The Mac mini is `securemac.[DOMAIN.ORG]` at **[LAN-IP-REDACTED]**; `services.[DOMAIN.ORG]` is a **virtual machine running on it** with no separate physical presence. Both are now listed correctly, with the NAS.
+- **"NetGate 2100 pfSense firewall"** removed — no such appliance exists; the perimeter firewall is macOS `pf` on the Mac mini.
+- **"HP iLO 5 (on dc1)"** removed — there is no out-of-band management controller; thermal monitoring relies on host sensors.
+- **Encryption corrected** — the policy claimed LUKS on all hosts and workstations. The Mac uses **FileVault**; **LUKS2** applies to the VM's virtual disks.
+- **Emergency shutdown corrected to guest-before-host.** The inherited procedure shut down a standalone server. Here the VM runs on the Mac, so shutting the host first would drop the guest uncleanly.
+- **UPS scope restated** around the actual single-host concentration.
+- RS#1 workstations (`Engineering`, `Accounting`, `LabRat`) and `dc1` removed.
+
+**One prohibition was reversed on purpose.** The policy stated *"No laptop
+computers used for CUI (desktop workstations only)."* A SCAP-hardened laptop is
+planned as the model daily driver, to move routine work off the appliance
+(SSP §3.2.1) — the inherited blanket prohibition would have forbidden the
+planned architecture. It is replaced with conditions: full-disk encryption,
+enrolment in the compliance baseline, and physical security when unattended.
+
+Workstation provisions are retained and scoped for adopting deployments.
+Raised as **POA&M-058**; no control changed.
+
+
 ## Purpose
 
-This combined policy establishes requirements for physical and environmental protection of facilities and equipment, as well as media protection for [ORGANIZATION]'s CyberHygiene Production Network (CPN). It ensures that physical access to CUI systems is controlled, environmental threats are mitigated, and media containing CUI is properly protected, transported, sanitized, and disposed of. The policy aligns with NIST SP 800-171 Revision 2 (PE-1 through PE-20 and MP-1 through MP-8) and supports CMMC Level 2 compliance for government contracting operations.
+This combined policy establishes requirements for physical and environmental protection of facilities and equipment, as well as media protection for [DOMAIN.ORG]'s SecureMac Reference System #2. It ensures that physical access to CUI systems is controlled, environmental threats are mitigated, and media containing CUI is properly protected, transported, sanitized, and disposed of. The policy aligns with NIST SP 800-171 Revision 2 (PE-1 through PE-20 and MP-1 through MP-8) and supports CMMC Level 2 compliance for systems administration and AI research operations.
 
 ## Scope
 
 This policy applies to:
 
 **Physical Facilities:**
-- Home office location (Albuquerque, NM) where all CUI processing occurs
+- Home office location ([LOCATION-REDACTED]) where all CUI processing occurs
 - Dedicated office space within residence
-- 42U locking server rack containing dc1.[DOMAIN.ORG]
-- Workstation areas (Engineering, Accounting, LabRat)
+- 2U rack-mount enclosure containing services.[DOMAIN.ORG]
+- Workstation areas — none presently; the Mac mini doubles as the sole management workstation (SSP §3.2.1). Where a deployment adds workstations, their areas are in scope of this policy.
 
 **Equipment:**
-- HP MicroServer Gen10+ (dc1.[DOMAIN.ORG], [LAN-IP-REDACTED])
-- Workstation computers (3 total)
-- NetGate 2100 pfSense firewall ([LAN-IP-REDACTED])
+- Mac mini M4 Pro — `securemac.[DOMAIN.ORG]`, **[LAN-IP-REDACTED]** — physical host, perimeter firewall (macOS `pf`), and hypervisor for the service VM
+- `services.[DOMAIN.ORG]` — Rocky Linux 9.7 **virtual machine** ([LAN-IP-REDACTED]) running on the Mac mini under UTM; it has no separate physical presence
+- Synology NAS — `nas.[DOMAIN.ORG]`, [LAN-IP-REDACTED]
+- Workstation computers: **none presently deployed**
+- **No separate firewall appliance.** The perimeter firewall is macOS `pf` on the Mac mini; the VM additionally runs `firewalld`
 - Network infrastructure (switches, cabling)
 - RAID 5 array (3x 3TB HDDs with LUKS encryption)
 
 **Media:**
-- Internal storage (LUKS-encrypted partitions on dc1 and workstations)
+- Internal storage — **FileVault** full-disk encryption on the Mac mini; **LUKS2** on the VM's virtual disks
 - External USB drives for backups (LUKS-encrypted)
 - Backup media (ReaR ISO images, offline backups)
 - Removable media (if used for CUI transport)
@@ -48,7 +76,7 @@ This policy applies to:
 
 ## Definitions
 
-- **Physical Access:** Entry to the physical space where CPN systems are located
+- **Physical Access:** Entry to the physical space where SecureMac systems are located
 
 - **Controlled Area:** Home office space with restricted access (locked door)
 
@@ -68,7 +96,7 @@ This policy applies to:
 
 ### 1. Physical and Environmental Protection Policy and Procedures (PE-1)
 
-[ORGANIZATION] shall maintain and review this policy annually. Implementation procedures are documented in Section 3 of this document. Compliance is verified through:
+[DOMAIN.ORG] shall maintain and review this policy annually. Implementation procedures are documented in Section 3 of this document. Compliance is verified through:
 - Annual physical security assessment
 - Quarterly facility inspections
 - Monthly environmental monitoring checks
@@ -84,7 +112,7 @@ This policy applies to:
 **Authorization Process:**
 - Owner/Principal: Permanent authorization based on Top Secret clearance and business ownership
 - Contractors: Temporary authorization requires:
-  - Executed NDA (per TCC-PS-001)
+  - Executed NDA (per DIWAI-PS-001)
   - Business need justification
   - Supervised access (Owner present at all times)
   - Limited duration (specific date/time)
@@ -99,7 +127,7 @@ This policy applies to:
 ### 3. Physical Access Control (PE-3)
 
 **Facility Description:**
-- **Location:** Home office, Albuquerque, NM (dedicated workspace within residence)
+- **Location:** Home office, [LOCATION-REDACTED] (dedicated workspace within residence)
 - **Access Points:** Single entry door to home office
 - **Physical Security Features:**
   - Entry-controlled (locked door when unattended)
@@ -147,7 +175,7 @@ This policy applies to:
 
 **Information Transmission:**
 - Network cables secured within office (no exposed cabling outside controlled area)
-- Wireless network secured with WPA3-Enterprise (FreeIPA authentication)
+- Wireless network secured with WPA3-Enterprise (389-DS LDAP authentication)
 - No wireless keyboard/mouse on systems processing CUI (USB wired only)
 
 ### 5. Monitoring Physical Access (PE-6)
@@ -196,9 +224,9 @@ If emergency facility repair required (e.g., electrical, HVAC):
 
 **Power Protection:**
 - All critical equipment on UPS (Uninterruptible Power Supply):
-  - Domain controller (dc1) on UPS with 30-minute runtime
-  - Network equipment (pfSense, switches) on UPS
-  - At least one workstation on UPS for emergency shutdown
+  - Mac mini on UPS — this single host carries the perimeter firewall, the hypervisor and the CUI file store, so its loss takes the whole system
+  - Network equipment (switches, media converters) on UPS
+  - NAS on UPS, to avoid interrupting a backup mid-write
 - UPS battery health tested quarterly
 - Generator backup: Not currently deployed (future consideration)
 
@@ -220,7 +248,8 @@ sudo apctest
 
 **Emergency Power-Down:**
 - In case of emergency requiring immediate power-down:
-  1. Initiate graceful shutdown of dc1: `sudo shutdown -h now`
+  1. Shut down **guest before host** — the VM runs on the Mac:
+     `ssh services 'sudo shutdown -h now'` then shut down macOS
   2. Allow UPS to safely power down equipment
   3. If immediate power cut needed, disable UPS and switch off circuit breakers
 
@@ -230,7 +259,7 @@ sudo apctest
 - Circuit breaker panel accessible to Owner
 - Office on dedicated circuit (15A or 20A)
 - Emergency shutoff procedure:
-  1. If time permits, gracefully shutdown dc1
+  1. If time permits, shut down the VM first, then the Mac host (guest before host)
   2. Switch off circuit breaker for office
   3. Switch off UPS if battery backup not needed
   4. Document reason for emergency shutoff
@@ -283,7 +312,7 @@ sudo apctest
 **Environmental Monitoring:**
 - Office maintains normal residential temperature and humidity
 - HVAC system serves office space
-- Server equipment generates minimal heat (single server + workstations)
+- Equipment generates minimal heat (one Mac mini, one NAS, network gear; the service VM is virtual and adds no separate thermal load)
 - Acceptable temperature range: 60-80°F (15-27°C)
 - Acceptable relative humidity: 30-60%
 
@@ -294,7 +323,7 @@ sudo apctest
 - Equipment positioned for adequate airflow
 
 **Temperature Alarms:**
-- HP iLO 5 (on dc1) provides hardware temperature monitoring
+- **No out-of-band management controller is present.** Thermal monitoring relies on macOS/SMC sensors on the host; there is no iLO/IPMI equivalent
 - Critical temperature threshold triggers alert
 - Monitor via iLO dashboard: https://[LAN-IP-REDACTED]
 
@@ -354,14 +383,26 @@ sudo apctest
 - **NOT APPLICABLE:** All CUI processing occurs exclusively at primary home office
 - No alternate work sites authorized
 - No mobile devices process or store CUI
-- No laptop computers used for CUI (desktop workstations only)
+- Portable computers are permitted for CUI **only** where full-disk encryption is enabled, the device is enrolled in the compliance baseline (SCAP/mSCP), and it is physically secured when unattended.
+
+- **Wired connection is the required default in the office.** Laptops operating on the CUI network shall use wired Ethernet. This preference is **enforced by network design**, not by instruction alone — the CUI segment is delivered over wired interfaces, and the perimeter `pf` ruleset governs what may traverse it.
+
+- **Wireless is permitted only away from the office**, where a wired connection is not available. In that mode:
+  - the link shall use WPA2/WPA3 with authentication (3.1.17);
+  - access to CUI resources shall be by VPN to the boundary, not by direct exposure of services;
+  - the device remains subject to this policy and to `DIWAI-SCP-001` for transmission protection;
+  - CUI is not to be processed over open or untrusted wireless networks.
+
+  > **Planned change.** A SCAP-hardened laptop is planned for introduction to the LAN as the model daily driver, moving routine work off the appliance (SSP §3.2.1). The previous blanket prohibition on laptops was inherited from Reference System #1 and would have forbidden that architecture.
+  >
+  > **Wireless authorisation must be updated before that device is introduced.** Requirement 3.1.16 obliges the organisation to *authorise wireless access prior to allowing such connections*. The current position — recorded in SSP §2.5.2 and scored on 2026-08-03 — is that wireless is **not permitted**: the Mac host's `en1` is powered off and `pf` bars CUI egress by that path. Introducing a laptop that uses wireless away from the office changes that posture and requires the authorisation, the conditions above, and the SSP boundary text to be updated **in advance of deployment**, not after.
 - No remote work locations
 - No cloud storage for CUI
 
 **Travel:**
 - Owner may travel for business
 - No CUI data taken on travel
-- Remote access to CPN not currently configured (future: VPN with MFA)
+- Remote access to SecureMac not currently configured (future: VPN with MFA)
 
 ### 16. Location of System Components (PE-18)
 
@@ -369,7 +410,7 @@ sudo apctest
 - All CUI processing equipment located within home office
 - Server rack position: (document specific location)
 - Workstations: (document specific locations)
-- Network equipment: pfSense in server rack or secured location
+- Network equipment: switches and media converters in the 2U rack or a secured location; the perimeter firewall is software on the Mac mini and has no separate enclosure
 - No CUI equipment in public or shared areas of residence
 
 **Positioning Requirements:**
@@ -410,7 +451,7 @@ sudo apctest
   1. Conduct thorough search of office and residence
   2. Review access logs (any contractor visits?)
   3. If not found within 24 hours, report as potential theft
-  4. Initiate incident response (TCC-IRP-001)
+  4. Initiate incident response (DIWAI-IRP-001)
   5. Report to law enforcement if theft suspected
   6. Assess CUI data exposure (LUKS encryption should protect data)
   7. Report to DoD if CUI compromise possible (72-hour clock)
@@ -421,7 +462,7 @@ sudo apctest
 
 ### 1. Media Protection Policy and Procedures (MP-1)
 
-[ORGANIZATION] shall implement and maintain media protection procedures to safeguard CUI on all media types. Compliance verified through:
+[DOMAIN.ORG] shall implement and maintain media protection procedures to safeguard CUI on all media types. Compliance verified through:
 - Quarterly media inventory
 - Annual media sanitization procedure review
 - Monthly backup media verification
@@ -433,12 +474,12 @@ sudo apctest
 - All media access restricted to Owner/Principal only
 - No shared media or cloud storage for CUI
 - Physical media stored in locked office
-- Digital media encrypted (LUKS) and access controlled via FreeIPA
+- Digital media encrypted (LUKS) and access controlled via 389-DS LDAP
 - Backup media stored in locked server rack or locked safe
 
 **Media Types:**
-- **System Storage:** LUKS-encrypted partitions on dc1 and workstations
-- **RAID Array:** 3x 3TB HDDs in RAID 5, LUKS-encrypted, mounted at /srv/samba
+- **System Storage:** FileVault on the Mac mini; LUKS2 on the VM's virtual disks
+- **RAID Array:** NAS storage (nas.[DOMAIN.ORG]) with LUKS-encrypted volumes
 - **Backup USB Drives:** LUKS-encrypted, stored in locked location
 - **Offline Backups:** ReaR ISO images, encrypted, stored offsite (monthly rotation)
 
@@ -446,7 +487,7 @@ sudo apctest
 ```bash
 # Access encrypted RAID array (if manual mount needed)
 sudo cryptsetup luksOpen /dev/md0 samba_data
-sudo mount /dev/mapper/samba_data /srv/samba
+sudo mount nas.[DOMAIN.ORG]:/share /mnt/nas
 
 # Verify encryption status
 sudo cryptsetup status samba_data
@@ -469,7 +510,7 @@ sudo mount /dev/mapper/backup_usb /media/backup
 **Physical Media Labels:**
 - USB drives containing CUI: Apply "CUI" label
 - Backup media: Label "CUI - Backup - Date"
-- Media stored offsite: "CUI - Contract Coach - Do Not Destroy"
+- Media stored offsite: "CUI - [ORGANIZATION] - Do Not Destroy"
 
 **Simplified Marking (Solopreneur):**
 - Owner marks all CUI materials
@@ -511,7 +552,7 @@ Maintain inventory of all CUI media:
 **Electronic Delivery (Preferred):**
 - TLS-encrypted email with CUI marking in subject
 - Secure government portal upload
-- FreeIPA-authenticated Samba transfer (internal only)
+- 389-DS LDAP-authenticated NAS transfer (internal only)
 - VPN-encrypted transfer (when VPN implemented)
 
 **Physical Transport (Offsite Backups):**
@@ -587,7 +628,7 @@ sudo cryptsetup luksOpen /dev/sdX test  # Should fail
 
 **Authorized Media Use:**
 - CUI shall only be stored on FIPS 140-2 validated encrypted media
-- All workstations and servers use LUKS encryption
+- Full-disk encryption on all hosts: **FileVault** (Mac mini), **LUKS2** (service VM), and encrypted volumes on the NAS
 - Backup media must be LUKS-encrypted
 - No unencrypted storage of CUI permitted
 
@@ -640,8 +681,8 @@ df -h | grep media
 
 | Role | Responsibilities |
 |------|------------------|
-| **Owner/Principal (Don Shannon)** | Maintain physical security of facility; control physical access; oversee environmental controls; authorize equipment movement; maintain asset inventory; perform media sanitization; transport offsite backups |
-| **ISSO (Don Shannon, concurrent role)** | Document physical security procedures; conduct quarterly facility inspections; maintain access logs; verify encryption status; review sanitization procedures; track media inventory |
+| **Owner/Principal ([SYSTEM-OWNER])** | Maintain physical security of facility; control physical access; oversee environmental controls; authorize equipment movement; maintain asset inventory; perform media sanitization; transport offsite backups |
+| **ISSO ([SYSTEM-OWNER], concurrent role)** | Document physical security procedures; conduct quarterly facility inspections; maintain access logs; verify encryption status; review sanitization procedures; track media inventory |
 | **Contractors** | Comply with supervised access requirements; do not access server equipment; report physical security concerns; do not remove any media from facility |
 
 ## Compliance and Enforcement
@@ -677,8 +718,8 @@ df -h | grep media
 - NIST SP 800-88 Rev 1 (Guidelines for Media Sanitization)
 - 32 CFR Part 2002 (CUI Marking)
 - System Security Plan (SSP), Sections 3.10 and 3.8
-- Risk Management Policy (TCC-RA-001)
-- Incident Response Policy (TCC-IRP-001)
+- Risk Management Policy (DIWAI-RA-001)
+- Incident Response Policy (DIWAI-IRP-001)
 
 ---
 
@@ -689,8 +730,10 @@ df -h | grep media
 
 **Approved By:**
 /s/ [SYSTEM-OWNER]
-Owner/Principal, [ORGANIZATION]
+Owner/Principal, [DOMAIN.ORG]
 
 **Date:** November 2, 2025
 
 **Next Review Date:** November 2, 2026
+
+---

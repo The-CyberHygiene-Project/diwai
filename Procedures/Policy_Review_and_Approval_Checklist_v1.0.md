@@ -1,5 +1,7 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Policy Review and Approval Checklist
-## [ORGANIZATION] - CyberHygiene Production Network
+## [DOMAIN.ORG] - SecureMac Reference System #2
 
 **Prepared for:** [SYSTEM-OWNER], Owner/Principal/ISSO
 **Date:** November 2, 2025
@@ -29,7 +31,7 @@ This checklist guides you through reviewing, approving, and implementing the 7 n
 - [ ] Review next steps and recommendations
 
 **Key Questions:**
-- Do the policies accurately reflect my CyberHygiene Production Network?
+- Do the policies accurately reflect my SecureMac Reference System #2?
 - Are the solopreneur adaptations appropriate?
 - Do I agree with the compliance approach?
 
@@ -44,7 +46,7 @@ Review in this recommended order:
 
 - [ ] Read Purpose and Scope sections
 - [ ] Review prohibited activities (Section 3)
-- [ ] Verify password requirements match FreeIPA policy
+- [ ] Verify password requirements match 389-DS LDAP policy
 - [ ] Review CUI marking requirements
 - [ ] Check incident reporting procedures
 - [ ] Review user acknowledgment form at end
@@ -61,7 +63,7 @@ Review in this recommended order:
 
 - [ ] Verify TS clearance information is accurate
 - [ ] Review contractor onboarding procedures (Section 2, Procedure 1)
-- [ ] Check FreeIPA account provisioning commands
+- [ ] Check 389-DS LDAP account provisioning commands
 - [ ] Review quarterly access review procedures
 - [ ] Verify emergency access revocation procedures
 - [ ] Review self-attestation form template (Appendix B)
@@ -95,7 +97,7 @@ Review in this recommended order:
 **File:** `Incident_Response_Policy_and_Procedures.docx`
 
 - [ ] Review incident classification matrix (Low/Medium/High/Critical)
-- [ ] Check containment procedures with FreeIPA commands
+- [ ] Check containment procedures with 389-DS LDAP commands
 - [ ] Review Wazuh integration for alerting
 - [ ] Verify DoD reporting procedures (72-hour requirement)
 - [ ] Review backup recovery procedures (ReaR)
@@ -194,7 +196,7 @@ Status: Implemented
 Evidence: Incident Response Policy and Procedures (TCC-IRP-001)
 Location: /backup/personnel-security/policies/Incident_Response_Policy_and_Procedures.docx
 Implementation: Detailed procedures for detection, response, containment, eradication,
-recovery, and post-incident activities. Integrated with Wazuh SIEM, FreeIPA,
+recovery, and post-incident activities. Integrated with Wazuh SIEM, 389-DS LDAP,
 and backup systems. Annual tabletop exercises required.
 ```
 
@@ -214,7 +216,7 @@ Status: Implemented
 Evidence: Personnel Security Policy (TCC-PS-001)
 Location: /backup/personnel-security/policies/Personnel_Security_Policy.docx
 Implementation: Owner holds TS clearance exceeding CUI requirements. Contractor vetting
-procedures with FreeIPA account provisioning. Quarterly access reviews. Emergency revocation
+procedures with 389-DS LDAP account provisioning. Quarterly access reviews. Emergency revocation
 procedures within 1 hour.
 ```
 
@@ -253,7 +255,7 @@ Status: Implemented
 Evidence: Acceptable Use Policy (TCC-AUP-001)
 Location: /backup/personnel-security/policies/Acceptable_Use_Policy.docx
 Implementation: Comprehensive acceptable use policy with prohibited activities,
-CUI marking requirements, password policy integration with FreeIPA, incident reporting
+CUI marking requirements, password policy integration with 389-DS LDAP, incident reporting
 procedures. User acknowledgment required.
 ```
 
@@ -375,7 +377,7 @@ sudo chmod 600 /backup/personnel-security/policies/*.docx
 ```bash
 # Create index file
 cat > /tmp/policy_index.txt << 'EOF'
-[ORGANIZATION] - Policy Document Index
+[DOMAIN.ORG] - Policy Document Index
 Updated: November 2, 2025
 
 Policy Documents:
@@ -419,7 +421,7 @@ Create your own acknowledgment:
 cat > /tmp/owner_acknowledgment.txt << 'EOF'
 POLICY ACKNOWLEDGMENT
 
-I, [SYSTEM-OWNER], Owner/Principal/ISSO of [ORGANIZATION], acknowledge
+I, [SYSTEM-OWNER], Owner/Principal/ISSO of [DOMAIN.ORG], acknowledge
 that I have reviewed and approved the following cybersecurity policies:
 
 - Acceptable Use Policy (TCC-AUP-001)
@@ -593,3 +595,5 @@ Upon completion of this checklist:
 **Prepared By:** Claude Code Assistant
 **Date:** November 2, 2025
 **File Location:** `/home/[USERNAME]/Documents/Claude/Artifacts/Policy_Review_and_Approval_Checklist.md`
+
+---

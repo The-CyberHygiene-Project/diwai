@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Incident Response Policy and Procedures
 
-**Document ID:** TCC-IRP-001
-**Version:** 1.0
+**Document ID:** DIWAI-IRP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-IRP-001` to `DIWAI-IRP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or post-incident
 **Next Review:** November 2, 2026
@@ -11,31 +14,51 @@
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** This policy was
+inherited from Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG];
+the identifier changed but the technical content did not. Corrected in this
+revision: three named workstations that belong to RS#1 (`LabRat`, `Engineering`,
+`Accounting`) replaced with the actual three-host boundary; **pfSense/NetGate**
+references replaced with the real controls (macOS `pf` at the perimeter,
+`firewalld` on the VM); **ClamAV/freshclam** replaced with the **YARA** stack that
+has provided SI-3 since 2026-06-12; **FreeIPA `ipa` commands** replaced with
+389-DS equivalents (`ipa-server` is not installed here); `dc1` hostname
+corrected; personnel scope corrected to a single operator holding all roles.
+A containment caution was added recording that the Mac and VM share a LAN
+segment, so severing the WAN does not isolate them. Controls described by
+**function** rather than product where practical, so a future substitution does
+not silently invalidate the text. Raised as **POA&M-058**; no control changed.
+
+
 ## 1. Incident Response Policy
 
 ### Purpose
 
-This policy defines [ORGANIZATION]'s structured approach to managing cybersecurity incidents on the CyberHygiene Production Network (CPN). It ensures timely detection, response, and recovery to protect Controlled Unclassified Information (CUI) and Federal Contract Information (FCI), in alignment with NIST SP 800-171 Rev 2 (IR-1 through IR-8) and DFARS 252.204-7012 (72-hour external reporting). The policy minimizes operational disruption to core functions such as proposal development, contract administration, and client communications.
+This policy defines [DOMAIN.ORG]'s structured approach to managing cybersecurity incidents on the SecureMac Reference System #2. It ensures timely detection, response, and recovery to protect Controlled Unclassified Information (CUI) and Federal Contract Information (FCI), in alignment with NIST SP 800-171 Rev 2 (IR-1 through IR-8) and DFARS 252.204-7012 (72-hour external reporting). The policy minimizes operational disruption to core functions such as AI-assisted systems administration and research.
 
 ### Scope
 
-Applies to all CPN assets, including:
+Applies to all SecureMac assets, including:
 
-- **Domain controller:** dc1.[DOMAIN.ORG] ([LAN-IP-REDACTED])
-  - FreeIPA domain controller
+- **Domain controller:** services.[DOMAIN.ORG] ([LAN-IP-REDACTED])
+  - 389-DS LDAP domain controller
   - Wazuh Manager (SIEM/security monitoring)
-  - Samba file server with RAID 5 encrypted storage
+  - NAS file server with RAID 5 encrypted storage
   - Centralized rsyslog server
 
-- **Workstations:**
-  - LabRat ([LAN-IP-REDACTED])
-  - Engineering ([LAN-IP-REDACTED])
-  - Accounting ([LAN-IP-REDACTED])
+- **Hosts in boundary:**
+  - `securemac.[DOMAIN.ORG]` — Mac mini M4 Pro ([LAN-IP-REDACTED]), physical host, WAN gateway/firewall, AI inference, and the sole management workstation
+  - `services.[DOMAIN.ORG]` — Rocky Linux 9.7 VM ([LAN-IP-REDACTED]) hosting the directory, SIEM, mail and web services
+  - `nas.[DOMAIN.ORG]` — Synology NAS ([LAN-IP-REDACTED]), supporting infrastructure
 
 - **Network Infrastructure:**
-  - pfSense firewall ([LAN-IP-REDACTED]) with Suricata IDS/IPS
+  - Perimeter firewall: macOS `pf` on the Mac mini ([LAN-IP-REDACTED]); host firewall: `firewalld` on the VM
+  - Network intrusion detection: Suricata on the VM
 
-- **Personnel:** Employees, contractors, and subcontractors accessing CPN
+- **Personnel:** This policy applies to all personnel with access to the system — employees, contractors and subcontractors.
+
+  > **Current instantiation.** In this reference deployment a **single operator holds all four roles** (System Owner, ISSO, System Administrator, User) — see `DIWAI-RAM-001` — and there are presently no employees, contractors or subcontractors. **The personnel provisions below are retained deliberately and apply in full wherever a deployment includes additional people.** This system is a reference model intended for adoption by very small businesses in two configurations: a secure single-operator system, or a domain controller serving a VSB of up to roughly fifteen users. Provisions written only for the present headcount would not survive that adoption.
 
 **Incident Types:** Unauthorized access, data exfiltration, malware infection, denial of service, policy violations, or any event that threatens the confidentiality, integrity, or availability of CUI/FCI.
 
@@ -44,21 +67,21 @@ Applies to all CPN assets, including:
 #### 1. Incident Detection and Reporting
 
 All personnel shall report suspected incidents immediately to the ISSO via:
-- **Email:** Don@contractcoach.com
+- **Email:** [EMAIL-REDACTED]
 - **Phone:** [REDACTED-PHONE]
 
 Automated monitoring tools shall generate alerts within 1 hour of detection:
 - **Wazuh Manager:** Real-time SIEM alerts from all endpoints
-- **Suricata IDS/IPS:** Network-based intrusion detection on pfSense
+- **Suricata IDS/IPS:** Network-based intrusion detection on the VM
 - **rsyslog:** Centralized logging from all systems
 - **auditd:** System audit logging per NIST CUI profile
-- **ClamAV:** Malware detection alerts
+- **Host-based malicious-code protection:** YARA (Wazuh active response on FIM rules 550/554, plus a weekly full-system scan), corroborated by VirusTotal reputation lookups
 
 #### 2. Roles and Responsibilities
 
 | Role | Responsibilities |
 |------|------------------|
-| **ISSO (Don Shannon)** | Lead detection, analysis, containment, reporting, and post-incident review. Coordinate with external entities (e.g., DoD, DIBCSIA). Serve as Incident Commander for all phases. |
+| **ISSO ([SYSTEM-OWNER])** | Lead detection, analysis, containment, reporting, and post-incident review. Coordinate with external entities (e.g., DoD, DIBCSIA). Serve as Incident Commander for all phases. |
 | **Users/Contractors** | Report symptoms immediately; isolate systems if instructed; provide evidence (e.g., screenshots, error messages); cooperate with investigation. |
 
 **Note:** As a solopreneur operation, the ISSO fulfills all incident response roles (Incident Commander, Technical Lead, Communications Lead, Documentation Lead).
@@ -66,7 +89,7 @@ Automated monitoring tools shall generate alerts within 1 hour of detection:
 #### 3. Response and Recovery
 
 **Response Timeline Requirements:**
-- **Containment:** Achieve within 4 hours (e.g., account disable via FreeIPA `ipa user-disable`)
+- **Containment:** Achieve within 4 hours (e.g., account disable via 389-DS LDAP `sudo ldapmodify` (disable user))
 - **Eradication/Recovery:** Complete within 24 hours for low-impact incidents using verified backups (ReaR ISOs)
 - **Testing:** Annual tabletop exercises to validate procedures
 
@@ -79,7 +102,7 @@ Automated monitoring tools shall generate alerts within 1 hour of detection:
 #### 4. Notification Requirements
 
 **Internal Notifications:**
-- Notify all CPN users within 2 hours of confirmed incident
+- Notify all SecureMac users within 2 hours of confirmed incident
 - Provide status updates every 4 hours during active incident response
 
 **External Notifications:**
@@ -123,7 +146,7 @@ This policy integrates with:
 
 ### Overview
 
-This procedure provides actionable steps for executing the Incident Response Policy. It leverages CPN tools (Wazuh SIEM, OpenSCAP, ReaR backups) and assumes a small-team environment.
+This procedure provides actionable steps for executing the Incident Response Policy. It leverages SecureMac tools (Wazuh SIEM, OpenSCAP, ReaR backups) and assumes a small-team environment.
 
 **Incident Classification:**
 - **Low:** Single anomaly, no CUI impact (e.g., failed login attempts)
@@ -135,20 +158,21 @@ This procedure provides actionable steps for executing the Incident Response Pol
 **Maintenance Activities:**
 - Maintain emergency contact list (ISSO primary; DIBCSIA: 301-225-0136)
 - Verify monitoring tools quarterly:
-  - `sudo systemctl status wazuh-manager` (Wazuh Manager on dc1)
-  - `sudo ipactl status` (FreeIPA services)
-  - `sudo systemctl status clamav-freshclam` (ClamAV updates)
+  - `sudo systemctl status wazuh-manager` (Wazuh Manager on the VM)
+  - `systemctl status dirsrv@diwai` (389-DS LDAP services)
+  - `systemctl list-timers yara-fullscan.timer` (malicious-code scan schedule)
+  - `sudo /usr/local/sbin/diwai-control-health` (24 automated control checks)
   - `journalctl -u rsyslog` (centralized logging)
 
 **Training:**
 - Integrate IR procedures into annual security awareness training
-- Conduct tabletop exercises (e.g., mock unauthorized Samba access scenario)
+- Conduct tabletop exercises (e.g., mock unauthorized NAS access scenario)
 - Review incident response flowcharts quarterly
 
 **Resources:**
 - Incident log template: `/backup/logs/incidents/template.txt`
 - Recovery procedures: `/backup/procedures/recovery_guide.md`
-- Wazuh dashboard: https://dc1.[DOMAIN.ORG]:443 (Wazuh UI)
+- Wazuh dashboard: https://services.[DOMAIN.ORG]:443 (Wazuh UI)
 
 ### Procedure Steps
 
@@ -157,7 +181,7 @@ This procedure provides actionable steps for executing the Incident Response Pol
 **Triggers:**
 - User report via email/phone
 - Wazuh alert (dashboard or email notification)
-- Suricata IDS/IPS alert on pfSense
+- Suricata IDS/IPS alert on the VM
 - Failed login alerts: `grep "fail" /var/log/secure | tail -20`
 - Suspicious file integrity monitor (FIM) alerts from Wazuh
 
@@ -166,7 +190,7 @@ This procedure provides actionable steps for executing the Incident Response Pol
 **Step 1.1** - Initial Response:
 ```bash
 # Access domain controller
-ssh dc1.[DOMAIN.ORG]
+ssh services.[DOMAIN.ORG]
 
 # Create incident log
 sudo mkdir -p /backup/logs/incidents/
@@ -208,36 +232,42 @@ For compromised user accounts:
 kinit admin
 
 # Disable compromised account
-ipa user-disable <username>
+ldapmodify -H ldaps://services.[DOMAIN.ORG] -D "cn=Directory Manager" -W   # set nsAccountLock: true
 
 # Verify account status
-ipa user-show <username>
+ldapsearch -H ldaps://services.[DOMAIN.ORG] -D "cn=Directory Manager" -W \
+  -b "uid=<username>,ou=people,dc=diwai,dc=org" nsAccountLock
 ```
 
-For compromised workstations:
+To block a host or address:
 ```bash
-# Block IP address at pfSense firewall
-# Navigate to Firewall > Rules
-# Add block rule for affected IP address
+# On the VM (host firewall)
+sudo firewall-cmd --add-rich-rule='rule family=ipv4 source address=<IP> drop'
 
-# Or use SSH if pfSense SSH is configured:
-# ssh pfsense@[LAN-IP-REDACTED]
-# Add firewall rule via CLI
+# At the perimeter (Mac mini, macOS pf) — edit the anchor then reload
+sudo vi /etc/pf_diwai.conf
+sudo pfctl -f /etc/pf_diwai.conf
 ```
+
+> **Containment caution.** The Mac and the VM share the [LAN-IP-REDACTED]/24 segment.
+> Severing the WAN link contains external access but does **not** isolate the VM
+> from the Mac. If lateral movement is suspected, containment must address the
+> LAN path as well.
 
 For active malware:
 ```bash
 # Quarantine infected files (Wazuh active response)
 # Check Wazuh dashboard for active response actions
 
-# Manual quarantine if needed
-sudo clamscan -r /path/to/infected --move=/var/quarantine/
+# Manual scan if needed
+sudo /usr/local/sbin/yara-fullscan.sh          # full-system YARA scan
+sudo yara -r /var/ossec/etc/rules/yara/ /path/to/suspect
 ```
 
 **Step 2.2** - Notify Users:
 ```bash
 # Send email notification to all users
-# Template: "CPN access restricted pending security investigation. Stand by for updates."
+# Template: "SecureMac access restricted pending security investigation. Stand by for updates."
 ```
 
 **Step 2.3** - Document Containment Actions:
@@ -249,11 +279,8 @@ sudo clamscan -r /path/to/infected --move=/var/quarantine/
 
 **Step 3.1** - Scan and Remediate:
 ```bash
-# Update malware signatures
-sudo freshclam
-
-# Full system scan
-sudo clamscan -r / --infected --log=/var/log/clamav-incident-scan.log
+# Refresh YARA rulesets, then run a full-system scan
+sudo /usr/local/sbin/yara-fullscan.sh
 
 # Apply OpenSCAP remediation if config drift detected
 sudo oscap xccdf eval \
@@ -272,17 +299,17 @@ ls -lt /backup/daily/ | head -5
 
 # Extract specific config files
 cd /backup/daily/$(ls -t /backup/daily/ | head -1)
-tar -xzf ipa-config.tar.gz -C /tmp/
+tar -xzf dirsrv-config.tar.gz -C /tmp/
 
 # Restore files
-sudo cp -a /tmp/etc/ipa/* /etc/ipa/
-sudo systemctl restart ipa
+sudo cp -a /tmp/etc/dirsrv/slapd-diwai/* /etc/dirsrv/slapd-diwai/
+sudo systemctl restart dirsrv@diwai
 ```
 
 **Full system restore:**
 ```bash
 # Boot from ReaR ISO
-# Located at: /srv/samba/backups/rear-dc1.iso
+# Located at: /var/backups/securemac-rear.iso
 
 # Run recovery (from ReaR boot environment)
 rear recover
@@ -294,7 +321,7 @@ sudo systemctl status wazuh-manager
 
 **Step 3.3** - Verify System Integrity:
 ```bash
-# Verify FreeIPA services
+# Verify 389-DS LDAP services
 sudo ipactl status
 
 # Verify Wazuh Manager
@@ -314,10 +341,11 @@ fips-mode-setup --check
 **Step 3.4** - Re-enable Access:
 ```bash
 # Re-enable user accounts (after password reset)
-ipa user-enable <username>
+ldapmodify -H ldaps://services.[DOMAIN.ORG] -D "cn=Directory Manager" -W   # clear nsAccountLock
 
 # Remove firewall blocks
-# Via pfSense GUI: Firewall > Rules > Delete temporary block rules
+sudo firewall-cmd --remove-rich-rule='rule family=ipv4 source address=<IP> drop'   # VM
+sudo pfctl -f /etc/pf_diwai.conf                                                    # Mac, after removing the rule
 
 # Notify users of restored access
 ```
@@ -328,7 +356,7 @@ ipa user-enable <username>
 - Review Wazuh timeline of events
 - Analyze audit logs: `sudo ausearch -ts <incident_date>`
 - Check authentication logs: `sudo aureport -au`
-- Review Suricata IDS logs on pfSense
+- Review Suricata IDS logs on the VM (`/var/log/suricata/`)
 - Identify attack vector and vulnerabilities exploited
 
 **Step 4.2** - External Reporting:
@@ -363,9 +391,9 @@ ipa user-enable <username>
 **Testing Requirements:**
 - **Annual Tabletop Exercise:** November 15 (or anniversary of last incident)
 - **Test Scenarios:**
-  - Simulated malware infection on workstation
-  - Unauthorized access attempt to Samba shares
-  - DoS attack on domain controller
+  - Simulated malicious-code detection on the Mac host
+  - Unauthorized access attempt to NAS shares
+  - DoS attack on the directory service (389-DS on the VM)
   - Ransomware scenario with backup recovery
 
 **Performance Metrics:**
@@ -380,7 +408,7 @@ ipa user-enable <username>
 
 | Severity | Examples | Response Time | Containment Target | External Report? |
 |----------|----------|---------------|-------------------|------------------|
-| **Low** | Failed login attempts (3-5 attempts)<br>Single workstation anomaly<br>Non-CUI system affected | 24 hours | 8 hours | No |
+| **Low** | Failed login attempts (3-5 attempts)<br>Single-host anomaly<br>Non-CUI system affected | 24 hours | 8 hours | No |
 | **Medium** | Malware detection on endpoint<br>Suspicious network traffic<br>Potential CUI exposure<br>Multiple failed logins (>5) | 12 hours | 4 hours | If CUI impacted |
 | **High** | Confirmed data exfiltration<br>CUI compromise<br>Ransomware infection<br>Domain controller compromise | Immediate | 2 hours | Yes (72 hours) |
 | **Critical** | Multiple system compromise<br>Active data exfiltration<br>Loss of FIPS compliance<br>Encryption key compromise | Immediate | 1 hour | Yes (immediate notification + 72hr formal report) |
@@ -400,18 +428,18 @@ sudo ausearch -ua <username> -ts recent
 # Check Wazuh alerts (last 24 hours)
 sudo tail -f /var/ossec/logs/alerts/alerts.log
 
-# Review FreeIPA authentication logs
+# Review 389-DS LDAP authentication logs
 sudo journalctl -u krb5kdc | tail -50
 
-# Check Samba file access logs
+# Check NAS file access logs
 sudo tail -f /var/log/samba/log.smbd
 ```
 
 ### Containment Commands
 ```bash
-# Disable FreeIPA user
+# Disable 389-DS LDAP user
 kinit admin
-ipa user-disable <username>
+ldapmodify -H ldaps://services.[DOMAIN.ORG] -D "cn=Directory Manager" -W   # set nsAccountLock: true
 
 # Reset user password
 ipa passwd <username>
@@ -433,13 +461,13 @@ ls -lt /backup/daily/ | head -5
 cd /backup/daily/<latest>/
 sha256sum -c checksums.sha256
 
-# Restore FreeIPA configuration
+# Restore 389-DS LDAP configuration
 tar -xzf ipa-config.tar.gz -C /tmp/
-sudo cp -a /tmp/etc/ipa/* /etc/ipa/
+sudo cp -a /tmp/etc/dirsrv/slapd-diwai/* /etc/dirsrv/slapd-diwai/
 sudo ipactl restart
 
 # Full system recovery
-# Boot from: /srv/samba/backups/rear-dc1.iso
+# Boot from: /var/backups/securemac-rear.iso
 # Run: rear recover
 ```
 
@@ -449,7 +477,7 @@ sudo ipactl restart
 
 ### Internal Contacts
 - **ISSO/System Owner:** [SYSTEM-OWNER]
-  - Email: Don@contractcoach.com
+  - Email: [EMAIL-REDACTED]
   - Phone: [REDACTED-PHONE]
   - Available: 24/7 for critical incidents
 
@@ -477,8 +505,10 @@ sudo ipactl restart
 
 **Approved By:**
 /s/ [SYSTEM-OWNER]
-Owner/Principal, [ORGANIZATION]
+Owner/Principal, [DOMAIN.ORG]
 
 **Date:** November 2, 2025
 
 **Next Review Date:** November 2, 2026
+
+---

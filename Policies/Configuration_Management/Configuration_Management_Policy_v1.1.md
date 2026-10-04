@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Configuration Management Policy
 
-**Document ID:** TCC-CMP-001
-**Version:** 1.0
+**Document ID:** DIWAI-CMP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-CMP-001` to `DIWAI-CMP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
 **Next Review:** December 2026
@@ -11,9 +14,34 @@
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** Inherited from
+Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG].
+
+**The system inventory — the core artefact of a configuration management policy —
+described the wrong machines running the wrong operating systems:**
+
+- `services.[DOMAIN.ORG]` was listed **twice**, once as a Rocky Linux server and once as a **macOS Sequoia** "AI/ML Server". The AI host is the **Mac mini** (`ai.[DOMAIN.ORG]` / `securemac.[DOMAIN.ORG]`), and it runs **macOS Tahoe 26**, not Sequoia.
+- The **Mac mini was listed as a workstation running Rocky Linux 9.7**, alongside fictional hosts `ws1` and `ws2`.
+- A **pfSense appliance** appeared as network infrastructure; none exists.
+- No entry recorded that `services.[DOMAIN.ORG]` is a **virtual machine on the Mac mini** rather than separate hardware — material to a hardware inventory.
+
+**Baseline standards corrected.** The policy cited the **CIS Apple macOS
+Benchmark** for the Mac. The baseline actually in use is the **macOS Security
+Compliance Project (mSCP)**, local profile `diwai_phase1`, NIST 800-171 aligned —
+the one the weekly scan evaluates and the SSP reports against. The **pfSense DISA
+STIG** line is replaced by treating the `pf` ruleset and `firewalld` configuration
+as configuration items under change control, which is what they are.
+
+Also corrected: **ClamAV** replaced with the YARA stack in the software inventory
+(SI-3 since 2026-06-12); workstation provisions retained and scoped.
+
+Raised as **POA&M-058**; no control changed.
+
+
 ## 1. Purpose
 
-This policy establishes [ORGANIZATION]'s requirements for configuration management on the CyberHygiene Production Network (CPN). It ensures systems are configured securely, changes are controlled, and baseline configurations are maintained to protect Controlled Unclassified Information (CUI) in compliance with NIST SP 800-171 Rev 2 (CM-1 through CM-11) and CMMC Level 2.
+This policy establishes [DOMAIN.ORG]'s requirements for configuration management on the SecureMac Reference System #2. It ensures systems are configured securely, changes are controlled, and baseline configurations are maintained to protect Controlled Unclassified Information (CUI) in compliance with NIST SP 800-171 Rev 2 (CM-1 through CM-11) and CMMC Level 2.
 
 ---
 
@@ -21,11 +49,12 @@ This policy establishes [ORGANIZATION]'s requirements for configuration manageme
 
 This policy applies to:
 
-- **All CPN Systems:**
-  - dc1.[DOMAIN.ORG] (Rocky Linux 9.6) - Domain Controller
-  - ai.[DOMAIN.ORG] (macOS Sequoia) - AI/ML Server
-  - ws1, ws2, ws3.[DOMAIN.ORG] (Rocky Linux 9.6) - Workstations
-  - pfSense firewall - Network infrastructure
+- **All SecureMac Systems:**
+  - `securemac.[DOMAIN.ORG]` / `ai.[DOMAIN.ORG]` (**macOS Tahoe 26**) — Mac mini M4 Pro: perimeter firewall (`pf`), hypervisor, Nextcloud CUI store, AI inference, sole management workstation
+  - `services.[DOMAIN.ORG]` (**Rocky Linux 9.7/9.8 aarch64**, FIPS mode) — UTM virtual machine on the Mac mini: 389-DS, Wazuh, mail, Nextcloud database
+  - `nas.[DOMAIN.ORG]` (**Synology DSM**) — NAS: backups and file shares
+  - Workstations: none presently deployed; in scope where a deployment adds them
+  - Network: `pf` on the Mac mini (perimeter), `firewalld` on the VM — **software firewalls; no appliance**
 
 - **Configuration Items:** Operating systems, applications, firmware, network devices, security tools, baseline configurations
 
@@ -42,9 +71,9 @@ This policy applies to:
 1. **Establish Security Baselines (CM-2):**
    - Maintain documented baseline configurations for each system type
    - Baselines based on industry standards:
-     - **Rocky Linux:** NIST 800-171 CUI profile (SCAP)
-     - **macOS:** CIS Apple macOS Benchmark
-     - **pfSense:** DISA STIG where applicable
+     - **Rocky Linux (VM):** NIST 800-171 CUI profile, evaluated with OpenSCAP/SSG against a tailored profile
+     - **macOS (Mac mini):** **macOS Security Compliance Project (mSCP)** — local baseline `diwai_phase1`, NIST 800-171 aligned. *(The inherited reference to the CIS Apple macOS Benchmark did not describe the baseline actually in use.)*
+     - **Firewall rulesets:** `/etc/pf_diwai.conf` (Mac) and `firewalld` zones/rich rules (VM) are configuration items under change control; there is no appliance to which a DISA STIG applies
    - Document deviations from baseline with security justification
 
 2. **Configuration Settings (CM-6):**
@@ -55,7 +84,7 @@ This policy applies to:
    - Unnecessary services disabled (principle of least functionality)
 
 3. **Baseline Documentation Location:**
-   - `/Documentation/Baselines/` on dc1.[DOMAIN.ORG]
+   - `/Documentation/Baselines/` on services.[DOMAIN.ORG]
    - Version-controlled configuration files in Git repository
    - Software Bill of Materials (SBOM) maintained quarterly
 
@@ -81,7 +110,7 @@ This policy applies to:
    - **Emergency changes:** Document post-implementation
 
 4. **Change Documentation:**
-   - Change log maintained in `/var/log/change-management/`
+   - Change records maintained in the CUI repository under `Compliance/Change_Records/`
    - Include: Date, change description, approver, outcome, rollback procedure
    - POA&M updated if change addresses security finding
 
@@ -118,7 +147,7 @@ This policy applies to:
 **Logical Access Controls:**
 - Administrative access requires:
   - Unique user account (no shared accounts)
-  - Kerberos authentication via FreeIPA
+  - Kerberos authentication via 389-DS LDAP
   - sudo elevation for privileged commands (logged via auditd)
 - Root account disabled for remote login
 - Multi-factor authentication required for contractors (POA&M-SPRS-1)
@@ -139,7 +168,7 @@ This policy applies to:
 | Firewall | Enabled, default-deny | `firewall-cmd --state` |
 | Auditd | Running, CUI profile | `systemctl status auditd` |
 | SSH | Key-based only, no root login | `/etc/ssh/sshd_config` |
-| Password Policy | 14-char min, 90-day expiry | FreeIPA policy |
+| Password Policy | 14-char min, 90-day expiry | 389-DS LDAP policy |
 | Session Lock | 15-minute timeout | `gsettings` or screen saver |
 
 ### 3.6 Least Functionality (CM-7)
@@ -167,7 +196,7 @@ This policy applies to:
 **The organization shall maintain:**
 
 1. **System Inventory:**
-   - Hardware inventory (servers, workstations, network devices)
+   - Hardware inventory (hosts, workstations where deployed, network devices). Note that `services.[DOMAIN.ORG]` is a **virtual machine** on the Mac mini and has no separate hardware entry
    - Location, serial numbers, acquisition dates
    - Assignment (user/function)
    - Update quarterly
@@ -175,7 +204,7 @@ This policy applies to:
 2. **Software Inventory (SBOM):**
    - Operating systems and versions
    - Installed applications and patch levels
-   - Security software (Wazuh, ClamAV, Suricata)
+   - Security software (Wazuh, YARA, Suricata, fapolicyd, usbguard)
    - Update quarterly or upon major changes
    - Location: `Evidence/Software_Inventory/`
 
@@ -221,7 +250,7 @@ This policy applies to:
    - sudo access limited to System Administrator
    - Change management process required for all installations
 
-2. **Workstations:**
+2. **Workstations** *(where a deployment includes them; none presently)*:
    - Standard software suite pre-installed
    - Additional software requests submitted via change management
    - ISSO reviews security implications
@@ -280,7 +309,7 @@ This policy applies to:
 /etc/firewalld/                    # Firewall rules
 ```
 
-**macOS System (ai.[DOMAIN.ORG]):**
+**macOS System (services.[DOMAIN.ORG]):**
 ```
 /etc/pf.conf                       # Packet filter firewall
 ~/Library/Preferences/             # Security preferences
@@ -335,7 +364,7 @@ Outcome: Success / Failed / Rolled Back
 Post-Implementation Validation: <verification results>
 ```
 
-**Log Location:** `/var/log/change-management/changes.log`
+**Log Location:** CUI repository, `Compliance/Change_Records/` (one record per engagement; see `DIWAI-CR-2026-08-01`)
 
 ---
 
@@ -429,3 +458,5 @@ Signature: /s/ [SYSTEM-OWNER]                Date: February 15, 2026
 ---
 
 **END OF DOCUMENT**
+
+---

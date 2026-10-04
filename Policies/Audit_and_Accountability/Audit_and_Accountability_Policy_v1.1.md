@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Audit and Accountability Policy
 
-**Document ID:** TCC-AAP-001
-**Version:** 1.0
+**Document ID:** DIWAI-AAP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-AAP-001` to `DIWAI-AAP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
 **Next Review:** December 2026
@@ -11,9 +14,31 @@
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** Inherited from
+Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG].
+
+- **The audited-systems list named one host three times.** `mac-mini.[DOMAIN.ORG] ([LAN-IP-REDACTED])` appeared as "Admin Workstation", "Engineering Workstation" and "Operations Workstation" — three RS#1 workstations bulk-replaced with this system's single host, leaving three identical entries. Replaced with the actual three hosts.
+- **`pfSense` removed** from the log-source table; the firewalls are macOS `pf` and `firewalld`, whose logs reach Wazuh via the host agents.
+
+**Two retention figures were unsubstantiated and are corrected rather than
+restated** (verified 2026-08-04):
+
+- **"Centralized retention: 90 days on Wazuh Manager"** — **no ISM retention policy is configured** on the indexer. Nothing deletes indices at 90 days; data accumulates. The figure was not enforced by any mechanism.
+- **"Archival retention: 1 year on encrypted backup media"** — encrypted archives ship to the NAS daily, but **no expiry rule or verified one-year retention exists**.
+- **"Online retention: 30 days minimum"** is now achievable and is restated with its basis (6.4 GB configured capacity), together with the material caveat that retention was raised only on **2026-08-01** — before which it held roughly **one hour** (POA&M-012) — so audit history begins at that date and 30-day depth accrues from it.
+
+**AU-11 is a requirement to define and enforce retention.** Publishing periods
+that no mechanism enforces would be a claim that cannot be demonstrated on
+request. Defining an indexer ISM policy and a NAS archive expiry rule is
+outstanding work, tracked under **POA&M-059**.
+
+Raised as **POA&M-058**.
+
+
 ## 1. Purpose
 
-This policy establishes [ORGANIZATION]'s requirements for audit logging, monitoring, and accountability on the CyberHygiene Production Network (CPN). It ensures comprehensive audit trails for all security-relevant events to detect unauthorized activity, support incident investigations, and meet NIST SP 800-171 Rev 2 requirements (AU-1 through AU-12) and CMMC Level 2 compliance.
+This policy establishes [DOMAIN.ORG]'s requirements for audit logging, monitoring, and accountability on the SecureMac Reference System #2. It ensures comprehensive audit trails for all security-relevant events to detect unauthorized activity, support incident investigations, and meet NIST SP 800-171 Rev 2 requirements (AU-1 through AU-12) and CMMC Level 2 compliance.
 
 ---
 
@@ -21,14 +46,15 @@ This policy establishes [ORGANIZATION]'s requirements for audit logging, monitor
 
 This policy applies to:
 
-- **All CPN Systems:**
-  - dc1.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - Domain Controller
-  - ai.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - AI/ML Server
-  - ws1.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - Admin Workstation
-  - ws2.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - Engineering Workstation
-  - ws3.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - Operations Workstation
+- **All SecureMac Systems:**
+  - services.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - LDAP/Services Server
+  - services.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - AI/ML Server
+  - `securemac.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — Mac mini M4 Pro: host, perimeter firewall, hypervisor, Nextcloud CUI store, and sole management workstation
+  - `services.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — Rocky Linux VM: 389-DS, Wazuh manager, mail, Nextcloud database
+  - `nas.[DOMAIN.ORG]` ([LAN-IP-REDACTED]) — Synology NAS
+  - Additional workstations, where a deployment includes them
 
-- **All Personnel:** Employees, contractors, and subcontractors accessing CPN resources
+- **All Personnel:** Employees, contractors, and subcontractors accessing SecureMac resources
 
 - **Audit Events:** Authentication, authorization, file access, system configuration changes, privileged operations, security incidents
 
@@ -74,10 +100,17 @@ This policy applies to:
    - Logs transmitted to centralized Wazuh Manager for tamper-resistant storage
 
 3. **Retention Period (AU-11):**
-   - **Online retention:** 30 days minimum on local systems
-   - **Centralized retention:** 90 days on Wazuh Manager
-   - **Archival retention:** 1 year on encrypted backup media
+   - **Online retention (VM audit logs):** configured for `max_log_file = 64` MB × `num_logs = 100` ≈ **6.4 GB**, which at current volume supports well over 30 days. *Note: retention was raised on 2026-08-01 (`DIWAI-CR-2026-08-01` C12) from a prior configuration holding roughly one hour; audit history therefore begins 2026-08-01 and the 30-day depth accrues from that date.*
+   - **Centralized retention (Wazuh indexer):** **no automated retention policy is configured.** Verified 2026-08-04 — no ISM policy governs index deletion. Data accumulates rather than being retained for a defined period and then aged out. The previously stated "90 days" was not enforced by any mechanism.
+   - **Archival retention:** encrypted audit archives are shipped to the NAS daily (`wazuh-log-archive`). **No automated expiry or verified one-year retention is in place**; the previously stated "1 year" was not enforced.
    - Extended retention for incidents under investigation
+
+   > **Both centralized and archival figures were unsubstantiated claims and are
+   > corrected rather than restated.** Defining and enforcing retention periods —
+   > an ISM policy on the indexer, and an expiry rule for the NAS archives — is
+   > outstanding work, tracked with the other recurring-obligation gaps under
+   > **POA&M-059**. Stating a retention period no mechanism enforces would be an
+   > AU-11 claim that cannot be demonstrated.
 
 ### 3.3 Audit Monitoring and Review (AU-6, AU-6(1))
 
@@ -123,13 +156,13 @@ This policy applies to:
 | System Component | Logging Tool | Configuration |
 |------------------|--------------|---------------|
 | Operating System | auditd | NIST 800-171 CUI profile |
-| Authentication | pam, sssd, FreeIPA | All auth events logged |
+| Authentication | pam, sssd, 389-DS LDAP | All auth events logged |
 | File Access | auditd file watches | CUI directories monitored |
 | Web Services | Apache access/error logs | Combined log format |
 | Email Services | Postfix, Dovecot | Mail delivery and access logged |
 | SIEM | Wazuh Manager | Centralized log aggregation |
 | Network | Suricata IDS/IPS | EVE JSON format |
-| Firewall | pfSense | syslog to Wazuh Manager |
+| Firewall | macOS `pf` (Mac mini) / `firewalld` (VM) | pf logs via the Mac Wazuh agent; firewalld via the VM agent |
 
 ### 3.6 Audit Reduction and Reporting (AU-7)
 
@@ -218,13 +251,13 @@ This policy applies to:
 -w /etc/gshadow -p wa -k identity
 
 # CUI data access
--w /srv/samba/shared -p rwa -k cui_access
+-w /mnt/nas/shared -p rwa -k cui_access
 -w /data -p rwa -k cui_access
 ```
 
 ### 5.2 Wazuh SIEM Integration
 
-**Wazuh Manager:** dc1.[DOMAIN.ORG]:1514
+**Wazuh Manager:** services.[DOMAIN.ORG]:1514
 
 **Monitored Logs:**
 - `/var/log/audit/audit.log` (auditd)
@@ -289,7 +322,7 @@ All violations shall be documented and investigated according to the Incident Re
 - **Update Triggers:**
   - New regulatory requirements
   - Security incidents revealing policy gaps
-  - Changes to CPN infrastructure
+  - Changes to SecureMac infrastructure
   - Audit findings or assessments
 
 - **Approval Authority:** System Owner / ISSO
@@ -299,8 +332,8 @@ All violations shall be documented and investigated according to the Incident Re
 ## 9. Related Documents
 
 - System Security Plan (SSP) - Section AU (Audit and Accountability)
-- Incident Response Policy (TCC-IRP-001)
-- System and Information Integrity Policy (TCC-SII-001)
+- Incident Response Policy (DIWAI-IRP-001)
+- System and Information Integrity Policy (DIWAI-SI-001)
 - NIST SP 800-171 Rev 2
 - NIST SP 800-53 Rev 5 (AU family)
 
@@ -339,3 +372,5 @@ Signature: /s/ [SYSTEM-OWNER]                Date: February 15, 2026
 ---
 
 **END OF DOCUMENT**
+
+---

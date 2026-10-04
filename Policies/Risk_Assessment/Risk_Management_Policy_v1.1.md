@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Risk Management Policy and Procedures
 
-**Document ID:** TCC-RA-001
-**Version:** 1.0
+**Document ID:** DIWAI-RA-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-RA-001` to `DIWAI-RA-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon significant changes
 **Next Review:** November 2, 2026
@@ -11,40 +14,72 @@
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** Inherited from
+Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG]; the identifier
+changed, the content did not. **The asset register in Step 4.3 listed another
+system's assets** — `dc1`, `Engineering WS`, `Accounting WS`, `LabRat WS` and a
+`pfSense` appliance — with recovery time objectives attached to each. None of
+those assets exists here. Replaced with this system's three hosts.
+
+**Recovery Time Objectives are now recorded as "not established" rather than
+carried over.** The inherited table asserted a 4-hour RTO for the server tier.
+No restoration has been tested end to end (**POA&M-052**), and the one documented
+bare-metal recovery (`DIWAI-INC-002`) returned an incomplete host for reasons
+never determined. Publishing an untested RTO would assert a recovery capability
+that has not been demonstrated; the objectives are to be set once POA&M-052
+closes.
+
+Also corrected: **pfSense/NetGate** → macOS `pf` and `firewalld`, Suricata
+located on the VM; **ClamAV** → the YARA stack (SI-3 since 2026-06-12); the
+"Workstation Hardware Failure" scenario reframed as **host** hardware failure,
+which is the material risk here given that one machine carries the firewall,
+hypervisor, CUI store and daily working environment.
+
+Workstation provisions are **retained and scoped** — this is a reference model
+intended for adoption by very small businesses, including multi-user deployments.
+Raised as **POA&M-058**; no control changed.
+
+
 ## 1. Risk Management Policy
 
 ### Purpose
 
-This policy establishes a structured framework for identifying, assessing, prioritizing, responding to, and monitoring risks to [ORGANIZATION]'s CyberHygiene Production Network (CPN) and associated operations. It ensures the protection of Controlled Unclassified Information (CUI) and Federal Contract Information (FCI) by integrating risk management into daily activities, aligning with NIST SP 800-171 Revision 2 (RA-1 through RA-9) and supporting CMMC Level 2 requirements. The policy minimizes threats to core functions such as proposal development, contract administration, and client communications, while leveraging existing tools like Wazuh SIEM for vulnerability detection and OpenSCAP for configuration assessments.
+This policy establishes a structured framework for identifying, assessing, prioritizing, responding to, and monitoring risks to [DOMAIN.ORG]'s SecureMac Reference System #2 and associated operations. It ensures the protection of Controlled Unclassified Information (CUI) and Federal Contract Information (FCI) by integrating risk management into daily activities, aligning with NIST SP 800-171 Revision 2 (RA-1 through RA-9) and supporting CMMC Level 2 requirements. The policy minimizes threats to core functions such as AI-assisted systems administration and research, while leveraging existing tools like Wazuh SIEM for vulnerability detection and OpenSCAP for configuration assessments.
 
 ### Scope
 
-This policy applies to all CPN assets and personnel involved in handling CUI/FCI, including:
+This policy applies to all SecureMac assets and personnel involved in handling CUI/FCI, including:
 
 **Systems:**
-- **Domain controller:** dc1.[DOMAIN.ORG] ([LAN-IP-REDACTED])
-  - FreeIPA domain services
+- **Domain controller:** services.[DOMAIN.ORG] ([LAN-IP-REDACTED])
+  - 389-DS LDAP domain services
   - Wazuh Manager (SIEM and security monitoring)
-  - Samba file server with encrypted RAID 5 array
+  - NAS file server with encrypted RAID 5 array
   - Centralized rsyslog server
 
 - **Workstations:**
-  - LabRat ([LAN-IP-REDACTED])
-  - Engineering ([LAN-IP-REDACTED])
-  - Accounting ([LAN-IP-REDACTED])
+  - None presently deployed. The Mac mini host doubles as the sole management
+    workstation — see SSP §3.2.1 for the role-concentration risk this creates
+    and the planned separation.
+
+  > **Where a deployment includes workstations**, they are in scope of this
+  > policy and must be entered in the asset register below.
 
 - **Network Infrastructure:**
-  - pfSense firewall ([LAN-IP-REDACTED]) with Suricata IDS/IPS
+  - Perimeter firewall: macOS `pf` on the Mac mini ([LAN-IP-REDACTED])
+  - Host firewall: `firewalld` on the VM ([LAN-IP-REDACTED])
+  - Suricata IDS/IPS on the VM
 
 **Personnel:**
 - Employees (ISSO/System Owner)
-- Contractors and subcontractors accessing CPN via FreeIPA or Samba shares
+- Contractors and subcontractors accessing SecureMac via 389-DS LDAP or NAS shares
 
 **Processes:**
 - Risk assessments during system changes
-- Personnel onboarding/offboarding (per TCC-PS-001)
-- Incident response integration (per TCC-IRP-001)
-- System and information integrity monitoring (per TCC-SI-001)
+- Personnel onboarding/offboarding (per DIWAI-PS-001)
+- Incident response integration (per DIWAI-IRP-001)
+- System and information integrity monitoring (per DIWAI-SI-001)
 
 **Risk Types:**
 - Cybersecurity threats (malware, unauthorized access, data exfiltration)
@@ -78,7 +113,7 @@ This policy applies to all CPN assets and personnel involved in handling CUI/FCI
 
 #### 1. Risk Management Policy and Procedures (RA-1)
 
-[ORGANIZATION] shall maintain and review this policy annually, with procedures documented in Section 2 of this document. Compliance is verified through:
+[DOMAIN.ORG] shall maintain and review this policy annually, with procedures documented in Section 2 of this document. Compliance is verified through:
 - Quarterly System Security Plan (SSP) reviews
 - Integration with Wazuh alerts for real-time risk indicators
 - OpenSCAP compliance scanning results
@@ -86,12 +121,12 @@ This policy applies to all CPN assets and personnel involved in handling CUI/FCI
 
 #### 2. Security Categorization (RA-2)
 
-All CPN systems and information shall be categorized based on potential impact to organizational operations, assets, and individuals (Low/Moderate/High per FIPS 199):
+All SecureMac systems and information shall be categorized based on potential impact to organizational operations, assets, and individuals (Low/Moderate/High per FIPS 199):
 
 **System Categorization:**
-- **Overall CPN:** Moderate impact due to CUI/FCI handling
-- **Domain Controller (dc1):** Moderate impact (critical authentication and authorization services)
-- **Workstations:** Moderate impact (CUI data processing and storage)
+- **Overall SecureMac:** Moderate impact due to CUI/FCI handling
+- **Service VM (`services.[DOMAIN.ORG]`):** High impact — 389-DS directory, Wazuh SIEM, mail, and the Nextcloud database
+- **Mac mini host (`securemac.[DOMAIN.ORG]`):** High impact — perimeter firewall, hypervisor, Nextcloud CUI file store (plaintext at rest), AI stack, and management workstation
 - **Network Infrastructure:** Moderate impact (controls access to all CUI systems)
 
 **Information Categorization:**
@@ -133,15 +168,15 @@ Conduct comprehensive risk assessments at the following intervals:
 #### 4. Risk Assessment Updates (RA-3)
 
 Update risk assessments within 72 hours of:
-- Security incidents (per TCC-IRP-001)
+- Security incidents (per DIWAI-IRP-001)
 - Wazuh vulnerability alerts with CVSS scores >7.0
 - OpenSCAP compliance failures
 - New threat intelligence
 - System configuration changes
 
 Integrate updates with:
-- System and Information Integrity Policy (TCC-SI-001) for flaw remediation tracking
-- Incident Response Policy (TCC-IRP-001) for post-incident analysis
+- System and Information Integrity Policy (DIWAI-SI-001) for flaw remediation tracking
+- Incident Response Policy (DIWAI-IRP-001) for post-incident analysis
 - Plan of Action & Milestones (POA&M) for remediation tracking
 
 #### 5. Vulnerability Monitoring and Scanning (RA-5)
@@ -159,7 +194,7 @@ Integrate updates with:
   - Results stored in `/backup/compliance-scans/`
 
 **Manual Reviews:**
-- High-risk asset configurations (dc1 FreeIPA, pfSense firewall)
+- High-risk asset configurations (389-DS on the VM; `pf` perimeter firewall on the Mac host)
 - Third-party software before deployment
 - Custom scripts and configurations
 
@@ -181,8 +216,8 @@ Track all remediation activities in POA&M.
 #### 6. Vulnerability Scanning Coverage (RA-5)
 
 Vulnerability scans shall cover:
-- All CPN endpoints (domain controller, workstations)
-- Network devices (pfSense firewall)
+- All in-boundary hosts (Mac mini, service VM, NAS; plus workstations where deployed)
+- Network boundary (`pf` on the Mac mini; `firewalld` on the VM)
 - Authenticated scans where possible (Wazuh agents)
 - Operating system vulnerabilities
 - Application vulnerabilities
@@ -194,7 +229,7 @@ Vulnerability scans shall cover:
 - Use Wazuh agent-based scanning to minimize network impact
 
 **Information Sharing:**
-- Share vulnerability findings with personnel via security awareness training (per TCC-AT-001)
+- Share vulnerability findings with personnel via security awareness training (per DIWAI-ATP-001)
 - Brief users on applicable mitigations
 - Update documentation based on findings
 
@@ -206,7 +241,7 @@ Assess risks from third-party vendors and contractors:
 1. Require vendor security attestations during onboarding
 2. Request CMMC self-assessment or certification status
 3. Review vendor security policies and procedures
-4. Assess vendor access requirements (FreeIPA accounts, Samba shares)
+4. Assess vendor access requirements (389-DS LDAP accounts, NAS shares)
 5. Implement least-privilege access controls
 
 **Vendor Categories:**
@@ -222,32 +257,32 @@ Assess risks from third-party vendors and contractors:
 **Mitigation Strategies:**
 - Contract flow-down clauses (FAR 52.204-21, DFARS 252.204-7012)
 - Non-Disclosure Agreements (NDAs) for all contractors
-- Limited-duration FreeIPA accounts with expiration dates
+- Limited-duration 389-DS LDAP accounts with expiration dates
 - Quarterly access reviews and account audits
-- Personnel Security procedures (per TCC-PS-001)
+- Personnel Security procedures (per DIWAI-PS-001)
 
 #### 8. Criticality Analysis (RA-7)
 
-Prioritize CPN components by criticality to organizational operations:
+Prioritize SecureMac components by criticality to organizational operations:
 
 **Criticality Levels:**
 
 **High Criticality:**
-- dc1.[DOMAIN.ORG] (domain controller)
-  - FreeIPA authentication/authorization
+- services.[DOMAIN.ORG] (domain controller)
+  - 389-DS LDAP authentication/authorization
   - Wazuh Manager security monitoring
-  - Samba file server (CUI data storage)
+  - NAS file server (CUI data storage)
   - rsyslog centralized logging
 - Loss impact: Complete operational shutdown
 
 **Medium Criticality:**
-- Workstations (Engineering, Accounting, LabRat)
+- Workstations, where a deployment includes them
   - Proposal development and contract administration
   - CUI document processing
 - Loss impact: Reduced operational capacity, deadline risk
 
 **Low Criticality:**
-- pfSense firewall (easily restored from backup configuration)
+- `pf` ruleset (restored from `/etc/pf_diwai.conf`, held in version control and backup)
 - Loss impact: Network isolation, restore within 4 hours
 
 **Criticality Analysis Updates:**
@@ -270,12 +305,12 @@ Include non-cyber risks in comprehensive risk assessments:
 - Unauthorized physical access to home office
 - Theft or damage to equipment
 - Loss of power or environmental controls
-- Coordinate with Physical Security Policy (TCC-PE-001)
+- Coordinate with Physical Security Policy (DIWAI-PE-MP-001)
 
 **Personnel Risks:**
 - Insider threats (accidental or malicious)
 - Loss of key personnel (solopreneur business continuity)
-- Coordinate with Personnel Security Policy (TCC-PS-001)
+- Coordinate with Personnel Security Policy (DIWAI-PS-001)
 
 **Natural Disasters:**
 - Fire, flood, severe weather
@@ -302,7 +337,7 @@ Continuous monitoring and periodic review of organizational risks:
   - SCA: 12-hour intervals
   - Active response for critical alerts
 
-- **Suricata IDS/IPS:** Network intrusion detection on pfSense
+- **Suricata IDS/IPS:** Network intrusion detection on the VM
   - Integration with Wazuh for centralized alerting
   - Daily rule updates
 
@@ -336,12 +371,12 @@ Continuous monitoring and periodic review of organizational risks:
 
 | Role | Responsibilities |
 |------|------------------|
-| **ISSO (Don Shannon)** | Lead risk assessments; maintain risk register; integrate Wazuh/OpenSCAP tools; report high risks to Owner/Principal; remediate or mitigate identified risks; coordinate DoD reporting per DFARS 252.204-7012 |
-| **Owner/Principal (Don Shannon)** | Approve risk responses for Medium/High residual risks; authorize resource allocation for risk mitigation; oversee policy compliance; make risk acceptance decisions |
+| **ISSO ([SYSTEM-OWNER])** | Lead risk assessments; maintain risk register; integrate Wazuh/OpenSCAP tools; report high risks to Owner/Principal; remediate or mitigate identified risks; coordinate DoD reporting per DFARS 252.204-7012 |
+| **Owner/Principal ([SYSTEM-OWNER])** | Approve risk responses for Medium/High residual risks; authorize resource allocation for risk mitigation; oversee policy compliance; make risk acceptance decisions |
 | **Personnel/Contractors** | Report potential risks immediately; participate in risk assessment interviews; cooperate with vulnerability scanning; attend tabletop exercises |
 | **Contract Administrator (if engaged)** | Support supply chain risk assessments; manage vendor NDAs and flow-down clauses; track vendor compliance |
 
-**Note:** As a solopreneur, the ISSO and Owner/Principal roles are fulfilled by the same individual (Don Shannon).
+**Note:** As a solopreneur, the ISSO and Owner/Principal roles are fulfilled by the same individual ([SYSTEM-OWNER]).
 
 ### Compliance and Enforcement
 
@@ -362,10 +397,10 @@ This policy integrates with:
 - NIST SP 800-171 Rev 2, RA Family (Risk Assessment)
 - NIST SP 800-30 Rev 1, Guide for Conducting Risk Assessments
 - System Security Plan (SSP), Section 3.11
-- Incident Response Policy (TCC-IRP-001)
-- Personnel Security Policy (TCC-PS-001)
-- System and Information Integrity Policy (TCC-SI-001)
-- Physical and Environmental Protection Policy (TCC-PE-001)
+- Incident Response Policy (DIWAI-IRP-001)
+- Personnel Security Policy (DIWAI-PS-001)
+- System and Information Integrity Policy (DIWAI-SI-001)
+- Physical and Environmental Protection Policy (DIWAI-PE-MP-001)
 - Wazuh Operations Guide
 - OpenSCAP compliance reports
 
@@ -375,7 +410,7 @@ This policy integrates with:
 
 ### Overview
 
-This procedure provides step-by-step guidance for implementing the Risk Management Policy (TCC-RA-001). It operationalizes risk identification, assessment, response, and monitoring processes to protect CUI/FCI on the CPN. Processes leverage automated capabilities like Wazuh SIEM (vulnerability detection, FIM, SCA) on dc1.[DOMAIN.ORG] and OpenSCAP for compliance scans.
+This procedure provides step-by-step guidance for implementing the Risk Management Policy (DIWAI-RA-001). It operationalizes risk identification, assessment, response, and monitoring processes to protect CUI/FCI on the SecureMac. Processes leverage automated capabilities like Wazuh SIEM (vulnerability detection, FIM, SCA) on services.[DOMAIN.ORG] and OpenSCAP for compliance scans.
 
 Risks are tracked in a centralized risk register: `/backup/risk-management/risk-register.xlsx`
 
@@ -425,7 +460,7 @@ sudo oscap xccdf eval \
     /usr/share/xml/scap/ssg/content/ssg-rl9-ds.xml
 
 # Export Wazuh vulnerability data
-# Access Wazuh dashboard: https://dc1.[DOMAIN.ORG]:443
+# Access Wazuh dashboard: https://services.[DOMAIN.ORG]:443
 # Navigate to Modules > Security Events > Vulnerabilities
 # Export vulnerability report
 
@@ -540,7 +575,7 @@ sudo oscap xccdf generate fix \
 
 **Step 2.2** - Prioritize Remediation:
 - Group vulnerabilities by severity
-- Consider system criticality (dc1 = highest priority)
+- Consider system criticality (the Mac host and the service VM are jointly highest priority — neither functions without the other)
 - Account for compensating controls
 - Create POA&M items for each vulnerability
 
@@ -585,10 +620,10 @@ sudo oscap xccdf eval \
 - Assess vendor's supply chain practices
 
 **Step 3.2** - Access Requirements Analysis:
-- Determine if vendor needs CPN access
+- Determine if vendor needs SecureMac access
 - Identify minimum required privileges
 - Specify access duration (temporary vs. ongoing)
-- Plan for FreeIPA account provisioning
+- Plan for 389-DS LDAP account provisioning
 
 **Step 3.3** - Risk Assessment:
 - Evaluate vendor's security posture
@@ -601,7 +636,7 @@ sudo oscap xccdf eval \
 # Create time-limited contractor account
 kinit admin
 ipa user-add contractor_name --first=First --last=Last \
-    --email=contractor@example.com --shell=/bin/bash
+    --email=[EMAIL-REDACTED] --shell=/bin/bash
 
 # Set account expiration
 ipa user-mod contractor_name --principal-expiration=20260101000000Z
@@ -648,11 +683,36 @@ For each system, assess:
 
 | System | Function | Users | CUI Data | RTO | Criticality |
 |--------|----------|-------|----------|-----|-------------|
-| dc1 | Authentication, files, monitoring | All | Yes | 4 hours | High |
-| Engineering WS | Proposal development | 1 | Yes | 24 hours | Medium |
-| Accounting WS | Contract admin | 1 | Yes | 24 hours | Medium |
-| LabRat WS | Testing, development | 1 | No | 72 hours | Low |
-| pfSense | Network security | All | No | 4 hours | Medium |
+| `securemac.[DOMAIN.ORG]` (Mac mini) | Perimeter firewall, hypervisor, Nextcloud CUI file store, AI stack, management workstation | 1 | **Yes — plaintext at rest** | **Not established** | **High** |
+| `services.[DOMAIN.ORG]` (Rocky VM) | 389-DS directory, Wazuh SIEM, mail, Nextcloud database | 1 | **Yes** | **1 hour** — measured ≈8 min end-to-end, 2026-08-04 (`DIWAI-EV-CP-2026-08-04`) | **High** |
+| `nas.[DOMAIN.ORG]` (Synology) | Backup target, file shares | 1 | **Yes** (backups) | **Not established** | Medium |
+
+> **RTO for the service VM was established 2026-08-04 by measurement**, not
+> estimate: a verified restoration from the NAS archive completed **end to end in
+> ≈8 minutes** (35 GB copy 5 min 51 s; boot to login 98 s), with the 389-DS
+> directory (21 entries, identical to production) and the Nextcloud database
+> (412 tables) confirmed intact — `DIWAI-EV-CP-2026-08-04`. The objective is set
+> at **1 hour**, allowing margin over the measured figure for decision time,
+> media availability and a less favourable starting position.
+>
+> **The Mac host and NAS RTOs remain "not established."** The Mac has no tested
+> restore, and it carries the firewall, hypervisor and plaintext CUI store. Note
+> also that restoring the VM alone yields a Nextcloud database referencing files
+> held on the Mac and absent from that archive (POA&M-050) — the 1-hour figure is
+> a **component** RTO, not a system-recovery objective.
+>
+> **Original note retained:** Recovery Time Objectives were deliberately recorded as "not established."
+> No restoration has been tested end to end (**POA&M-052**). A prior bare-metal
+> Time Machine recovery (`DIWAI-INC-002`, 2026-04-14) completed but returned an
+> **incomplete** host, and the cause was never determined. The operator's working
+> estimate is 1–3 hours for a Mac restore, based on that experience and recorded
+> in `DIWAI-IR-TTX-001` — but an estimate is not an objective, and stating an
+> untested RTO here would assert a recovery capability that has not been
+> demonstrated. RTOs are to be set once POA&M-052 is closed.
+>
+> **The two hosts are not independent.** The VM runs on the Mac, and Nextcloud is
+> split across both — files on the Mac, database in the VM. Neither restores to a
+> working state alone (POA&M-050).
 
 **Step 4.4** - Protection Prioritization:
 - Allocate backup resources based on criticality
@@ -677,7 +737,7 @@ sudo systemctl status wazuh-manager
 **Weekly Activities (Manual):**
 ```bash
 # Review Wazuh dashboard for new alerts
-# https://dc1.[DOMAIN.ORG]:443
+# https://services.[DOMAIN.ORG]:443
 
 # Check for critical vulnerabilities
 # Dashboard: Vulnerabilities > CVSS > Critical
@@ -751,7 +811,7 @@ uptime
 
 **Risk ID:** RISK-2025-001
 **Date Identified:** YYYY-MM-DD
-**Identified By:** Don Shannon (ISSO)
+**Identified By:** [SYSTEM-OWNER] (ISSO)
 
 **Risk Description:**
 [Detailed description of threat and vulnerability]
@@ -791,7 +851,7 @@ uptime
 **Planned Mitigations:**
 [Specific actions to reduce risk]
 
-**Implementation Owner:** Don Shannon
+**Implementation Owner:** [SYSTEM-OWNER]
 **Target Date:** YYYY-MM-DD
 **Status:** ☐ Open ☐ In Progress ☐ Closed ☐ Accepted
 
@@ -808,11 +868,11 @@ Date: _______________
 - **Likelihood:** Medium (increasing threat landscape)
 - **Impact:** High (CUI data inaccessible)
 - **Risk Score:** 6
-- **Mitigations:** ClamAV scanning, Wazuh FIM, offline backups, LUKS encryption
+- **Mitigations:** YARA scanning (Wazuh active response on FIM 550/554 plus weekly full scan), VirusTotal reputation lookup, Wazuh FIM, fapolicyd, SELinux, encrypted backups, LUKS/FileVault at rest
 - **Residual Risk:** Low
 
-### 2. Workstation Hardware Failure
-- **Threat:** Disk failure on Engineering workstation
+### 2. Host Hardware Failure
+- **Threat:** Disk or hardware failure on the Mac mini — which carries the firewall, the hypervisor, the CUI file store and the daily working environment simultaneously
 - **Likelihood:** Medium (age of equipment)
 - **Impact:** Medium (work disruption, data loss if no backup)
 - **Risk Score:** 4
@@ -861,7 +921,7 @@ Date: _______________
 
 3. **File Integrity Monitoring**
    - Dashboard: Modules > Security Events > Integrity Monitoring
-   - Watch for: Unauthorized changes to /etc, /var/ossec, /srv/samba
+   - Watch for: Unauthorized changes to /etc, /var/ossec, /mnt/nas
    - Action: Investigate all unexpected changes
 
 4. **Authentication**
@@ -883,8 +943,10 @@ Date: _______________
 
 **Approved By:**
 /s/ [SYSTEM-OWNER]
-Owner/Principal, [ORGANIZATION]
+Owner/Principal, [DOMAIN.ORG]
 
 **Date:** November 2, 2025
 
 **Next Review Date:** November 2, 2026
+
+---

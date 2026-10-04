@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # Personnel Security Policy
 
-**Document ID:** TCC-PS-001
-**Version:** 1.0
+**Document ID:** DIWAI-PS-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-PS-001` to `DIWAI-PS-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.2
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon significant organizational changes
 **Next Review:** November 2, 2026
@@ -11,16 +14,64 @@
 
 ---
 
+
+
+**Version 1.2 (2026-08-04) — screening claims made evidenceable.** Reviewed by
+the system owner, who directed that clearances and investigations which cannot
+currently be documented should not be discussed. Applied as follows.
+
+- **Security-clearance references removed as the basis of compliance.** v1.1 stated a Top Secret clearance as the **requirement** for the high-risk position and described an FBI Single Scope Background Investigation, credit review, neighbour interviews and DoD CAF adjudication as the screening performed. Two problems: (a) **CUI is unclassified** — NIST SP 800-171 **3.9.1** requires *screening*, not a clearance, so stating one as the requirement both overstates the standard and makes the policy unusable by any organisation adopting this reference model; (b) the supporting evidence is **not currently producible** — obtaining a copy of the investigative file is an action not yet taken. **A control claim that cannot be produced on request is a liability, not an asset.**
+- **Replaced with documentable screening:** identity verification, criminal history check, professional reference verification, signed eligibility attestation, and an executed NDA — each required to produce a retainable record, reviewed at least every three years.
+- **Storage path corrected.** Screening records were assigned to `/backup/personnel-security/`, which **exists on neither host** (verified 2026-08-04) — the same defect as F-2026-08-33. Records are assigned to the canonical CUI store at `Compliance/Evidence/Personnel/`, consistent with `DIWAI-TRR-001`.
+- Definition of "Personnel Screening" amended to match.
+
+**Retained:** counterintelligence reporting channels (§ insider threat), which
+describe where to report concerns and assert nothing about the operator's status.
+
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** Inherited from
+Reference System #1 (CyberInABox), which ran **FreeIPA**. This system runs
+**389-DS directly** — `ipa-server` is not installed — so every `ipa` command in
+this policy was inoperable as written. Sixteen instances converted to `dsidm`
+equivalents verified against the running directory (`dsidm diwai account
+lock|unlock|entry-status`, `dsidm diwai user create|get|list|modify`).
+
+**One capability does not carry across, and is recorded rather than faked.**
+FreeIPA supports **Kerberos principal expiration**, which this policy used to
+expire contractor accounts automatically and to query for accounts expiring
+within 30 days. **389-DS has no equivalent attribute.** Contractor end-dates must
+therefore be tracked in the contractor register and the account locked manually
+on that date (`dsidm diwai account lock`). Writing a `dsidm` command that appeared
+to do automatic expiry would have asserted a control this directory does not
+provide.
+
+> **Consequence worth noting:** contractor access expiry is now a **manual**
+> control dependent on someone remembering a date. That is a weaker position than
+> the inherited policy described, and a candidate for the automation in
+> **POA&M-059** (recurring obligations with no execution record).
+
+Also corrected: pfSense reference replaced with the `pf` ruleset on the Mac mini;
+workstation references scoped for deployments that include them.
+
+**Left unchanged:** §"Special Case — Solopreneur Environment", which already
+scopes this policy correctly for a single-operator business. *(The clearance note
+referred to here was subsequently rewritten in v1.2 — see below.)*
+Personnel provisions are retained in full — this is a reference model intended
+for adoption by VSBs with employees and contractors.
+
+Raised as **POA&M-058**; no control changed.
+
+
 ## Purpose
 
-This policy establishes requirements for personnel security within [ORGANIZATION], ensuring that individuals accessing the CyberHygiene Production Network (CPN) and handling Controlled Unclassified Information (CUI) or Federal Contract Information (FCI) are trustworthy and appropriately vetted. It aligns with NIST SP 800-171 Revision 2 (PS-1 through PS-8) and supports CMMC Level 2 by mitigating insider threats through screening, access agreements, and termination/transfer processes. The policy promotes a secure environment for government contracting operations, including proposal development and contract administration.
+This policy establishes requirements for personnel security within [DOMAIN.ORG], ensuring that individuals accessing the SecureMac Reference System #2 and handling Controlled Unclassified Information (CUI) or Federal Contract Information (FCI) are trustworthy and appropriately vetted. It aligns with NIST SP 800-171 Revision 2 (PS-1 through PS-8) and supports CMMC Level 2 by mitigating insider threats through screening, access agreements, and termination/transfer processes. The policy promotes a secure environment for systems administration and AI research operations, including proposal development and contract administration.
 
 ## Scope
 
 This policy applies to all personnel, including:
 
 - **Employees:** [SYSTEM-OWNER] (Owner/Principal/ISSO)
-- **Contractors and subcontractors:** Individuals accessing CPN resources via FreeIPA authentication or Samba file shares on dc1.[DOMAIN.ORG]
+- **Contractors and subcontractors:** Individuals accessing SecureMac resources via 389-DS LDAP authentication or NAS file shares (nas.[DOMAIN.ORG]) on services.[DOMAIN.ORG]
 - **Third parties:** Any individual involved in CUI/FCI processing
 
 **Personnel Lifecycle Coverage:**
@@ -31,11 +82,24 @@ This policy applies to all personnel, including:
 
 **Exclusions:** Non-CUI administrative staff (none currently).
 
-**Note:** As a solopreneur business, the Owner/Principal holds a current Top Secret (TS) security clearance, which exceeds all requirements for CUI access screening. Many personnel security controls are not applicable due to the single-person nature of the organization.
+**Note on screening and clearances.** **CUI is unclassified.** NIST SP 800-171
+**3.9.1** requires that individuals be *screened* prior to authorizing access to
+systems containing CUI; it does **not** require a security clearance, and no
+provision of this policy should be read as imposing one. Screening requirements
+are stated below in terms that any adopting organization can meet and, more
+importantly, **evidence**.
+
+Where the Owner/Principal holds credentials or investigations beyond these
+requirements, they are **not cited here as the basis of compliance** — a control
+claim that cannot be produced on request is a liability rather than an asset.
+Screening is evidenced by the records described in "Record Retention" below.
+
+Many personnel controls are scoped by the single-person nature of this
+deployment; see "Special Case — Solopreneur Environment".
 
 ## Definitions
 
-- **Personnel Screening:** Verification of background, including criminal history, credit checks (where applicable), and security clearances
+- **Personnel Screening:** Documented verification of an individual's background prior to authorizing CUI access — identity, criminal history, and professional references. CUI is unclassified; screening does not entail a security clearance.
 
 - **Access Agreement:** Non-Disclosure Agreement (NDA) or similar binding document outlining CUI handling responsibilities
 
@@ -51,27 +115,27 @@ This policy applies to all personnel, including:
 
 ### 1. Personnel Security Policy and Procedures (PS-1)
 
-[ORGANIZATION] shall maintain and review this policy annually. Procedures for implementation are documented in Section 2 of this document. Compliance is verified through:
+[DOMAIN.ORG] shall maintain and review this policy annually. Procedures for implementation are documented in Section 2 of this document. Compliance is verified through:
 - Quarterly System Security Plan (SSP) reviews
 - Annual access recertification
-- FreeIPA account audits
+- 389-DS LDAP account audits
 - Wazuh authentication log reviews
 
 ### 2. Position Risk Designation (PS-2)
 
-All positions involving CPN access shall be designated based on risk level:
+All positions involving SecureMac access shall be designated based on risk level:
 
 **High Risk:**
 - **Position:** ISSO/System Owner/Owner/Principal
-- **Access:** Full administrative access to all CPN systems
+- **Access:** Full administrative access to all SecureMac systems
 - **CUI Exposure:** Complete access to all CUI/FCI data
-- **Requirement:** Top Secret security clearance (currently held by Don Shannon)
-- **Screening:** FBI background investigation, credit check, reference interviews, adjudication by DoD CAF
-- **Reinvestigation:** Every 5 years per TS clearance requirements
+- **Requirement:** Documented screening before access is authorized; executed NDA/access agreement
+- **Screening:** Identity verification; criminal history check; professional reference verification; attestation of eligibility to access CUI
+- **Reinvestigation:** Reviewed at least every 3 years, and on any event under "Review Triggers"
 
 **Moderate Risk:**
 - **Position:** Contractors/consultants with CUI access
-- **Access:** Limited to specific Samba shares or workstations
+- **Access:** Limited to specific NAS shares, or to workstations where a deployment includes them
 - **CUI Exposure:** Partial access to specific CUI datasets
 - **Requirement:** NDA execution, basic screening
 - **Screening:** Self-attestation, proof of citizenship/residency, reference check
@@ -79,7 +143,7 @@ All positions involving CPN access shall be designated based on risk level:
 
 **Low Risk:**
 - **Position:** Administrative support without CUI access
-- **Access:** No CPN access
+- **Access:** No SecureMac access
 - **CUI Exposure:** None
 - **Requirement:** Minimal vetting
 - **Current Status:** No such positions exist
@@ -92,36 +156,34 @@ All positions involving CPN access shall be designated based on risk level:
 
 ### 3. Personnel Screening (PS-3)
 
-Prior to granting CPN access, all personnel shall undergo screening proportional to position risk:
+Prior to granting SecureMac access, all personnel shall undergo screening proportional to position risk:
 
-**High-Risk Positions (ISSO/Owner):**
-- Top Secret security clearance process (already completed)
-  - FBI background investigation (Single Scope Background Investigation)
-  - Credit history review
-  - Reference interviews with associates and neighbors
-  - Criminal history check (FBI fingerprint-based)
-  - Adjudication by DoD Consolidated Adjudication Facility (CAF)
-- Result: TS clearance EXCEEDS requirements for CUI access per NIST SP 800-171
-- Reinvestigation: Every 5 years per DoD requirements
-- Current Status: Don Shannon holds active TS clearance
+**High-Risk Positions (ISSO / System Owner):**
+- Identity verification (government-issued photo identification)
+- Criminal history check
+- Professional reference verification (minimum two)
+- Signed attestation of eligibility to access CUI and of no disqualifying circumstances
+- Executed NDA / access agreement before access is granted
+- **Each item above must produce a retainable record.** Screening that cannot be evidenced does not satisfy 3.9.1, however thorough it was in fact.
+- Review: at least every 3 years, and on any "Review Triggers" event
 
 **Moderate-Risk Positions (Contractors):**
-- Self-attestation form (template in `/backup/personnel-security/templates/`)
+- Self-attestation form (template held in `Compliance/Evidence/Personnel/templates/`)
 - Proof of U.S. citizenship or lawful permanent residency
 - Criminal background check (if contract value >$10,000 or CUI access >30 days)
 - Reference verification (minimum 2 professional references)
-- NDA execution before any CPN access
+- NDA execution before any SecureMac access
 
 **Screening Frequency:**
-- Initial: Before first access to CPN
-- Periodic: Every 5 years or upon clearance renewal
+- Initial: Before first access to SecureMac
+- Periodic: At least every 3 years
 - Event-driven: After security incidents or concerning behavior
 
 **Record Retention:**
 - Screening documentation: 3 years post-separation
 - NDA agreements: 7 years (contract requirement)
-- Clearance verification: Duration of employment + 3 years
-- Storage location: `/backup/personnel-security/` (LUKS encrypted)
+- Screening records: Duration of engagement + 3 years
+- Storage location: the canonical CUI store — `Compliance/Evidence/Personnel/` — on FileVault-encrypted storage with group-folder access control, consistent with training records under `DIWAI-TRR-001`. (The inherited path `/backup/personnel-security/` does not exist on either host.)
 
 ### 4. Personnel Termination (PS-4)
 
@@ -129,12 +191,12 @@ Upon termination or separation (voluntary or involuntary):
 
 **Immediate Actions (within 1 hour of notification):**
 ```bash
-# Disable FreeIPA account
+# Disable 389-DS LDAP account
 kinit admin
-ipa user-disable <username>
+dsidm diwai account lock uid=<username>,ou=people,dc=diwai,dc=org
 
 # Verify account disabled
-ipa user-show <username> | grep -i disabled
+dsidm diwai account entry-status uid=<username>,ou=people,dc=diwai,dc=org
 
 # Force Kerberos ticket expiration
 # (automatic upon account disable)
@@ -153,10 +215,10 @@ ipa user-show <username> | grep -i disabled
 # Review authentication history
 sudo ausearch -ua <username> -ts recent
 
-# Check file access on Samba shares
+# Check file access on NAS shares
 sudo grep <username> /var/log/samba/log.smbd
 
-# Review Wazuh agent logs for user's workstation
+# Review Wazuh agent logs for the host the user accessed
 # Dashboard: Agents > <agent> > Security Events
 ```
 
@@ -188,7 +250,7 @@ For internal transfers or role changes affecting risk level or access requiremen
 - Re-evaluate position risk designation
 - Assess new CUI access requirements
 - Determine if additional screening needed
-- Review current clearance/screening adequacy
+- Review current screening adequacy
 
 **Access Adjustments:**
 ```bash
@@ -200,9 +262,9 @@ ipa group-remove-member <old_group> --users=<username>
 ipa group-add-member <new_group> --users=<username>
 
 # Verify group memberships
-ipa user-show <username> | grep -A 10 "Member of groups"
+dsidm diwai user get <username>            # includes group membership
 
-# Adjust Samba share permissions if needed
+# Adjust NAS share permissions if needed
 # Review /etc/samba/smb.conf for share ACLs
 ```
 
@@ -231,15 +293,15 @@ All personnel shall sign an NDA or CUI Access Agreement prior to access, acknowl
 **Required Agreement Elements:**
 - Responsibilities for protecting CUI per 32 CFR Part 2002
 - Proper CUI marking and handling procedures
-- Incident reporting requirements per IR Policy (TCC-IRP-001)
-- Acceptable use of CPN systems
+- Incident reporting requirements per IR Policy (DIWAI-IRP-001)
+- Acceptable use of SecureMac systems
 - Prohibition on unauthorized disclosure
 - Consequences of policy violations
 - Agreement to comply with all security policies
 - Acknowledgment of monitoring and audit rights
 
 **Agreement Execution:**
-- **Timing:** Before any CPN access granted
+- **Timing:** Before any SecureMac access granted
 - **Method:** Digital signature accepted (via DocuSign or equivalent)
 - **Witnesses:** Not required for NDAs
 - **Copies:** Original to personnel file, copy to individual
@@ -268,8 +330,8 @@ Contractors, subcontractors, and third-party personnel must meet equivalent secu
 - Provide evidence of their own security policies
 - Submit CMMC self-assessment or certification (if applicable)
 - Meet screening requirements per Position Risk Designation (PS-2)
-- Execute NDA before any CPN access
-- Comply with all Contract Coach security policies
+- Execute NDA before any SecureMac access
+- Comply with all [ORGANIZATION] security policies
 
 **Contract Flow-Down Clauses:**
 - FAR 52.204-21 (Basic Safeguarding of Covered Contractor Information Systems)
@@ -283,7 +345,7 @@ Contractors, subcontractors, and third-party personnel must meet equivalent secu
 # Review contractor account activity
 sudo ausearch -ua contractor_name -ts week
 
-# Check Samba file access
+# Check NAS file access
 sudo grep contractor_name /var/log/samba/log.smbd
 
 # Review Wazuh authentication events
@@ -291,8 +353,8 @@ sudo grep contractor_name /var/log/samba/log.smbd
 ```
 
 **Supervised Access:**
-- Remote access via FreeIPA authentication (logged)
-- Samba file access audited via VFS audit module
+- Remote access via 389-DS LDAP authentication (logged)
+- NAS file access audited via VFS audit module
 - Wazuh SIEM monitors all contractor activity
 - Monthly review of contractor access logs
 - Quarterly contractor account recertification
@@ -301,11 +363,13 @@ sudo grep contractor_name /var/log/samba/log.smbd
 ```bash
 # Create time-limited contractor account
 kinit admin
-ipa user-add contractor_name --first=First --last=Last \
-    --email=contractor@example.com --shell=/bin/bash
+dsidm diwai user create --uid contractor_name --cn '<Full Name>' \
+    --email=[EMAIL-REDACTED] --shell=/bin/bash
 
 # Set account expiration (e.g., 90 days)
-ipa user-mod contractor_name --principal-expiration=20260201000000Z
+# 389-DS has no principal-expiration attribute; record the end date in the
+# contractor register and lock the account on that date:
+#   dsidm diwai account lock uid=contractor_name,ou=people,dc=diwai,dc=org
 
 # Restrict to specific groups (least privilege)
 ipa group-add-member contractors --users=contractor_name
@@ -313,7 +377,7 @@ ipa group-add-member file_share_ro --users=contractor_name
 
 # Do NOT add to sudorule or admin groups
 # Verify no elevated privileges
-ipa user-show contractor_name
+dsidm diwai user get contractor_name
 ```
 
 **Vendor Due Diligence:**
@@ -321,7 +385,7 @@ ipa user-show contractor_name
 - Review vendor incident history
 - Assess vendor's supply chain security
 - Verify vendor compliance with federal security requirements
-- Document vendor assessment in risk register (per TCC-RA-001)
+- Document vendor assessment in risk register (per DIWAI-RA-001)
 
 ### 8. Personnel Sanctions (PS-8)
 
@@ -371,9 +435,9 @@ Violations of security policies shall result in appropriate sanctions:
 - Major offense: Termination + possible legal action
 
 **Integration with Other Policies:**
-- Incident Response Policy (TCC-IRP-001): Security incident procedures
-- Risk Management Policy (TCC-RA-001): Personnel risk assessment
-- Training Policy (TCC-AT-001): Remedial training requirements
+- Incident Response Policy (DIWAI-IRP-001): Security incident procedures
+- Risk Management Policy (DIWAI-RA-001): Personnel risk assessment
+- Training Policy (DIWAI-ATP-001): Remedial training requirements
 
 **Appeals Process:**
 - Individual may appeal sanction to Owner/Principal (if not already Owner's decision)
@@ -385,18 +449,18 @@ Violations of security policies shall result in appropriate sanctions:
 
 | Role | Responsibilities |
 |------|------------------|
-| **ISSO (Don Shannon)** | Oversee screening processes; maintain personnel security records in `/backup/personnel-security/`; execute access provisioning/revocation; monitor compliance; conduct periodic access reviews; enforce sanctions (minor/moderate) |
-| **Owner/Principal (Don Shannon)** | Approve high-risk position designations; authorize major sanctions; accept residual personnel risks; ensure policy compliance; approve contractor engagements; make final personnel security decisions |
+| **ISSO ([SYSTEM-OWNER])** | Oversee screening processes; maintain personnel security records in `/backup/personnel-security/`; execute access provisioning/revocation; monitor compliance; conduct periodic access reviews; enforce sanctions (minor/moderate) |
+| **Owner/Principal ([SYSTEM-OWNER])** | Approve high-risk position designations; authorize major sanctions; accept residual personnel risks; ensure policy compliance; approve contractor engagements; make final personnel security decisions |
 | **Personnel/Contractors** | Complete required screening; adhere to access agreements; report security concerns or personal changes (legal issues, foreign contacts); participate in security training; comply with all policies |
 | **HR/Contract Administrator** | If engaged in future: Coordinate background checks, manage contractor agreements, track screening renewals. **Current Status:** ISSO handles all personnel security functions |
 
-**Note:** As a solopreneur, the ISSO and Owner/Principal roles are fulfilled by the same individual (Don Shannon), providing unified decision authority for all personnel security matters.
+**Note:** As a solopreneur, the ISSO and Owner/Principal roles are fulfilled by the same individual ([SYSTEM-OWNER]), providing unified decision authority for all personnel security matters.
 
 ## Compliance and Enforcement
 
 **Monitoring Activities:**
 - Annual audits of screening records and expirations
-- Quarterly FreeIPA account reviews
+- Quarterly 389-DS LDAP account reviews
 - Monthly contractor access log reviews
 - Wazuh authentication monitoring (continuous)
 - Integration with OpenSCAP compliance scans
@@ -405,19 +469,20 @@ Violations of security policies shall result in appropriate sanctions:
 - Security awareness training covers personnel security responsibilities
 - Annual refresher on CUI handling and NDA obligations
 - Incident reporting procedures (72-hour DoD requirement)
-- Documented in Security Awareness and Training Policy (TCC-AT-001)
+- Documented in Security Awareness and Training Policy (DIWAI-ATP-001)
 
 **Audit Procedures:**
 ```bash
-# List all active FreeIPA users
+# List all active 389-DS LDAP users
 kinit admin
-ipa user-find --all
+dsidm diwai user list
 
 # Check for accounts without recent activity
 sudo aureport -au --summary
 
 # Review contractor account expirations
-ipa user-find --principal-expiration="<$(date +%Y%m%d)000000Z"
+# 389-DS has no Kerberos principal expiry. Review end-dates from the
+# contractor register and lock manually — see note below.
 
 # List users in privileged groups
 ipa group-show admins
@@ -443,9 +508,9 @@ ipa group-show backup_operators
 - FAR 52.204-21 (Basic Safeguarding of Covered Contractor Information Systems)
 - 32 CFR Part 2002 (Controlled Unclassified Information Program)
 - System Security Plan (SSP), Section 3.9
-- Risk Management Policy (TCC-RA-001)
-- Incident Response Policy (TCC-IRP-001)
-- Security Awareness and Training Policy (TCC-AT-001)
+- Risk Management Policy (DIWAI-RA-001)
+- Incident Response Policy (DIWAI-IRP-001)
+- Security Awareness and Training Policy (DIWAI-ATP-001)
 
 ---
 
@@ -453,7 +518,7 @@ ipa group-show backup_operators
 
 ### Procedure 1: Contractor Onboarding
 
-**Trigger:** New contractor engagement requiring CPN access
+**Trigger:** New contractor engagement requiring SecureMac access
 
 **Steps:**
 
@@ -463,7 +528,7 @@ ipa group-show backup_operators
 - Request contractor security questionnaire
 - Review contractor's CMMC status or self-assessment
 - Evaluate contractor's security policies
-- Conduct risk assessment (per TCC-RA-001, Supply Chain Risk)
+- Conduct risk assessment (per DIWAI-RA-001, Supply Chain Risk)
 
 **2. Contract Execution:**
 - Include FAR 52.204-21 and DFARS 252.204-7012 flow-down clauses
@@ -487,17 +552,19 @@ ipa group-show backup_operators
 
 **5. Account Provisioning:**
 ```bash
-# Create FreeIPA account
+# Create 389-DS LDAP account
 kinit admin
 
 # Add contractor user
-ipa user-add contractor_name --first=FirstName --last=LastName \
-    --email=contractor@company.com \
+dsidm diwai user create --uid contractor_name --cn '<Full Name>' \
+    --email=[EMAIL-REDACTED] \
     --shell=/bin/bash \
     --homedir=/home/contractor_name
 
 # Set time-limited principal expiration
-ipa user-mod contractor_name --principal-expiration=20260531000000Z
+# 389-DS has no principal-expiration attribute; record the end date in the
+# contractor register and lock the account on that date:
+#   dsidm diwai account lock uid=contractor_name,ou=people,dc=diwai,dc=org
 
 # Set strong password (provide securely, require change on first login)
 ipa passwd contractor_name
@@ -509,13 +576,13 @@ ipa group-add-member contractors --users=contractor_name
 ipa group-add-member file_share_ro --users=contractor_name
 
 # Verify no admin privileges
-ipa user-show contractor_name | grep -A 20 "Member of groups"
+dsidm diwai user get contractor_name       # verify group membership
 # Should NOT see: admins, sudorule, backup_operators
 ```
 
 **6. Access Briefing:**
-- Demonstrate FreeIPA authentication process
-- Explain Samba file share access procedures
+- Demonstrate 389-DS LDAP authentication process
+- Explain NAS file share access procedures
 - Review acceptable use policy
 - Provide Wazuh monitoring disclosure (inform of logging)
 - Provide ISSO contact information for questions/incidents
@@ -524,11 +591,11 @@ ipa user-show contractor_name | grep -A 20 "Member of groups"
 - Create contractor personnel file: `/backup/personnel-security/contractors/<name>/`
 - File all screening documents
 - Store executed NDA and access agreement
-- Document FreeIPA account details (username, expiration, groups)
+- Document 389-DS LDAP account details (username, expiration, groups)
 - Add to contractor tracking spreadsheet
 
 **8. Wazuh Monitoring Setup:**
-- Verify Wazuh agent deployed to contractor's assigned workstation (if applicable)
+- Verify a Wazuh agent is deployed to any workstation assigned to the contractor (where the deployment includes workstations)
 - Configure alerts for contractor username
 - Enable FIM for contractor's file access
 - Set up authentication monitoring
@@ -543,9 +610,9 @@ ipa user-show contractor_name | grep -A 20 "Member of groups"
 
 **Step 1: Generate User List:**
 ```bash
-# List all active FreeIPA users
+# List all active 389-DS LDAP users
 kinit admin
-ipa user-find --all > /tmp/user_review_$(date +%Y%m%d).txt
+dsidm diwai user list > /tmp/user_review_$(date +%Y%m%d).txt
 
 # Identify users by group
 ipa group-show admins
@@ -575,10 +642,11 @@ sudo last -F | grep <username>
 **Step 4: Review Contractor Expirations:**
 ```bash
 # List contractor accounts with expirations
-ipa user-find --all | grep -A 5 contractor
+dsidm diwai user list | grep -A 5 contractor
 
 # Check for expired or soon-to-expire principals
-ipa user-find --principal-expiration="<$(date -d '+30 days' +%Y%m%d)000000Z"
+# Contractor accounts expiring within 30 days: review the contractor
+# register; 389-DS provides no principal-expiration query.
 ```
 
 **Step 5: Review Privileged Access:**
@@ -595,7 +663,7 @@ ipa group-show backup_operators
 **Step 6: Remediation:**
 - Disable inactive accounts (no activity in 90 days):
 ```bash
-ipa user-disable <username>
+dsidm diwai account lock uid=<username>,ou=people,dc=diwai,dc=org
 ```
 
 - Remove unnecessary group memberships
@@ -624,10 +692,10 @@ ipa user-disable <username>
 ```bash
 # Emergency account lockout
 kinit admin
-ipa user-disable <username>
+dsidm diwai account lock uid=<username>,ou=people,dc=diwai,dc=org
 
 # Verify disabled
-ipa user-show <username> | grep -i disabled
+dsidm diwai account entry-status uid=<username>,ou=people,dc=diwai,dc=org
 # Output should show: Account disabled: True
 ```
 
@@ -646,7 +714,7 @@ sudo klist -A
 # Add temporary firewall block for user's IP
 sudo firewall-cmd --add-rich-rule='rule family="ipv4" source address="<user_ip>" reject'
 
-# Or configure on pfSense:
+# Or apply at the perimeter, in /etc/pf_diwai.conf on the Mac mini:
 # Firewall > Rules > LAN > Add block rule for source IP
 ```
 
@@ -661,7 +729,7 @@ sudo cp /var/log/secure /backup/incident-evidence/$(date +%Y%m%d)-<username>/
 # Preserve audit logs
 sudo cp -r /var/log/audit /backup/incident-evidence/$(date +%Y%m%d)-<username>/
 
-# Preserve Samba access logs
+# Preserve NAS access logs
 sudo cp /var/log/samba/*.smbd /backup/incident-evidence/$(date +%Y%m%d)-<username>/
 
 # Preserve Wazuh alerts
@@ -687,7 +755,7 @@ sudo grep <username> /var/log/samba/log.smbd | tail -50
 - Review FIM alerts for suspicious changes
 
 **7. Incident Response:**
-- Follow Incident Response Policy (TCC-IRP-001)
+- Follow Incident Response Policy (DIWAI-IRP-001)
 - Determine if DoD reporting required (72-hour clock starts)
 - Notify Owner/Principal immediately
 - Consider law enforcement involvement
@@ -714,7 +782,7 @@ sudo grep <username> /var/log/samba/log.smbd | tail -50
 - [ ] Criminal background check completed (if required)
 - [ ] NDA executed and filed
 - [ ] CUI Access Agreement signed
-- [ ] FreeIPA account created with time-limited expiration
+- [ ] 389-DS LDAP account created with time-limited expiration
 - [ ] User added to appropriate groups (least privilege)
 - [ ] Admin privileges verified as NOT granted
 - [ ] Access briefing conducted
@@ -741,7 +809,7 @@ sudo grep <username> /var/log/samba/log.smbd | tail -50
 
 ### Personnel Termination
 
-- [ ] FreeIPA account disabled immediately
+- [ ] 389-DS LDAP account disabled immediately
 - [ ] Active sessions killed
 - [ ] Network access blocked (if needed)
 - [ ] Exit interview conducted (if planned)
@@ -761,7 +829,7 @@ sudo grep <username> /var/log/samba/log.smbd | tail -50
 
 ### Self-Attestation Form (Contractor Screening)
 
-**[ORGANIZATION] - Contractor Self-Attestation Form**
+**[DOMAIN.ORG] - Contractor Self-Attestation Form**
 
 **Contractor Information:**
 - Full Legal Name: _______________________
@@ -825,7 +893,7 @@ Signature: _______________________ Date: _______________________
 
 **Approved By:**
 /s/ [SYSTEM-OWNER]
-Owner/Principal, [ORGANIZATION]
+Owner/Principal, [DOMAIN.ORG]
 
 **Date:** November 2, 2025
 
@@ -839,7 +907,7 @@ Owner/Principal, [ORGANIZATION]
 - Version 1.0 - November 2, 2025 - Initial policy establishment
 
 **Distribution:**
-- Owner/Principal (Don Shannon)
+- Owner/Principal ([SYSTEM-OWNER])
 - Filed in: `/backup/personnel-security/policies/`
 - SSP Reference: Section 3.9
 
@@ -849,3 +917,5 @@ Owner/Principal, [ORGANIZATION]
 - Organizational structure changes
 - New contract requirements
 - Annual policy review cycle
+
+---

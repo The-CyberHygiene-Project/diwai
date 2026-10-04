@@ -1,7 +1,10 @@
+> **REDACTED PUBLIC COPY.** Identifiers (IPs, owner, organization, ISP, domain, contact, CAGE/DUNS) replaced with placeholders for public release. Authoritative unredacted copy held in the RS2 access-controlled store.
+
 # System and Communications Protection Policy
 
-**Document ID:** TCC-SCP-001
-**Version:** 1.0
+**Document ID:** DIWAI-SCP-001
+**Editorial Correction (2026-08-01):** Document identifier changed from `TCC-SCP-001` to `DIWAI-SCP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
 **Next Review:** December 2026
@@ -11,9 +14,31 @@
 
 ---
 
+
+**Version 1.1 (2026-08-04) — technical accuracy correction.** Inherited from
+Reference System #1 (CyberInABox) and bulk-edited for [DOMAIN.ORG].
+
+**Two claims asserted controls stronger than those in place. Both are corrected
+rather than restated:**
+
+1. **"Firewall/IDS functions on separate hardware (pfSense appliance)."** There is no separate hardware and no DMZ. The perimeter firewall (`pf`) runs on the Mac mini, which is also the hypervisor for the VM carrying the directory, SIEM and CUI database, and which holds the Nextcloud file store. This condition is **formally accepted** — risk **R-02** (HIGH) in `DIWAI-RAR-001`, tracked as **POA&M-023**, accepted in writing to 2027-03-31. **A signed policy claiming the separation exists directly contradicted an accepted risk stating it does not.**
+2. **"Suricata — IPS mode: Block and alert on threats."** Verified 2026-08-04: Suricata runs af-packet on `enp0s1`/`tun0` with no inline copy-mode and no nfqueue — **IDS only**. It detects and alerts; it does not block. Blocking is performed by `pf` and `firewalld` on rules, not by Suricata on detections.
+
+**Host inventory corrected.** The scope list gave `services.[DOMAIN.ORG]` two
+different addresses and roles, listed the Mac mini as a workstation, invented
+`ws1`/`ws2`, and placed a pfSense appliance at **[LAN-IP-REDACTED]** — the Mac's own
+address. Three different entities claimed one IP. Replaced with the actual three
+hosts; interface detail added for the triple-homed Mac.
+
+Also corrected: §5.1 rewritten for macOS `pf` (`/etc/pf_diwai.conf`); the
+superseded ClamAV FIPS risk-acceptance memo replaced with `DIWAI-EV-SI3-002`.
+Workstation provisions retained and scoped. Raised as **POA&M-058**; no control
+changed — but see item 1, where the policy had claimed one that never existed.
+
+
 ## 1. Purpose
 
-This policy establishes [ORGANIZATION]'s requirements for protecting system boundaries and communications on the CyberHygiene Production Network (CPN). It ensures confidentiality, integrity, and availability of Controlled Unclassified Information (CUI) during storage and transmission in compliance with NIST SP 800-171 Rev 2 (SC-1 through SC-28) and CMMC Level 2.
+This policy establishes [DOMAIN.ORG]'s requirements for protecting system boundaries and communications on the SecureMac Reference System #2. It ensures confidentiality, integrity, and availability of Controlled Unclassified Information (CUI) during storage and transmission in compliance with NIST SP 800-171 Rev 2 (SC-1 through SC-28) and CMMC Level 2.
 
 ---
 
@@ -21,11 +46,11 @@ This policy establishes [ORGANIZATION]'s requirements for protecting system boun
 
 This policy applies to:
 
-- **All CPN Systems:**
-  - dc1.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - Domain Controller
-  - ai.[DOMAIN.ORG] ([LAN-IP-REDACTED]) - AI/ML Server
-  - ws1, ws2, ws3.[DOMAIN.ORG] ([LAN-IP-REDACTED]-23) - Workstations
-  - pfSense firewall ([LAN-IP-REDACTED]) - Network perimeter
+- **All SecureMac Systems:**
+  - `securemac.[DOMAIN.ORG]` / `ai.[DOMAIN.ORG]` (**[LAN-IP-REDACTED]**) — Mac mini M4 Pro: perimeter firewall (macOS `pf`), hypervisor, Nextcloud CUI store, AI inference, sole management workstation
+  - `services.[DOMAIN.ORG]` (**[LAN-IP-REDACTED]**) — Rocky Linux VM: 389-DS directory, Wazuh SIEM, mail, Nextcloud database
+  - `nas.[DOMAIN.ORG]` (**[LAN-IP-REDACTED]**) — Synology NAS: backups and file shares
+  - Workstations: none presently deployed; in scope where a deployment adds them
 
 - **All Communications:**
   - Network traffic (internal and external)
@@ -55,8 +80,8 @@ This policy applies to:
 
 2. **Service Isolation:**
    - Each major service runs on dedicated system or container
-   - File server (Samba) separate from domain controller functions
-   - AI/ML workloads isolated on dedicated hardware (ai.[DOMAIN.ORG])
+   - File server (NAS) separate from domain controller functions
+   - AI/ML workloads isolated on dedicated hardware (services.[DOMAIN.ORG])
 
 ### 3.2 Security Function Isolation (SC-3)
 
@@ -64,8 +89,10 @@ This policy applies to:
 
 1. **Security Functions Isolated:**
    - SELinux mandatory access control enforces isolation
-   - Wazuh SIEM operates on domain controller with dedicated resources
-   - Firewall/IDS functions on separate hardware (pfSense appliance)
+   - Wazuh SIEM operates on the service VM
+   - **Security functions are NOT isolated on separate hardware.** The perimeter firewall (`pf`) runs on the Mac mini, which is also the hypervisor for the VM carrying the directory, SIEM and CUI database, and which holds the Nextcloud file store. There is no DMZ and no dedicated firewall appliance.
+
+     > This is a **known and formally accepted** condition, not an oversight: risk **R-02** (HIGH) in `DIWAI-RAR-001`, tracked as **POA&M-023**, accepted in writing until **2027-03-31**. The earlier text in this policy claimed separation on dedicated hardware; that claim was inherited from Reference System #1 and was never true here. Isolation is provided instead by SELinux, `fapolicyd`, per-host firewall rules and virtualization boundaries — mitigations, not separation.
 
 2. **Least Privilege for Security Components:**
    - Security services run with minimal required permissions
@@ -91,7 +118,7 @@ This policy applies to:
 **The organization shall protect against denial of service attacks:**
 
 1. **Network-Level Protections:**
-   - pfSense firewall with state table limits
+   - `pf` state table limits on the Mac mini; `firewalld` connection limits on the VM
    - Syn flood protection enabled
    - Connection rate limiting per source IP
    - Geographic IP blocking for high-risk countries
@@ -116,7 +143,7 @@ This policy applies to:
    - Storage capacity monitoring (alert at 75%, critical at 90%)
 
 2. **Priority Resource Allocation:**
-   - Critical services (FreeIPA, Wazuh) have elevated priority
+   - Critical services (389-DS LDAP, Wazuh) have elevated priority
    - Nice values adjusted to prioritize security services
    - QoS on network for VoIP/video if implemented
 
@@ -125,25 +152,25 @@ This policy applies to:
 **The organization shall:**
 
 1. **Managed Interfaces (SC-7):**
-   - pfSense firewall controls all external connections
+   - macOS `pf` on the Mac mini controls all external connections
    - Default-deny firewall policy
    - Explicit allow rules for required services only
    - DMZ not required (no externally-facing services)
 
 2. **External Telecommunications Services (SC-7(3)):**
    - Internet connectivity via commercial ISP
-   - No direct external access to CPN resources
-   - All external connections routed through pfSense
+   - No direct external access to SecureMac resources
+   - All external connections routed through `pf` on the Mac mini
    - Future: VPN with MFA for authorized remote access (POA&M-028)
 
 3. **Access Points (SC-7(7)):**
-   - Single internet connection point (pfSense WAN interface)
+   - Single internet connection point (`en0`, [ISP-REDACTED], on the Mac mini)
    - All wireless access points disabled or removed
    - Physical network ports in server room secured
 
 4. **Firewall Configuration:**
    - Stateful packet inspection enabled
-   - Outbound connections allowed (workstations only)
+   - Outbound connections allowed from in-boundary hosts as permitted by the `pf` ruleset
    - Inbound connections blocked by default
    - Allowed inbound: None (air-gapped from external access)
    - Internal zone: [LAN-IP-REDACTED]/24 (trusted)
@@ -152,7 +179,7 @@ This policy applies to:
 
 **The organization shall prevent:**
 
-- Remote users from simultaneously connecting to CPN and untrusted networks
+- Remote users from simultaneously connecting to SecureMac and untrusted networks
 - VPN split tunneling prohibited when implemented (POA&M-028)
 - All traffic routed through VPN tunnel (no local breakout)
 
@@ -220,7 +247,7 @@ This policy applies to:
      - Backup passphrase stored in secure location (physical safe)
 
    - **Kerberos Keys:**
-     - Managed by FreeIPA
+     - Managed by 389-DS LDAP
      - AES-256 encryption
      - Key rotation on password change
 
@@ -324,13 +351,13 @@ This policy applies to:
 **The organization shall:**
 
 1. **DNS Security (SC-20, SC-21):**
-   - FreeIPA provides authoritative DNS for [DOMAIN.ORG]
+   - 389-DS LDAP provides authoritative DNS for [DOMAIN.ORG]
    - DNSSEC enabled for external queries
    - DNS queries authenticated via TSIG (zone transfers)
    - Recursive queries restricted to internal network only
 
 2. **DNS Configuration:**
-   - Internal DNS: dc1.[DOMAIN.ORG] ([LAN-IP-REDACTED])
+   - Internal DNS: services.[DOMAIN.ORG] ([LAN-IP-REDACTED])
    - External forwarders: 1.1.1.1 (Cloudflare), 8.8.8.8 (Google)
    - DNS over TLS (DoT) for external queries (future enhancement)
 
@@ -338,7 +365,7 @@ This policy applies to:
 
 **The organization shall:**
 
-- Provide authoritative DNS within CPN (FreeIPA integrated DNS)
+- Provide authoritative DNS within SecureMac (389-DS LDAP integrated DNS)
 - Fault-tolerant: Secondary DNS on future backup domain controller
 - DNS records signed with DNSSEC
 
@@ -369,7 +396,7 @@ This policy applies to:
 
 ### 3.20 Thin Nodes (SC-25)
 
-**Not applicable:** CPN does not use thin clients or zero clients.
+**Not applicable:** SecureMac does not use thin clients or zero clients.
 
 ### 3.21 Honeypots (SC-26)
 
@@ -410,7 +437,7 @@ This policy applies to:
 ### 4.3 System Administrator
 
 - Implement and maintain encryption (LUKS, TLS, SSH)
-- Configure network security devices (pfSense, Suricata)
+- Configure network security controls (`pf` on the Mac mini, `firewalld` and Suricata on the VM)
 - Monitor security logs for boundary violations
 - Maintain TLS certificates (renewal, deployment)
 - Configure secure communication protocols
@@ -428,21 +455,24 @@ This policy applies to:
 
 ## 5. Implementation Details
 
-### 5.1 pfSense Firewall Configuration
+### 5.1 Perimeter Firewall Configuration — macOS `pf` on the Mac mini
 
-**Interfaces:**
-- WAN: Internet-facing (DHCP from ISP)
-- LAN: [LAN-IP-REDACTED]/24 (static [LAN-IP-REDACTED])
+**Interfaces (Mac mini, triple-homed):**
+- `en0` — WAN, [WAN-IP-REDACTED]/29 ([ISP-REDACTED], static /29 block)
+- `en6` — LAN/CUI, [LAN-IP-REDACTED]/24 (Thunderbolt Ethernet)
+- `en1` — Wi-Fi, **powered off**; out of the CUI data path (SSP §2.5.2)
+
+Ruleset: `/etc/pf_diwai.conf`, loaded with `pfctl -f`.
 
 **Default Rules:**
 - WAN inbound: BLOCK ALL (default deny)
-- LAN outbound: ALLOW (workstations need internet for updates)
+- LAN outbound: ALLOW (in-boundary hosts require internet for updates and mail)
 - LAN to LAN: ALLOW (internal communication)
 
-**Suricata IDS/IPS:**
-- Emerging Threats Open ruleset
-- Daily automatic updates
-- IPS mode: Block and alert on threats
+**Suricata — intrusion *detection*, on the service VM:**
+- Emerging Threats Open ruleset (~49,500 rules)
+- Interfaces: `enp0s1`, `tun0` (af-packet)
+- **IDS mode — detect and alert only.** Suricata is **not** deployed inline and does **not** block traffic. The inherited text claimed "IPS mode: Block and alert"; that overstated the control. Blocking is performed by `pf` and `firewalld`, on rules, not by Suricata on detections.
 - Logs sent to Wazuh SIEM
 
 **Advanced Settings:**
@@ -466,8 +496,8 @@ Header always set Strict-Transport-Security "max-age=31536000"
 ```
 
 **Certificate Locations:**
-- Certificate: `/etc/pki/tls/certs/wildcard.[DOMAIN.ORG].crt`
-- Private Key: `/etc/pki/tls/private/wildcard.[DOMAIN.ORG].key`
+- Certificate: `/etc/pki/tls/certs/[DOMAIN.ORG].crt`
+- Private Key: `/etc/pki/tls/private/[DOMAIN.ORG].key`
 - CA Chain: `/etc/pki/tls/certs/ca-bundle.crt`
 
 ### 5.3 SSH Hardening
@@ -503,8 +533,8 @@ smtp_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
 # Inbound TLS
 smtpd_tls_security_level = may
 smtpd_tls_auth_only = yes
-smtpd_tls_cert_file = /etc/pki/tls/certs/wildcard.[DOMAIN.ORG].crt
-smtpd_tls_key_file = /etc/pki/tls/private/wildcard.[DOMAIN.ORG].key
+smtpd_tls_cert_file = /etc/pki/tls/certs/[DOMAIN.ORG].crt
+smtpd_tls_key_file = /etc/pki/tls/private/[DOMAIN.ORG].key
 smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
 ```
 
@@ -531,10 +561,10 @@ done
 ### 5.6 Network Segmentation (Future)
 
 **Planned VLANs (if implemented):**
-- VLAN 10: Management ([LAN-IP-REDACTED]/24)
-- VLAN 20: User workstations ([LAN-IP-REDACTED]/24)
-- VLAN 30: Servers ([LAN-IP-REDACTED]/24)
-- VLAN 40: Guest ([LAN-IP-REDACTED]/24 - isolated)
+- LAN: Management ([LAN-IP-REDACTED]/24)
+- Subnet: Mac host ([LAN-IP-REDACTED])
+- Subnet: Services VM ([LAN-IP-REDACTED])
+- Guest WiFi: isolated VLAN (if applicable)
 
 **Current State:** Single flat network ([LAN-IP-REDACTED]/24)
 
@@ -657,9 +687,9 @@ done
 ## 11. Related Documents
 
 - System Security Plan (SSP) - Section SC (System and Communications Protection)
-- Configuration Management Policy (TCC-CMP-001)
-- Incident Response Policy (TCC-IRP-001)
-- Risk Acceptance Memo: ClamAV FIPS Incompatibility
+- Configuration Management Policy (DIWAI-CMP-001)
+- Incident Response Policy (DIWAI-IRP-001)
+- `DIWAI-EV-SI3-002` — SI-3 Control Substitution (ClamAV decommissioned; YARA stack adopted). Supersedes the earlier ClamAV FIPS risk-acceptance memo (RISK-2026-004)
 - NIST SP 800-171 Rev 2
 - NIST SP 800-52 Rev 2 (TLS Guidelines)
 - NIST SP 800-77 Rev 1 (IPsec VPN Guide)
@@ -701,3 +731,5 @@ Signature: /s/ [SYSTEM-OWNER]                Date: February 15, 2026
 ---
 
 **END OF DOCUMENT**
+
+---
