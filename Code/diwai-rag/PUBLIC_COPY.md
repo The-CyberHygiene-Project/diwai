@@ -10,4 +10,4 @@ Snapshot of the `diagnosis-loop` branch, 2026-10-04 (no git history). Because na
 - **Diagnosis loop** (`diagnose/`, `bin/diwai-diagnose`): read-only; turns monitor results into findings and decision forms; names the approved repair, never runs one.
 - **Evaluations** (`evals/`): live model checks, including planted-instruction tests. The diagnosis check's current honest result is 12 of 15 cases (see the change record).
 
-Left out on purpose: the live-system facts file for the diagnosis loop (it names a current, unpatched finding).
+The diagnosis loop's live-system facts file was held back until the finding it names was patched (RLSA-2026:71487, Unbound, patched 2026-10-04); it is now included.

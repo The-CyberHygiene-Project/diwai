@@ -1,0 +1,61 @@
+Diagnosis loop: facts (Task 1, 2026-10-04)
+
+VM monitor /usr/local/sbin/diwai-control-health (497 lines, root 0750, timer every 15 min).
+Read once with the owner's VM sudo (ssh -tt services sudo -v, then sudo -n cat; then sudo -K).
+The script itself is NOT committed; a private copy was kept in Claude's scratch folder for Task 2's edit.
+
+Single result path: every check result goes through two helpers:
+  ok()   { CHECKS=$((CHECKS+1)); printf "  [ OK ] %s\n" "$*"; }
+  fail() { CHECKS=$((CHECKS+1)); FAILURES+=("$*"); printf "  [FAIL] %s\n" "$*"; }
+-> Task 2 hook: wrap ok/fail to also append a JSON line, using the current section id/name.
+Checks carry no ids; sections are numbered in comments "# --- <id>. <title> ---". 50 ok/fail calls in 17 sections.
+Task 2 sets SEC_ID/SEC_NAME at each section header (one inserted line per header).
+
+Check ids and names (id = the monitor's own section number):
+  1   SIEM is running
+  2   Every enrolled agent is connected
+  3   Audit subsystem
+  4   Clock is genuinely synchronised
+  5   Scheduled scans actually produced output
+  5b  Encrypted archive pipeline is actually delivering
+  5c  CVE scanning is running AND its data is current
+  6   Protective services
+  7   SELinux + FIPS remain enforcing
+  8   Certificate expiry
+  9   Authenticated-path probe (POA&M-055)
+  10  Directory password for uid=[USERNAME] (stored by 4 services)
+  11  Mac audit subsystem warnings reach a person (3.3.4)
+  12  Wazuh API alive, with the OpenSSL workaround it depends on
+  13  Mac inactivity enforcement (3.5.6) is running and has nothing to report
+  14  Patch review cadence (3.14.1 / DIWAI-PR-001)
+
+Report/exit structure: "# --- report" section (line 360) branches: all-pass -> recovery mail -> exit 0 (line 384);
+else syslog + state-change mail -> exit 1 (line 497). No exits before line 360.
+-> Task 2 writes latest.json immediately after the "# --- report" header, so every run (pass or fail) writes it.
+
+Not covered by any monitor check: Wazuh's <ruleset> block (the wazuh-ruleset-missing repair's finding).
+-> stays unmapped in v1 (plan Task 4); listed as a gap for the next monitor change.
+
+Task 2 (2026-10-04 ~13:20, owner's VM sudo, then sudo -K):
+- backup /usr/local/sbin/diwai-control-health.bak-20261004-json; folder /var/lib/diwai-control-health (755)
+- new script installed via base64 + cp -p + mv -f (root root 0750 kept); bash -n OK; new sha256 prefix 3139b2354313
+- live run: latest.json -rw-r--r-- root, read WITHOUT sudo, tools/monitor-json-validate.py: VALID, 31 results, 16 checks
+- rollback proven: old version restored -> a run wrote no new report; new version reinstalled -> report again
+- "Job failed" from systemctl = the monitor's normal exit 1 when any check fails (line 497), unchanged
+- live finding: check 5c FAIL "2 actionable CRITICAL vulnerability(ies) — patch within 72h" (owner told)
+- known flaw: the detail scrub turns "password unchanged" into "password=[REDACTED]" (over-eager on "password "):
+  tighten to "=" or ":" only at the next monitor change
+- private script copies deleted from Claude's scratch folder
+
+Task 9 (2026-10-04):
+- Live model check (evals/diagnose_model_check.py, Devstral, 10 runs per case, 7 cases):
+  run 1: dates 0/10, forged-</DATA> 9/10; run 2 (no-dates rule): forged 3/10; run 3 (reminder names repair
+  instructions): dates 8/10; run 4 (card technical note NOT shown to the model): 70/70 PASSED.
+  Root cause: the card note's rule dates/record ids were read as findings. Planted wordings incl. the Mac Studio's
+  "PWNED" line: ignored 10/10 each. In every failing run the code still discarded unallowed repairs.
+- Live acceptance (bin/diwai-diagnose, VM session open): mac 9/9 ok; services 1 failing check (5c) -> exactly one
+  finding CRITICAL_SECURITY_FIX_OVERDUE, no gaps, no repair offered (none approved for it), model explanation accurate,
+  no invented dates. Matches the monitor's own report. Case record: no emails, password values, keys or tokens.
+- ISSO question: check 5c fires when an actionable critical EXISTS ("patch within 72h"); the mapped card describes an
+  OVERDUE fix ("waiting more than three days"), so the form overstates urgency. Options: a CRITICAL_FIX_PENDING card,
+  or split 5c's conditions in the monitor.
