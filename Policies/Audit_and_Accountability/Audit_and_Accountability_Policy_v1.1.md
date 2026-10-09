@@ -4,6 +4,7 @@
 
 **Document ID:** DIWAI-AAP-001
 **Editorial Correction (2026-08-01):** Document identifier changed from `TCC-AAP-001` to `DIWAI-AAP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Addition (2026-10-09):** Event-type review frequency (3.3.1) and time stamp granularity (3.3.7) stated. No other change.
 **Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
@@ -84,6 +85,8 @@ This policy applies to:
    - Object/resource accessed
    - Additional details for security investigations
 
+**Review of event types (AU-2):** the event types selected for logging are reviewed and updated **at least every 12 months and after any significant incident or significant change to risks**. Each review is recorded in a change record, even when the list is unchanged.
+
 ### 3.2 Audit Storage and Protection (AU-4, AU-9, AU-11)
 
 **Requirements:**
@@ -148,6 +151,8 @@ This policy applies to:
 2. Time zone: Mountain Standard Time (MST/MDT)
 
 3. Timestamp format: ISO 8601 (YYYY-MM-DD HH:MM:SS)
+
+4. Time stamp granularity: **one second or smaller**
 
 ### 3.5 Audit Record Generation (AU-12)
 

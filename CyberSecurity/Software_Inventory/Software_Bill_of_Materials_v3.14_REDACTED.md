@@ -5,8 +5,8 @@
 **System:** [DOMAIN.ORG] SecureMac Reference System  
 **Organization:** [DOMAIN.ORG] (Do It With AI)  
 **Classification:** Controlled Unclassified Information (CUI)  
-**Version:** 3.11  
-**Date Generated:** 2026-10-03  
+**Version:** 3.14  
+**Date Generated:** 2026-10-09  
 **Scope:** 2 systems (1 combined firewall/DC/mail/SIEM/AI/Nextcloud server-host + 1 Rocky Linux service VM)  
 **Architectures:** ARM64 (Apple Silicon — both systems)  
 
@@ -19,7 +19,7 @@
 | Hostname | IP | Platform | Architecture | Packages | Role |
 |----------|----|----------|--------------|----------|------|
 | **services.[DOMAIN.ORG]** | [LAN-IP-REDACTED] | Rocky Linux 9.7 (Blue Onyx) | aarch64 | ~817 RPM | Domain Controller, Mail, VPN, IDS, SIEM, Monitoring |
-| **Mac mini (host)** | [LAN-IP-REDACTED] (LAN) / [WAN-IP-REDACTED] (WAN) | macOS Tahoe 26.4.1 | ARM64 (M4 Pro) | macOS native + Homebrew | Firewall/Router, AI Inference Host, Nextcloud (Private Cloud) |
+| **Mac mini (host)** | [LAN-IP-REDACTED] (LAN) / [WAN-IP-REDACTED] (WAN) | macOS Tahoe 26.7 | ARM64 (M4 Pro) | macOS native + Homebrew | Firewall/Router, AI Inference Host, Nextcloud (Private Cloud) |
 
 **Total Systems:** 2  
 **Architecture:** ARM64 (Apple Silicon) throughout — no x86_64  
@@ -28,7 +28,7 @@
 ### Platform Distribution
 
 - **Rocky Linux 9.7 (aarch64):** 1 system — FIPS 140-2 mode enabled, SELinux enforcing
-- **macOS Tahoe 26.4 (ARM64):** 1 system — M4 Pro hardware encryption, pf firewall
+- **macOS Tahoe 26.7 (ARM64):** 1 system — M4 Pro hardware encryption, pf firewall
 
 ---
 
@@ -72,6 +72,9 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 | 3.9 | 2026-10-03 | [SYSTEM-OWNER] | **Retired Ollama models removed (DIWAI-CR-2026-10-05).** 7 models, 90 GB, deleted from `~/.ollama/models`: devstral, devstral-agent, gemma4 26b-a4b-it-q8_0, gemma4 26b-a4b-it-qat, gemma4 31b-it-q8_0, mistral, nomic-embed-text. The Ollama binary, the disabled launcher and the retired Magistral MLX model (13 GB, `/opt/local/models`) are unchanged. |
 | 3.10 | 2026-10-04 | [SYSTEM-OWNER] | **Repair library v1 (DIWAI-CR-2026-10-07).** **Added:** `diwai-repair` (root-owned, standard-library Python) with two YubiKey-approved repairs; approver key = P-256 FIDO2 credential on a standard YubiKey 5 (public key SHA-256 `42ca390a…104f`). **Changed:** Open WebUI launcher gains `CORS_ALLOW_ORIGIN=https://ai.[DOMAIN.ORG]` (run by the repair). **Related:** VM sudo now asks for the password (DIWAI-CR-2026-10-06). |
 | 3.11 | 2026-10-04 | [SYSTEM-OWNER] | **Magistral back in service through LM Studio (DIWAI-CR-2026-10-08).** The retired Magistral Small 2509 MLX model (kept by owner decision) was verified against the publisher and copied (APFS clone, no extra space) into LM Studio as `magistral-small-2509-mlx`; Open WebUI assistant `magistral-general` added. mlx-lm stays retired. |
+| 3.12 | 2026-10-04 | [SYSTEM-OWNER] | **Diagnosis loop v1 (DIWAI-CR-2026-10-09).** **Added:** `diwai-diagnose` (read-only; never sudo, never runs a repair). **Changed:** the VM control-health monitor also writes `/var/lib/diwai-control-health/latest.json`; the monitor is now listed (previously unrecorded). |
+| 3.13 | 2026-10-06 | [SYSTEM-OWNER] | **ONLYOFFICE Desktop Editors 9.4.0 added to the Mac host (DIWAI-CR-2026-10-10)** to open the Rev 3 measurement register (an .xlsx file); the host had no spreadsheet application. Automatic updates turned off. |
+| 3.14 | 2026-10-09 | [SYSTEM-OWNER] | **Mac host versions reconciled with the installed state (record accuracy; no component added or removed).** Read from the running host on 2026-10-09 (`sw_vers`, `brew list --versions`, `occ app:list`). **Corrected:** macOS Tahoe 26.4.1 (25E253) → **26.7 (25G229)** in the inventory table, the platform summary and the System 2 section; PHP 8.3.31 → **8.3.33**; libfido2 1.16.0_2 → **1.17.0**; Homebrew OpenSSH 10.3p1 → **10.5p1**; `twofactor_totp` "(bundled)" → **14.0.0 (bundled)**. **Checked and unchanged:** nginx 1.31.0, redis 8.8.0, Nextcloud 32.0.11.1, groupfolders 20.1.14, richdocuments 9.1.0, LM Studio 0.4.25+1 with its two selected engines, Open WebUI 0.11.4, Python 3.12.15 and the 13 pinned library packages, Ghostscript 10.08.0, Tesseract 5.5.3, Aider 0.86.2, ONLYOFFICE 9.4.0. |
 
 ---
 
@@ -216,15 +219,16 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 | **openscap** | 1.3.13-1.el9_7.rocky.0.1.aarch64 | SCAP compliance scanner |
 | **openscap-scanner** | 1.3.13-1.el9_7.rocky.0.1.aarch64 | oscap CLI tool |
 | **scap-security-guide** | 0.1.80-1.el9_7.rocky.1.2.noarch | NIST 800-171 CUI content |
+| **diwai-control-health** (local script, `/usr/local/sbin`, root 0750; systemd timer every 15 min) | 2026-10-04 (SHA-256 prefix `3139b2354313`) | Control-health monitor (DIWAI-CR-2026-08-20): 16 sections of checks; mails the owner on a change of state; since DIWAI-CR-2026-10-09 also writes `/var/lib/diwai-control-health/latest.json` (0644) for `diwai-diagnose`. Previously unrecorded |
 
 **Last Scan Result:** 102 pass / 0 fail / 0 errors (2026-06-08)  
 **Profile:** `xccdf_org.ssgproject.content_profile_cui`
 
 ---
 
-## SYSTEM 2: Mac mini Host (macOS Tahoe 26.4)
+## SYSTEM 2: Mac mini Host (macOS Tahoe 26.7)
 
-**Platform:** macOS Tahoe 26.4.1 (Build 25E253)  
+**Platform:** macOS Tahoe 26.7 (Build 25G229)  
 **Hardware:** Apple Mac mini (M4 Pro, 2024)  
 **Chip:** Apple M4 Pro — 14-core CPU, 20-core GPU, 16-core Neural Engine  
 **Architecture:** ARM64 (Apple Silicon)  
@@ -244,7 +248,7 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 
 #### Operating System
 
-- **macOS Tahoe** 26.4.1 (Build 25E253) — Apple Unix-based OS
+- **macOS Tahoe** 26.7 (Build 25G229) — Apple Unix-based OS
 - **XNU Kernel** — Darwin kernel ARM64
 - **System Integrity Protection (SIP)** — Enabled
 - **Gatekeeper** — Enabled (code signing enforcement)
@@ -285,10 +289,10 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 | Package | Version | Purpose |
 |---------|---------|---------|
 | **nextcloud** | 32.0.11.1 | Private cloud platform — `/opt/local/nextcloud`, data dir `/opt/local/nextcloud/data` (FileVault-encrypted) |
-| **php** | 8.3.31 | PHP runtime (Homebrew, `php8.3-fpm`) |
+| **php** | 8.3.33 | PHP runtime (Homebrew, `php8.3-fpm`) |
 | **nginx** | 1.31.0 | Reverse proxy / web server for `cloud.[DOMAIN.ORG]` (Homebrew) |
 | **groupfolders** | 20.1.14 | Nextcloud app — shared CUI/FCI/Operations/AI-Knowledge-Base/Internal/Public/Archive group folders |
-| **twofactor_totp** | (bundled) | Nextcloud app — TOTP 2FA, enforced instance-wide |
+| **twofactor_totp** | 14.0.0 (bundled) | Nextcloud app — TOTP 2FA, enforced instance-wide |
 | **richdocuments (Collabora Online)** | 9.1.0 | Office document viewing/editing, proxied to `127.0.0.1:9980` |
 | **redis** | 8.8.0 | Local file-locking / caching backend (`127.0.0.1:6379`, Homebrew) |
 
@@ -360,8 +364,8 @@ Local library the models search offline (`~/diwai-rag`, local git, no remote). *
 |---------|---------|--------|---------|
 | ~~**ykman**~~ | ~~5.9.0~~ | Homebrew | YubiKey Manager — **REMOVED 2026-06-12** (CM-7, unused after YubiKey retirement; verified absent via `brew list`) |
 | ~~**yubico-piv-tool**~~ | ~~2.7.3~~ | Homebrew | PIV tool — **REMOVED 2026-06-12** (CM-7, unused after YubiKey retirement; verified absent via `brew list`) |
-| **libfido2** | 1.16.0_2 | Homebrew | FIDO2 library — dependency for Homebrew OpenSSH (retained) |
-| **openssh** | 10.3p1 | Homebrew | OpenSSH compiled with libfido2 support (FIDO2-SK key ops) — retained |
+| **libfido2** | 1.17.0 | Homebrew | FIDO2 library — dependency for Homebrew OpenSSH (retained) |
+| **openssh** | 10.5p1 | Homebrew | OpenSSH compiled with libfido2 support (FIDO2-SK key ops) — retained |
 
 **Note (updated 2026-06-29):** `ykman` and `yubico-piv-tool` were **removed from the Mac host on 2026-06-12** under least-functionality (CM-7) after the YubiKey PIV approach was retired — see POA&M-002 hygiene actions; confirmed absent by `brew list`. `libfido2` and Homebrew `openssh` are **retained** (Homebrew OpenSSH would be required if FIDO2-SK keys are ever reintroduced; macOS system OpenSSH 10.2p1/LibreSSL lacks libfido2). Current admin SSH to the VM uses an RSA-4096 key (`~/.ssh/diwai_rsa`), password+key auth.
 
@@ -369,11 +373,13 @@ Local library the models search offline (`~/diwai-rag`, local git, no remote). *
 
 | Component | Purpose |
 |-----------|---------|
-| **SSH** (built-in + Homebrew 10.3p1) | Remote access to VM (`~/.ssh/diwai_rsa`); Homebrew SSH required for FIDO2-SK ops |
+| **SSH** (built-in + Homebrew 10.5p1) | Remote access to VM (`~/.ssh/diwai_rsa`); Homebrew SSH required for FIDO2-SK ops |
 | **SuperDuper! 3.20-beta.8** | Bootable clone (blocked by Tahoe beta bug — deferred) |
 | **Tunnelblick / OpenVPN Connect** | VPN client for `[USERNAME]-diwai.ovpn` |
 | **Aider 0.86.2** (pipx 1.11.1, Python 3.11) | AI pair-programming CLI on the build side: drafts runbooks, repairs and tests; never edits a live configuration file itself; may run an ISSO-approved repair after a typed yes (decision 13, option B). Started through **`aider-leashed`** (`~/diwai/aider-leash/`, git-tracked; linked as `~/.local/bin/aider-leashed`), which refuses project-level Aider settings and flags that skip a person, and turns automatic test/lint commands off. It edits only the files a person adds to the chat; a person reviews every edit; a shell command runs only after a typed yes. Context file `~/diwai/aider-system-context.md` (updated 2026-10-03). Model: Devstral via LM Studio 127.0.0.1:1234 (repointed from Ollama 2026-10-03); offline settings (no update check, no analytics, no model-price download); temperature 0.15. Previously unrecorded |
 | **diwai-repair 1.0** (repair library; `/usr/local/lib/diwai-repair`, root-owned; `/usr/local/bin/diwai-repair`) | Runs only ISSO-approved repairs (check, back up, one change, verify, undo). Python standard library under `/usr/bin/python3` 3.9.6; approvals = YubiKey FIDO2 assertions (`fido2-assert`, PIN + touch; libfido2 1.17.0, Homebrew) checked with `/usr/bin/openssl` (LibreSSL 3.3.6). Run records `/var/db/diwai-repair/runs` (root, 700). Source `~/diwai-rag` (git). v1 repairs: `owui-cors-any-origin`, `wazuh-ruleset-missing` (DIWAI-CR-2026-10-07) |
+| **diwai-diagnose 1.0** (`~/diwai-rag/bin/diwai-diagnose`, venv Python; source `~/diwai-rag`, git) | Read-only diagnosis: reads the VM monitor report over the owner's SSH session, runs 9 Mac checks, maps failed checks to runbook cards by fixed rules, asks Devstral (LM Studio 127.0.0.1:1234) to explain and to pick only from approved repairs built for each finding, prints decision forms, keeps case records in `~/diwai-rag/cases/`. Never sudo; never runs a repair (DIWAI-CR-2026-10-09) |
+| **ONLYOFFICE Desktop Editors 9.4.0** (`/Applications/ONLYOFFICE.app`, Homebrew cask `onlyoffice`, Apple Silicon build) | Opens and edits spreadsheets and documents locally; installed 2026-10-06 to read the Rev 3 measurement register. Vendor: Ascensio System SIA; Developer ID signed (Team `2WH24U26GJ`), notarized by Apple, signature verified after install. Download: ONLYOFFICE's own GitHub release v9.4.0 (`ONLYOFFICE-arm.dmg`, 542,306,356 bytes, SHA-256 `e965be2222609add6b5a70baa2a8cdb599402491fb2925825d9039dcb154beb4`, pinned and checked by Homebrew). **Automatic updates disabled** (`SUEnableAutomaticChecks` and `SUAutomaticallyUpdate` = 0 in `asc.onlyoffice.ONLYOFFICE`); updates only through the change process. License: open source (AGPL-3.0, per the vendor). The app has an "AI" menu for outside AI services: **not configured and not to be used on this host** |
 
 ---
 

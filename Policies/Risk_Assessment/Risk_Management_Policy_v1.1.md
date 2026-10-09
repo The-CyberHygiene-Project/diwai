@@ -4,6 +4,7 @@
 
 **Document ID:** DIWAI-RA-001
 **Editorial Correction (2026-08-01):** Document identifier changed from `TCC-RA-001` to `DIWAI-RA-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Addition (2026-10-09):** Supply chain risk management plan: lifecycle coverage added under section 7 (3.17.01). No other change.
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon significant changes
@@ -260,6 +261,17 @@ Assess risks from third-party vendors and contractors:
 - Limited-duration 389-DS LDAP accounts with expiration dates
 - Quarterly access reviews and account audits
 - Personnel Security procedures (per DIWAI-PS-001)
+
+**Supply chain risk management plan: lifecycle coverage.** [DOMAIN.ORG] does not design or manufacture system components. Its supply chain is the hardware it buys and the software it obtains, installs and maintains: Apple hardware and macOS; Rocky Linux and vendor RPM packages; Homebrew software; Python packages; and the organization's own Git repositories. The plan addresses each lifecycle phase as follows.
+
+- **Design.** The organization does not design components it relies on. Design risk is addressed at selection: software is chosen only from sources that publish security fixes, and the SBOM records what is installed and where it came from. Components that cannot be supported or verified are not adopted (see 03.16.02).
+- **Manufacturing.** The organization does not manufacture components. Manufacturing risk for third-party software is addressed by accepting only signed or checksummed releases from the publisher (below). For hardware, the organization buys new equipment from authorized resellers.
+- **Delivery.** Software is delivered over HTTPS from the publisher's official repository. RPM packages are installed with `dnf` with GPG signature verification required, and package checksums are verified by `dnf`. macOS software comes from Apple Software Update or is notarized by its developer (Gatekeeper). A repository whose signature check fails is not used: the Grafana repository was retired on 2026-08-02 for exactly this reason (DIWAI-CR-2026-08-04). Python packages are installed into named virtual environments, and the versions installed are recorded in the SBOM. The organization's own Git repositories are delivered from the owner's own machines. Clones of the organization's public repositories are also kept on an encrypted removable volume (APFS with FileVault) so the work stays reachable when the network is down. The clones hold only content already published; they are refreshed from the hosted repositories with a fast-forward-only pull, and if upstream history has been rewritten, the old copy is set aside and the repository is cloned again. No third-party Git repository is cloned into the boundary.
+- **Integration.** Components are integrated only by the owner under the change process in the Configuration Management Policy (DIWAI-CMP-001). Each change is recorded in a change record, and the SBOM is updated.
+- **Maintenance.** Security updates come from the same official channels, at the monthly review cadence set by owner decision, with critical fixes within 72 hours of detection (SSP Appendix E.3; Patch Reviews). A component whose publisher stops supplying security fixes is treated under 03.16.02.
+- **Disposal.** Equipment that held CUI is sanitized before disposal, repair or reuse (Physical and Media Protection Policy, section on media sanitization, MP-6), and the disposal is recorded in the asset inventory.
+
+The SBOM section "Supply Chain Security" lists the approved sources. Any new source is added there by change record before software from it is installed.
 
 #### 8. Criticality Analysis (RA-7)
 

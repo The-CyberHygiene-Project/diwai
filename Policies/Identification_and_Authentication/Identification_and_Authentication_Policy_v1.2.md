@@ -4,6 +4,7 @@
 
 **Document ID:** DIWAI-IAP-001
 **Editorial Correction (2026-08-01):** Document identifier changed from `TCC-IAP-001` to `DIWAI-IAP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Addition (2026-10-09):** Account types allowed (including reserved identities) and prohibited, intended system usage and the circumstances for disabling accounts (3.1.1 d.02, f.04, f.05), notification periods and identifier reuse added to section 3.3, and the password expiration scope and exemptions stated (3.5.7) (3.1.1, 3.5.5). Earlier 2026-10-09 corrections (password length, lockout, history) are recorded in DIWAI-CR-2026-10-11.
 **Version:** 1.2
 **Effective Date:** June 6, 2026
 **Previous Version:** 1.0 (February 15, 2026) — YubiKey PIV hardware token as primary MFA
@@ -160,14 +161,47 @@ This policy applies to:
    - **Disabled:** Immediate upon termination or extended leave (>30 days)
    - **Deleted:** 90 days after termination (after backup retention)
 
+**Account types allowed.**
+- **Named administrator account.** One named, individually assigned account for the system owner (`[USERNAME]`), used for ordinary work and elevating with `sudo` for privileged operations.
+- **Directory user accounts.** Named user accounts held in the 389-DS directory for VM services. Contractor accounts, if any, are limited-duration with an expiry date.
+- **Service accounts.** Non-interactive accounts used by services (for example `wazuh-indexer`), with no interactive login.
+- **Break-glass account.** One emergency administrative account on the Mac host (`sysadmin`), tested and used only if the owner is unavailable.
+- **Application accounts.** Accounts inside applications (for example the Nextcloud and Open WebUI administrator accounts), each individually named.
+- **Reserved identities.** Locked accounts held so that a name cannot be issued to anyone else (for example `demo_user`, the reserved demo identity). They are never used to log in; see the Retired Identifiers Register (`DIWAI-IA-REG-001`).
+
+**Account types prohibited.**
+- **Shared or group accounts** for interactive use.
+- **Anonymous or guest accounts.**
+- **Direct root login over SSH.**
+- **Default or vendor-supplied accounts left active** with their original credentials.
+- **Application self-registration** (Open WebUI `ENABLE_SIGNUP=false`).
+
+
+**Authorizing and disabling accounts (AC-2).**
+
+**Intended system usage.** Access to the system is authorized only for its intended uses, and an account receives only the access its holder's use requires:
+- administering and maintaining the system and its security controls;
+- storing, processing and exchanging the organization's CUI and FCI for contract work, through the Nextcloud CUI store and the services that support it (directory, mail, monitoring, backup);
+- operating the local AI stack for the organization's compliance and operations work.
+
+Use outside these purposes is unacceptable use under the Acceptable Use Policy, section 3. The Owner checks the intended use when an account is requested and records it with the request.
+
+**Disabling for a policy violation.** An account is disabled when its holder commits a moderate or major violation of organizational policy, as the Personnel Security Policy sanctions define them. A first moderate offense suspends access; a major offense ends it. A contractor's directory account is disabled immediately (Acceptable Use Policy 12.2). A minor offense is handled by counseling or a written warning and does not by itself disable the account. The Owner disables the account (for the directory, by locking the entry), and the disabling is recorded in the access record with the date and the reason.
+
+**Disabling for a significant risk.** An account is disabled when a significant risk associated with its holder is discovered, including: evidence that the holder's credentials are compromised or that the holder is acting under duress; loss or theft of a device that holds access; a credible indication of misuse or unauthorized disclosure of CUI; a security incident involving the holder; or a change in the holder's eligibility to hold access, such as loss of the status the access attestation requires. The Owner may disable the account at once, pending review. It stays disabled until the Owner records that the risk is resolved.
+
+**Notification periods (AC-2(g)):** account managers and designated personnel or roles are notified within **24 hours** when an account is no longer required, within **24 hours** when a user is terminated or transferred, and within **24 hours** when system usage or need-to-know changes for an individual. The notification is an entry in the change or access record.
+
+**Identifier reuse (IA-4):** an identifier is **never reused** for a different individual or service. Retired identifiers are recorded in the Retired Identifiers Register (`DIWAI-IA-REG-001`, Evidence folder).
+
 **Authenticator Management (IA-5):**
 
 1. **Password Requirements (IA-5(1)):**
-   - **Length:** 14 characters minimum (389-DS LDAP policy enforced)
+   - **Length:** 16 characters minimum (389-DS `passwordMinLength` and the Mac `diwai.minimum.length` rule; raised from 14 on 2026-10-09, `DIWAI-CR-2026-10-11`)
    - **Complexity:** At least 3 character classes (upper, lower, number, special)
-   - **Expiration:** 90 days (configurable per user role)
-   - **History:** Cannot reuse last 24 passwords
-   - **Lockout:** 5 failed attempts = 30-minute lockout
+   - **Expiration:** **90 days for interactive user accounts**, counted from each password change: the Mac `[USERNAME]` account by a per-user account policy, the VM local `[USERNAME]` account by `chage -M 90`, and directory user accounts by the 389-DS global policy (warning 14 days before). **Exempt by owner decision 2026-10-09**, because expiry would break them: the service account `svc-nas` (it cannot change a password interactively), the locked reserved identity `demo_user`, the break-glass account `sysadmin` (which must work when the owner cannot), and the VM operating-system account `root` (the recovery account: remote login is refused by `PermitRootLogin no`, and no routine user signs in with it). `DIWAI-CR-2026-10-11`; `DIWAI-CR-2026-10-12`.
+   - **History:** Cannot reuse the last 6 passwords (enforced on both hosts; SSP Appendix E.4)
+   - **Lockout:** VM: 3 failed attempts within 5 minutes lock the account for 15 minutes; directory: 3 failed binds lock for 60 minutes; Mac: 5 consecutive failed attempts, released 15 minutes after the last (`DIWAI-CR-2026-10-11`)
    - **Transmission:** Never transmitted in clear text. The directory **refuses insecure binds** (`nsslapd-require-secure-binds: on`, enforced 2026-08-03 — `DIWAI-CR-2026-08-10`); all binds occur over **LDAPS** or the local **LDAPI** socket
 
 2. **Initial Password:**
@@ -326,25 +360,18 @@ This policy applies to:
 
 ### 5.1 389-DS LDAP Password Policy
 
-**Global Policy:**
-```
-ipa pwpolicy-show
-  Max lifetime (days): 90
-  Min lifetime (hours): 1
-  History size: 24
-  Min character classes: 3
-  Min length: 14
-  Max failures: 5
-  Failure reset interval: 30 minutes
-  Lockout duration: 30 minutes
-```
+**Settings in force** (read back 2026-10-09; `DIWAI-CR-2026-10-11`):
 
-**Privileged User Policy:**
-```
-ipa pwpolicy-add --desc="Admin Policy" --maxlife=60 --minlife=1 \
-  --history=24 --minclasses=4 --minlength=16 --maxfail=3 \
-  --failinterval=30 --lockouttime=60 admins
-```
+| Setting | VM directory (389-DS `cn=config`) | VM operating system (PAM faillock) | Mac host (`pwpolicy`) |
+|---|---|---|---|
+| Minimum length | 16 (`passwordMinLength`) | n/a | 16 (`diwai.minimum.length`) |
+| Character classes | 3 (`passwordMinCategories`) | n/a | n/a |
+| History | 6 (`passwordInHistory`) | n/a | 6 |
+| Failed attempts | 3 (`passwordMaxFailure`) | 3 (`deny`) | 5 consecutive |
+| Counting window | n/a | 300 s (`fail_interval`) | n/a (consecutive count) |
+| Lock duration | 3600 s | 900 s (`unlock_time`) | released 900 s after the last failure |
+
+Administrative accounts use the same limits; there is no separate privileged-user password policy.
 
 ### 5.2 SSH Configuration
 

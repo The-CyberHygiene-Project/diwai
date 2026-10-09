@@ -4,6 +4,7 @@
 
 **Document ID:** DIWAI-AUP-001
 **Editorial Correction (2026-08-01):** Document identifier changed from `TCC-AUP-001` to `DIWAI-AUP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Addition (2026-10-09):** Section 10.1, use of external systems, added (3.1.20). Section 2.2 password requirements brought to the values in force (length 16, expiration scope, history 6, lockout). No other change.
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually
@@ -146,11 +147,11 @@ All computing devices that connect to SecureMac must comply with:
 
 #### 2.2 Password Requirements
 System-level and user-level passwords must comply with the 389-DS directory password policy, as specified in **`DIWAI-IAP-001`** (Identification and Authentication Policy):
-- Minimum 14 characters
+- Minimum 16 characters
 - At least 3 character classes (uppercase, lowercase, numbers, special characters)
-- 90-day expiration
-- 24 password history (no reuse)
-- 5 failed attempts = 30-minute lockout
+- Expiration: 90 days for interactive user accounts; service, break-glass and reserved accounts are exempt (see `DIWAI-IAP-001`, section 3.3)
+- Password history: the last 6 passwords cannot be reused
+- Lockout: 3 failed attempts lock a VM account for 15 minutes (5 consecutive failures on the Mac host); see `DIWAI-IAP-001`
 
 **Password Protection:**
 - Passwords must never be shared with others
@@ -399,6 +400,16 @@ Users must report the following incidents immediately (within 1 hour):
 - Personal devices may not process or store CUI
 - Personal devices may not access NAS file shares (nas.[DOMAIN.ORG])
 - Future BYOD program may be developed with mobile device management (MDM)
+
+#### 10.1 Use of External Systems (AC-20, 3.1.20)
+
+**External systems.** An external system is any system not owned, operated and administered by the organization, including personal computers, phones, tablets, and cloud or hosted services outside the system boundary.
+
+1. **Prohibited unless authorized.** Use of an external system to access, process, store or transmit CUI is prohibited unless the Owner has specifically authorized that system in writing.
+2. **Requirements before authorization.** Before authorizing an external system, the Owner confirms that: (a) the system encrypts data in transit and at rest with FIPS-validated cryptography; (b) access requires multi-factor authentication; (c) the system receives security updates from its publisher; (d) CUI is not retained on it after the session unless the authorization states otherwise; and (e) the host organization's terms do not conflict with the contract's CUI requirements.
+3. **Verification.** The Owner records the verification of items (a) to (e), or the provider's published attestation, in the authorization record before use. Authorization is reviewed annually and whenever the provider's terms change.
+4. **Agreements.** For each authorized external system, the Owner keeps the signed connection or processing agreement, or the provider's terms of service in force at the time of authorization, in the compliance evidence folder.
+5. **Current state.** No external system is currently authorized to access, process or store CUI. Email is self-hosted inside the system boundary (Dovecot and Roundcube) with encryption and safeguards, so it is not an external system. The control-health and security alert messages sent to an external mail account carry system status only and contain no CUI.
 
 ### 11. Training and Awareness
 

@@ -4,6 +4,8 @@
 
 **Document ID:** DIWAI-SI-001
 **Editorial Correction (2026-08-01):** Document identifier changed from `TCC-SI-001` to `DIWAI-SI-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
+**Addition (2026-10-09):** Treatment of components no longer supported by their publisher added to Section 2 (3.16.02).
+**Technical Correction (2026-10-09):** Flaw remediation (SI-2), the compliance bullet in Section 1, the alert-processing steps and Procedure 2 aligned to SSP Appendix E.3 (as amended 2026-09-15) and DIWAI-PR-001 v1.2: monthly review plus review on return after any gap over 30 days, 72 hours from detection for PATCH-class CRITICAL, 7 and 30 days from review for other updates, 14 days for reboots, and `dnf-automatic` download-only as a compensated deviation. Replaces the CVSS-banded deadlines and automatic patching inherited from Reference System #1, which this system did not follow. **No change to any other control.**
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon system changes
@@ -74,7 +76,7 @@ This policy applies to all SecureMac systems, including:
 - **YARA:** Malicious-code detection (5,972 rules) — Wazuh active response on FIM rules 550/554, plus a weekly full-system scan (`yara-fullscan.timer`)
 - **VirusTotal:** Reputation lookup on FIM events
 - **fapolicyd / SELinux:** Application allow-listing and mandatory access control on the VM
-- **dnf-automatic:** Automated security patching
+- **dnf-automatic:** Downloads and stages security updates on the VM; download-only (`apply_updates = no`). The operator applies them at the review
 - **OpenSCAP:** Compliance verification and configuration assessment
 - **Suricata:** Network intrusion detection/prevention
 
@@ -107,44 +109,36 @@ This policy applies to all SecureMac systems, including:
 - Quarterly Wazuh dashboard reviews
 - Quarterly OpenSCAP compliance scans
 - Monthly vulnerability scan reports
-- Weekly flaw remediation status reviews
+- Monthly flaw remediation review (DIWAI-PR-001), and a review on return to the system after any gap over 30 days
 
 ### 2. Flaw Remediation (SI-2)
 
-**Vulnerability Identification:**
-- Wazuh vulnerability detection runs continuously on all systems
-- CVE feed updates every 60 minutes
-- OpenSCAP scans quarterly (minimum)
-- Manual security bulletins reviewed weekly (US-CERT, Rocky Linux, vendor advisories)
+Flaw remediation is governed by SSP Appendix E.3 and carried out by the Patch Review Procedure (DIWAI-PR-001). This policy states the requirements; the procedure states how they are met.
 
-**Remediation Timelines:**
-- **Critical vulnerabilities (CVSS 9.0-10.0):** 7 days maximum
-- **High severity (CVSS 7.0-8.9):** 30 days
-- **Medium severity (CVSS 4.0-6.9):** 90 days
-- **Low severity (CVSS 0.1-3.9):** Next scheduled maintenance window
+**Identification.** Available updates are identified daily and automatically (`dnf-automatic`, download-only, on the VM; macOS `softwareupdate` on the host). Vulnerabilities are identified by the CVE scanners (`diwai-cve-scan` on the VM, `diwai-cve-scan-mac` on the host) and by the OpenSCAP and mSCP baseline scans, together with Wazuh. The vulnerability data a scan uses is current to within 24 hours before the scan runs. Manual security bulletins (US-CERT, Rocky Linux, vendor advisories) are reviewed at the monthly review.
 
-**Automated Patching:**
-- `dnf-automatic` enabled on all SecureMac systems
-- Security updates applied automatically (with testing on non-production first)
-- Critical patches may require manual application with immediate testing
+**Review.** Pending updates are reviewed **monthly**, after the automated scans, and **on return to the system after any gap of more than 30 days**. Detection stays daily and automated because exposure does not pause: webmail, mail and VPN services are internet-published continuously.
 
-**Flaw Remediation Process:**
-1. Wazuh vulnerability detector identifies flaw and generates alert
-2. ISSO reviews alert and assesses CVSS score and exploitability
-3. Prioritize remediation based on severity and criticality of affected system
-4. Stage the patch on the lowest-criticality component available; where a
-   deployment has workstations, patch those before the server tier
-5. Apply to the VM, then the Mac host, per `CUI_Patch_Review_Procedure`
-6. Verify FIPS mode integrity after patching: `fips-mode-setup --check`
-7. Rescan with Wazuh and OpenSCAP to verify remediation
-8. Document remediation in POA&M
-9. Escalate to Owner/Principal if patch causes operational issues
+**Remediation timeframes.**
 
-**Exception Process:**
-- If patch unavailable or incompatible, implement compensating controls
-- Document accepted risk with Owner/Principal approval
-- Add to POA&M with target remediation date
-- Re-assess monthly until resolved
+| Condition | Timeframe |
+|---|---|
+| PATCH-class CRITICAL | Within **72 hours of detection** (the timestamp of the scan report that first lists the finding), out of cycle, regardless of the review date. The clock does not pause for a missed review. |
+| Other critical or security-relevant updates | Within **7 days of review** |
+| Routine updates | Within **30 days of review** |
+| Kernel or operating-system updates needing a reboot | Within **14 days**, scheduled and attended |
+| A vulnerability with known exploitation | Immediately; treated as an incident if the system is exposed |
+| A fix that needs a stream migration | A POA&M item; not attempted during a review |
+
+**Automated patching.** `dnf-automatic` on the VM is configured download-only: it stages updates and applies none. Updates are applied by the operator at the review (and out of cycle for PATCH-class CRITICAL). macOS Software Update and Homebrew on the host are likewise applied at the review. This is a documented deviation from automatic application; its compensating control is the review and the 72-hour rule above.
+
+**Process.** The operator follows DIWAI-PR-001: triage the scan output into its classes, apply to the VM then the Mac host, verify FIPS mode (`fips-mode-setup --check`) and re-scan, record the work in the patch review log, and raise a POA&M item for anything that cannot be applied.
+
+**Exceptions.** If a patch is unavailable or incompatible, the Owner records the accepted risk and any compensating controls, adds a POA&M item with a target date, and reassesses monthly until resolved.
+
+**Components no longer supported by their publisher.** When a component's publisher stops supplying security fixes, the Owner records it in the SBOM as unsupported, with the date, and in the POA&M as a risk. Where the component can be replaced, it is replaced under the change process. Where it cannot be replaced immediately, the Owner selects and records one or more of: (a) isolating it so it is reachable only from the hosts that need it; (b) removing or disabling features it does not need; (c) moving to a supported stream or version in a planned change after a tested restore; (d) adding compensating monitoring in Wazuh; (e) a documented risk acceptance with a review date. Example: the end-of-life Node.js 18 and the MariaDB 10.5 packages recorded in the CVE scanning change record of 2026-08-04.
+
+**Known gap.** No reminder yet exists for the review cadence itself (SSP Appendix E.3, amendment 9); until one does, the cadence depends on the operator. The control-health check reports the age of open findings.
 
 ### 3. Malicious Code Protection (SI-3)
 
@@ -246,8 +240,8 @@ Wazuh monitors these critical paths (12-hour scan interval):
 - **DISA STIGs:** DoD security guidance updates
 
 **Alert Processing:**
-1. Wazuh automatically ingests CVE feeds (updated hourly)
-2. ISSO reviews US-CERT/CISA alerts weekly
+1. The CVE scanners and the Wazuh feed ingest vulnerability intelligence
+2. ISSO reviews US-CERT/CISA alerts at the monthly review
 3. Critical alerts trigger immediate assessment of SecureMac exposure
 4. Applicable alerts generate remediation tasks in POA&M
 5. High-priority alerts drive immediate patching (per SI-2 timelines)
@@ -503,37 +497,11 @@ sudo ausearch -f /path/to/modified/file -ts recent
 
 **Time Required:** 15-30 minutes
 
-### Procedure 2: Weekly Vulnerability Remediation
+### Procedure 2: Vulnerability Remediation
 
-**Frequency:** Weekly (Friday mornings)
+**Frequency:** Monthly review, and on return to the system after any gap over 30 days; PATCH-class CRITICAL within 72 hours of detection.
 
-**Process:**
-```bash
-# 1. Review available security updates
-sudo dnf updateinfo list security
-
-# 2. Stage updates on the lowest-criticality component available
-# (SSH to the staging host, where one exists)
-sudo dnf update --security -y
-
-# 3. Verify FIPS mode after update
-fips-mode-setup --check
-
-# 4. Reboot if kernel updated
-sudo reboot
-
-# 5. Post-reboot verification
-uname -r
-sudo systemctl status wazuh-agent
-
-# 6. If successful, apply to any workstations in the deployment
-# (Repeat for Engineering and Accounting)
-
-# 7. Finally, update the VM (services.[DOMAIN.ORG]) during a maintenance window
-# (Schedule for weekend or evening)
-
-# 8. Document all updates in POA&M
-```
+**Process:** follow the Patch Review Procedure (DIWAI-PR-001), which is the procedure of record: it triages the scan output, applies updates to the VM then the Mac host, verifies FIPS mode and re-scans, and records the work in the patch review log. Do not run a bare `dnf update`: the procedure applies a reviewed set.
 
 ### Procedure 3: Quarterly Compliance Verification
 
@@ -592,7 +560,7 @@ systemctl list-timers yara-fullscan.timer
 1. Assess exploit availability (check NVD, exploit-db)
 2. Verify all affected systems via Wazuh vulnerability dashboard
 3. Stage and test the patch within 24 hours
-4. Deploy to production within 7 days
+4. Deploy within 72 hours of detection if PATCH-class CRITICAL (DIWAI-PR-001 section 6), otherwise within 7 days of review
 5. Document in POA&M
 
 ### Example 3: Malware Detection

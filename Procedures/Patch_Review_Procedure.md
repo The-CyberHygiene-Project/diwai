@@ -6,8 +6,8 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | **DIWAI-PR-001** |
-| **Version** | 1.2 |
-| **Date** | September 15, 2026 (issued August 2, 2026) |
+| **Version** | 1.3 |
+| **Date** | October 9, 2026 (issued August 2, 2026) |
 | **Owner** | [SYSTEM-OWNER], ISSO / System Owner |
 | **Implements** | SSP v2.18 **Appendix E.3** (Flaw Remediation Timeframes) |
 | **Satisfies** | 3.14.1, 3.4.3 · addresses **POA&M-025** |
@@ -59,7 +59,7 @@ Consequences, both deliberate:
 
 ---
 
-## 4. Weekly procedure
+## 4. Review procedure
 
 Allow 15–20 minutes. Run after the Monday scans (`diwai-cve-scan.timer` 04:30,
 `oscap-scan.timer`).
@@ -76,7 +76,7 @@ things:
 | Class | Action |
 |:---|:---|
 | **PATCH** | Same stream, fix available. **This is the actionable list.** Apply within the E.3 timeframe |
-| **STREAM-MIGRATION** | No fix in the installed stream. Not a patch — raise or update a POA&M item. Do not attempt during a weekly review |
+| **STREAM-MIGRATION** | No fix in the installed stream. Not a patch — raise or update a POA&M item. Do not attempt during a review |
 | **THIRD-PARTY** | Rocky errata cannot judge these. Check the vendor separately — see §4.3 |
 
 If the output says **`STALE CACHE`**, the advisory data did not refresh. Treat
@@ -117,7 +117,7 @@ macOS update currency. Read its classification the same way as the VM's:
 | Class | Action |
 |:---|:---|
 | **UPGRADE AVAILABLE** | The actionable list. Apply per the timeframes above |
-| **AT LATEST** | Already newest — **upgrading changes nothing.** Do not re-triage weekly |
+| **AT LATEST** | Already newest — **upgrading changes nothing.** Do not re-triage between reviews |
 | **SUPPRESSED** | Triaged not-applicable; reasons in `~/diwai/etc/cve-mac-suppressions.txt` |
 
 **Treat Homebrew results as ADVISORY.** CPE product is assumed to equal the
@@ -136,7 +136,7 @@ sudo dnf update --advisory=<RLSA-ID>        # preferred: scoped to the advisory
 sudo dnf update <package> [<package>...]     # or named packages
 ```
 
-**Do not run a bare `dnf update` during a weekly review.** That is unattended
+**Do not run a bare `dnf update` during a review.** That is unattended
 installation performed by hand — the thing this deviation exists to avoid.
 
 ### 4.6 Verify afterwards — mandatory
@@ -152,6 +152,23 @@ systemctl is-active wazuh-manager suricata auditd chronyd httpd mariadb dirsrv@d
 Both must be clean before the review is closed. If the update requires a
 reboot, schedule it within **14 days**, attended — the VM cannot boot
 unattended (single LUKS keyslot, no escrow, POA&M-026).
+
+### 4.7 After a macOS update — mandatory
+
+A macOS update can silently reset controls on the Mac. Two have been found: the
+mSCP settings (`audit_warn`, screensaver unlock; POA&M-003, -029) and, on
+2026-09-03, the TOTP line in `/etc/pam.d/sshd`, which stayed missing for 36 days
+(`DIWAI-CR-2026-10-11`, finding 7). After every macOS update, and before the
+review is closed:
+
+```
+sudo bash ~/diwai/scripts/fix-mscp-regression.sh
+```
+
+Read the last step of its output (step 5, the Mac SSH TOTP check). **OK** means
+SSH on the Mac still asks for a TOTP code. **FAIL** means it may ask for a key
+and password only: run `sudo bash ~/diwai/scripts/restore-mac-ssh-totp.sh` with a
+second session open, then run the step again. Record the result in the review log.
 
 ---
 
@@ -174,16 +191,16 @@ POA&M entry rather than a recurring row.
 
 | Condition | Action |
 |:---|:---|
-| PATCH-class **CRITICAL** | Apply within **72 hours of detection** — out of cycle, without waiting for the weekly review |
+| PATCH-class **CRITICAL** | Apply within **72 hours of detection** — out of cycle, without waiting for the next review |
 | A CVE with known exploitation | Apply immediately; treat as an incident if the system is exposed |
-| Fix requires a stream migration | POA&M item — do not attempt in a weekly review |
+| Fix requires a stream migration | POA&M item — do not attempt in a review |
 | Update breaks a control | Roll back, record it, and treat the breakage as the finding |
 
 ### 6.1 When the 72-hour clock starts (added 2026-09-15, F-2026-09-04)
 
 **"Detection" means the timestamp of the scan report that first lists the
 finding** — `cve-scan-mac-<date>.json` on the Mac, the `diwai-cve-scan` report on
-the VM. Not the date of the weekly review, not the date the alert mail is read,
+the VM. Not the date of the review, not the date the alert mail is read,
 and not the vendor's publication date.
 
 **Why it needed saying.** As issued, §6 set a 72-hour deadline and **never said
@@ -225,6 +242,7 @@ own finding (3.14.1) and never converts an overdue critical into a compliant one
 
 | Version | Date | Author | Description |
 |:---|:---|:---|:---|
+| **1.3** | **2026-10-09** | **[SYSTEM-OWNER]** | **NEW §4.7: after every macOS update, run the mSCP fix and read the Mac SSH TOTP check.** A macOS update removed the Mac TOTP line on 2026-09-03 and nothing noticed for 36 days (`DIWAI-CR-2026-10-11`, finding 7). The mSCP fix script now ends with the TOTP check; the procedure requires it to be read and recorded. |
 | **1.2** | **2026-09-15** | **[SYSTEM-OWNER]** | **REVIEW CADENCE WEEKLY → MONTHLY, by owner decision, plus a mandatory review on return after any gap over 30 days.** The weekly cadence lapsed for five and a half weeks and was caught by automation, not the calendar. The system is worked in concentrated sessions and may sit unattended for weeks, but **its exposure does not pause** — webmail, mail and OpenVPN are internet-published continuously. The response is split: **detection stays daily and automated** with control-health alerting on actionable CRITICAL; **PATCH-class CRITICAL stays at 72 h from detection** (§6.1, unchanged); **the human review moves to monthly**. 3.14.1 requires timeframes to be defined *and met* — a monthly cadence that is met evidences the control better than a weekly one that is not. **Header version corrected 1.0 → 1.2**: the 1.1 entry below was recorded without bumping the header. SSP Appendix E.3 revised to match. **Outstanding:** a reminder to the owner (SMS preferred) is not yet wired, so the cadence currently depends on memory |
 | **1.1** | **2026-09-15** | **[SYSTEM-OWNER]** | **The 72-hour escalation clock now has a defined start (F-2026-09-04).** As issued, §6 required PATCH-class CRITICAL within 72 hours but never said from *what*, while §3 measured "within 7 days" from review — so the same event was both a breach and compliant depending on which row was read. §6.1 defines detection as the timestamp of the scan report that first lists the finding, states that §6 takes precedence over §3 for PATCH-class CRITICAL, and records that a lapsed review cadence does not pause the clock. This aligns the procedure with what `diwai-control-health` already measures. Raised while applying six Mac upgrades on 2026-09-15 (`CUI_Patch_Review_Log.md`) |
 | **1.0** | **2026-08-02** | **[SYSTEM-OWNER]** | Initial issue. Operationalises SSP Appendix E.3; establishes the weekly review as the compensating control for the `dnf-automatic` deviation |
