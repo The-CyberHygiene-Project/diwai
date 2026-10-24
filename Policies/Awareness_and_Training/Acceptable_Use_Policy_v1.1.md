@@ -5,6 +5,8 @@
 **Document ID:** DIWAI-AUP-001
 **Editorial Correction (2026-08-01):** Document identifier changed from `TCC-AUP-001` to `DIWAI-AUP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
 **Addition (2026-10-09):** Section 10.1, use of external systems, added (3.1.20). Section 2.2 password requirements brought to the values in force (length 16, expiration scope, history 6, lockout). No other change.
+
+**Change (2026-10-23):** section 2.2, the 90-day expiration line replaced by the three-year change interval of `DIWAI-IAP-001` section 3.3. `DIWAI-CR-2026-10-26`.
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually
@@ -149,7 +151,7 @@ All computing devices that connect to SecureMac must comply with:
 System-level and user-level passwords must comply with the 389-DS directory password policy, as specified in **`DIWAI-IAP-001`** (Identification and Authentication Policy):
 - Minimum 16 characters
 - At least 3 character classes (uppercase, lowercase, numbers, special characters)
-- Expiration: 90 days for interactive user accounts; service, break-glass and reserved accounts are exempt (see `DIWAI-IAP-001`, section 3.3)
+- Change interval: at least every three years, and after any incident or evidence of compromise, for every password; the system enforces it for interactive accounts and the credential register tracks the rest (see `DIWAI-IAP-001`, section 3.3, and `DIWAI-CRR-001`)
 - Password history: the last 6 passwords cannot be reused
 - Lockout: 3 failed attempts lock a VM account for 15 minutes (5 consecutive failures on the Mac host); see `DIWAI-IAP-001`
 

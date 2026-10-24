@@ -8,6 +8,8 @@
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon significant changes
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
 **Next Review:** November 2, 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -400,7 +402,7 @@ This policy integrates with:
 
 **Enforcement:**
 - Violations (e.g., unreported risks, failure to remediate) may result in access revocation, disciplinary action, or contract termination
-- Quarterly tabletop exercises validate effectiveness
+- The annual tabletop exercise validates effectiveness
 - Exercise results update SSP and POA&M
 - Annual policy review and approval
 
@@ -896,7 +898,7 @@ Date: _______________
 - **Likelihood:** Low (home office, locked)
 - **Impact:** High (CUI exposure, equipment theft)
 - **Risk Score:** 3
-- **Mitigations:** Locked office, alarm system, LUKS encryption, TS clearance holder
+- [PERSONNEL-SCREENING-NOTE-REDACTED]
 - **Residual Risk:** Low
 
 ### 4. Contractor Account Compromise

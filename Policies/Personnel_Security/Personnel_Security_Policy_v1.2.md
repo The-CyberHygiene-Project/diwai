@@ -7,6 +7,10 @@
 **Version:** 1.2
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon significant organizational changes
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-31`):** PS-4 now includes the Nextcloud step (disable the user, revoke app passwords), after a drill showed an app password still worked once the directory entry was locked.
 **Next Review:** November 2, 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -16,11 +20,10 @@
 
 
 
-**Version 1.2 (2026-08-04) — screening claims made evidenceable.** Reviewed by
-the system owner, who directed that clearances and investigations which cannot
-currently be documented should not be discussed. Applied as follows.
+**Change (2026-10-23):** section 3, sole-owner basis added under the high-risk heading (`DIWAI-CR-2026-10-27`); screening of any other person is unchanged. Version not bumped.
+[PERSONNEL-SCREENING-NOTE-REDACTED] Applied as follows.
 
-- **Security-clearance references removed as the basis of compliance.** v1.1 stated a Top Secret clearance as the **requirement** for the high-risk position and described an FBI Single Scope Background Investigation, credit review, neighbour interviews and DoD CAF adjudication as the screening performed. Two problems: (a) **CUI is unclassified** — NIST SP 800-171 **3.9.1** requires *screening*, not a clearance, so stating one as the requirement both overstates the standard and makes the policy unusable by any organisation adopting this reference model; (b) the supporting evidence is **not currently producible** — obtaining a copy of the investigative file is an action not yet taken. **A control claim that cannot be produced on request is a liability, not an asset.**
+- [PERSONNEL-SCREENING-NOTE-REDACTED] **A control claim that cannot be produced on request is a liability, not an asset.**
 - **Replaced with documentable screening:** identity verification, criminal history check, professional reference verification, signed eligibility attestation, and an executed NDA — each required to produce a retainable record, reviewed at least every three years.
 - **Storage path corrected.** Screening records were assigned to `/backup/personnel-security/`, which **exists on neither host** (verified 2026-08-04) — the same defect as F-2026-08-33. Records are assigned to the canonical CUI store at `Compliance/Evidence/Personnel/`, consistent with `DIWAI-TRR-001`.
 - Definition of "Personnel Screening" amended to match.
@@ -52,12 +55,7 @@ provide.
 
 Also corrected: pfSense reference replaced with the `pf` ruleset on the Mac mini;
 workstation references scoped for deployments that include them.
-
-**Left unchanged:** §"Special Case — Solopreneur Environment", which already
-scopes this policy correctly for a single-operator business. *(The clearance note
-referred to here was subsequently rewritten in v1.2 — see below.)*
-Personnel provisions are retained in full — this is a reference model intended
-for adoption by VSBs with employees and contractors.
+ **Left unchanged:** §"Special Case — Solopreneur Environment", which already scopes this policy correctly for a single-operator business. [PERSONNEL-SCREENING-NOTE-REDACTED]
 
 Raised as **POA&M-058**; no control changed.
 
@@ -81,13 +79,7 @@ This policy applies to all personnel, including:
 - Termination and access revocation
 
 **Exclusions:** Non-CUI administrative staff (none currently).
-
-**Note on screening and clearances.** **CUI is unclassified.** NIST SP 800-171
-**3.9.1** requires that individuals be *screened* prior to authorizing access to
-systems containing CUI; it does **not** require a security clearance, and no
-provision of this policy should be read as imposing one. Screening requirements
-are stated below in terms that any adopting organization can meet and, more
-importantly, **evidence**.
+[PERSONNEL-SCREENING-NOTE-REDACTED] Screening requirements are stated below in terms that any adopting organization can meet and, more importantly, **evidence**.
 
 Where the Owner/Principal holds credentials or investigations beyond these
 requirements, they are **not cited here as the basis of compliance** — a control
@@ -99,7 +91,7 @@ deployment; see "Special Case — Solopreneur Environment".
 
 ## Definitions
 
-- **Personnel Screening:** Documented verification of an individual's background prior to authorizing CUI access — identity, criminal history, and professional references. CUI is unclassified; screening does not entail a security clearance.
+- **Personnel Screening:** Documented verification of an individual's background prior to authorizing CUI access — identity, criminal history, and professional references. [PERSONNEL-SCREENING-NOTE-REDACTED]
 
 - **Access Agreement:** Non-Disclosure Agreement (NDA) or similar binding document outlining CUI handling responsibilities
 
@@ -159,6 +151,8 @@ All positions involving SecureMac access shall be designated based on risk level
 Prior to granting SecureMac access, all personnel shall undergo screening proportional to position risk:
 
 **High-Risk Positions (ISSO / System Owner):**
+ **Sole-owner basis (2026-10-23).** While the System Owner is the organization's sole principal and the only person with access, the five records below are **not required of the owner** for the owner's own access. The owner's access is authorized on the basis of (1) ownership and control of the company, (2) a signed attestation of eligibility, held in `Compliance/Evidence/Personnel/` and renewed at least every 3 years, and (3) the owner's Joint Certification Program certification (DD Form 2345) while it is in force, cited by existence and expiry only. **This exception ends the day any other person is given access.** Every other person is screened in full under the list below, or under Moderate-Risk Positions, before access is granted. [PERSONNEL-SCREENING-NOTE-REDACTED]
+
 - Identity verification (government-issued photo identification)
 - Criminal history check
 - Professional reference verification (minimum two)
@@ -197,6 +191,20 @@ dsidm diwai account lock uid=<username>,ou=people,dc=diwai,dc=org
 
 # Verify account disabled
 dsidm diwai account entry-status uid=<username>,ou=people,dc=diwai,dc=org
+
+# Remove the account from the cui-users group (uniqueMember)
+
+# Lock and expire the VM local account, if one exists
+sudo usermod -L -e 1970-01-02 <username>
+
+# Nextcloud: disable the user and revoke its app passwords.
+# REQUIRED: locking the directory entry alone does NOT stop an app password.
+# (Proven 2026-10-23, DIWAI-EV-PS-2026-10-23-N: the app password kept working
+# after the directory lock and was refused only after occ user:disable.)
+cd /opt/local/nextcloud
+sudo php occ user:disable <username>
+sudo php occ user:auth-tokens:list <username>      # then delete each token:
+sudo php occ user:auth-tokens:delete <username> <token-id>
 
 # Force Kerberos ticket expiration
 # (automatic upon account disable)
@@ -356,8 +364,7 @@ sudo grep contractor_name /var/log/samba/log.smbd
 - Remote access via 389-DS LDAP authentication (logged)
 - NAS file access audited via VFS audit module
 - Wazuh SIEM monitors all contractor activity
-- Monthly review of contractor access logs
-- Quarterly contractor account recertification
+- Contractor access logs and account recertification apply only if a contractor is ever added; none exist now (`DIWAI-SCH-001` M8)
 
 **Contractor Account Management:**
 ```bash
@@ -461,7 +468,6 @@ Violations of security policies shall result in appropriate sanctions:
 **Monitoring Activities:**
 - Annual audits of screening records and expirations
 - Quarterly 389-DS LDAP account reviews
-- Monthly contractor access log reviews
 - Wazuh authentication monitoring (continuous)
 - Integration with OpenSCAP compliance scans
 

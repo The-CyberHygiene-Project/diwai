@@ -7,6 +7,10 @@
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or post-incident
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
+
+> **Change (2026-10-24, `DIWAI-CR-2026-10-40`):** the recovery wording named a backup regime that does not exist here (ReaR images, `/backup/daily`, `/backup/procedures`); it now points to `CUI_Backup_Procedures_v2.0.md` §6. Response targets (4 h, 24 h / 72 h, 2 h notice, 72 h external report) are unchanged. The version number is unchanged.
 **Next Review:** November 2, 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -90,14 +94,12 @@ Automated monitoring tools shall generate alerts within 1 hour of detection:
 
 **Response Timeline Requirements:**
 - **Containment:** Achieve within 4 hours (e.g., account disable via 389-DS LDAP `sudo ldapmodify` (disable user))
-- **Eradication/Recovery:** Complete within 24 hours for low-impact incidents using verified backups (ReaR ISOs)
+- **Eradication/Recovery:** Complete within 24 hours for low-impact incidents using verified backups (`CUI_Backup_Procedures_v2.0.md` §6)
 - **Testing:** Annual tabletop exercises to validate procedures
 
 **Recovery Resources:**
-- Automated daily backups of critical files
-- Weekly full-system ReaR ISO backups to encrypted RAID array
-- LUKS-encrypted offsite backup media (rotated monthly)
-- System recovery procedures documented in `/backup/procedures/`
+- Time Machine backup to encrypted media, checked monthly (`DIWAI-SCH-001` M6); offsite rotation is not in effect (POA&M-050)
+- Recovery procedures: `CUI_Backup_Procedures_v2.0.md` §6 (Mac host and files §6.1, services VM §6.2, Wazuh alert archive §6.3)
 
 #### 4. Notification Requirements
 
@@ -146,7 +148,7 @@ This policy integrates with:
 
 ### Overview
 
-This procedure provides actionable steps for executing the Incident Response Policy. It leverages SecureMac tools (Wazuh SIEM, OpenSCAP, ReaR backups) and assumes a small-team environment.
+This procedure provides actionable steps for executing the Incident Response Policy. It leverages SecureMac tools (Wazuh SIEM, OpenSCAP, Time Machine and archive backups) and assumes a small-team environment.
 
 **Incident Classification:**
 - **Low:** Single anomaly, no CUI impact (e.g., failed login attempts)
@@ -167,11 +169,11 @@ This procedure provides actionable steps for executing the Incident Response Pol
 **Training:**
 - Integrate IR procedures into annual security awareness training
 - Conduct tabletop exercises (e.g., mock unauthorized NAS access scenario)
-- Review incident response flowcharts quarterly
+- Review incident response flowcharts annually, with the tabletop exercise
 
 **Resources:**
 - Incident log template: `/backup/logs/incidents/template.txt`
-- Recovery procedures: `/backup/procedures/recovery_guide.md`
+- Recovery procedures: `CUI_Backup_Procedures_v2.0.md` §6
 - Wazuh dashboard: https://services.[DOMAIN.ORG]:443 (Wazuh UI)
 
 ### Procedure Steps
@@ -292,32 +294,7 @@ sudo oscap xccdf eval \
 
 **Step 3.2** - Restore from Backups (if needed):
 
-**File-level restore:**
-```bash
-# List available backups
-ls -lt /backup/daily/ | head -5
-
-# Extract specific config files
-cd /backup/daily/$(ls -t /backup/daily/ | head -1)
-tar -xzf dirsrv-config.tar.gz -C /tmp/
-
-# Restore files
-sudo cp -a /tmp/etc/dirsrv/slapd-diwai/* /etc/dirsrv/slapd-diwai/
-sudo systemctl restart dirsrv@diwai
-```
-
-**Full system restore:**
-```bash
-# Boot from ReaR ISO
-# Located at: /var/backups/securemac-rear.iso
-
-# Run recovery (from ReaR boot environment)
-rear recover
-
-# After recovery, verify services
-sudo ipactl status
-sudo systemctl status wazuh-manager
-```
+Restore with `CUI_Backup_Procedures_v2.0.md` §6: the Mac host and individual files (§6.1), the services VM (§6.2) and the Wazuh alert archive (§6.3). After any restore, verify services as in Step 3.3.
 
 **Step 3.3** - Verify System Integrity:
 ```bash
@@ -389,7 +366,7 @@ sudo pfctl -f /etc/pf_diwai.conf                                                
 - Retention period: 3 years minimum
 
 **Testing Requirements:**
-- **Annual Tabletop Exercise:** November 15 (or anniversary of last incident)
+- **Annual Tabletop Exercise:** on the anniversary of the last exercise (next due 2027-08-03)
 - **Test Scenarios:**
   - Simulated malicious-code detection on the Mac host
   - Unauthorized access attempt to NAS shares
@@ -452,24 +429,8 @@ sudo firewall-cmd --add-rich-rule='rule family="ipv4" source address="<IP>" reje
 sudo firewall-cmd --reload
 ```
 
-### Recovery Commands
-```bash
-# List recent backups
-ls -lt /backup/daily/ | head -5
-
-# Verify backup integrity
-cd /backup/daily/<latest>/
-sha256sum -c checksums.sha256
-
-# Restore 389-DS LDAP configuration
-tar -xzf ipa-config.tar.gz -C /tmp/
-sudo cp -a /tmp/etc/dirsrv/slapd-diwai/* /etc/dirsrv/slapd-diwai/
-sudo ipactl restart
-
-# Full system recovery
-# Boot from: /var/backups/securemac-rear.iso
-# Run: rear recover
-```
+### Recovery
+Restore with `CUI_Backup_Procedures_v2.0.md` §6: the Mac host and individual files (§6.1), the services VM (§6.2) and the Wazuh alert archive (§6.3). Recovery steps are kept in one place, the backup procedures, so they cannot drift apart.
 
 ---
 

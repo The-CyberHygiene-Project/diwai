@@ -7,6 +7,8 @@
 **Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
 **Next Review:** December 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -118,10 +120,9 @@ This policy applies to:
    - **In-person:** One-on-one session with ISSO (preferred for new hires)
    - **Online:** NIST CSRC awareness materials or approved third-party platform
    - **Documentation:** Security awareness handbook provided
-   - **Refreshers:** Email bulletins, security tips, tabletop exercises
+   - **Refreshers:** tabletop exercises
 
 5. **Training Effectiveness Measurement:**
-   - Phishing simulation tests (quarterly)
    - Incident reporting response time tracking
    - Knowledge assessment quiz (minimum 80% passing score)
    - Training attendance records maintained
@@ -137,7 +138,7 @@ This policy applies to:
      - Vulnerability management
      - Patch deployment procedures
      - Incident response procedures
-   - **Frequency:** Annual training + monthly security bulletins
+   - **Frequency:** Annual training
    - **Certification:** Encouraged but not required (CISSP, Security+, CySA+)
 
 2. **Information System Security Officer (ISSO):**
@@ -259,17 +260,7 @@ This policy applies to:
 
 ### 5.3 Ongoing Security Awareness
 
-**Monthly Security Tips:**
-- Email bulletin with security topic (password hygiene, phishing trends, etc.)
-- 5-minute read
-- Real-world examples and case studies
-
-**Quarterly Phishing Simulations:**
-- Simulated phishing emails sent to all users
-- Track click rates and reporting rates
-- Individualized feedback for clicked links
-- Aggregate results shared (no individual shaming)
-- Goal: <5% click rate, >75% reporting rate
+*Monthly security tips and quarterly phishing simulations are not performed: there is one person, who builds the system (`DIWAI-SCH-001` M9, Q8).*
 
 **Incident-Driven Training:**
 - Security bulletins issued within 24 hours of significant threats
@@ -303,19 +294,12 @@ This policy applies to:
 
 | Metric | Target | Measurement Frequency |
 |--------|--------|----------------------|
-| Annual training completion rate | 100% by Jan 31 | Monthly |
+| Training completion against due dates in `DIWAI-TRR-001` | 100% | Quarterly (`DIWAI-SCH-001` Q7) |
 | New hire training completion | 100% within 5 days | Per hire |
-| Phishing simulation click rate | <5% | Quarterly |
-| Incident reporting rate | >90% of simulations | Quarterly |
 | Security quiz pass rate | >80% | Annually |
 | Time to report incidents | <1 hour for critical | Per incident |
 
-**Quarterly Training Report:**
-- Compliance rates by department/role
-- Phishing simulation results and trends
-- Training effectiveness analysis
-- Recommendations for improvement
-- Budget and resource needs
+**Quarterly training check:** training currency is checked against the register `DIWAI-TRR-001` and the result is recorded (`DIWAI-SCH-001` Q7). No separate compliance report is produced.
 
 ---
 

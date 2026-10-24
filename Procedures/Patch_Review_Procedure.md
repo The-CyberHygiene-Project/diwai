@@ -6,8 +6,8 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | **DIWAI-PR-001** |
-| **Version** | 1.3 |
-| **Date** | October 9, 2026 (issued August 2, 2026) |
+| **Version** | 1.5 |
+| **Date** | October 23, 2026 (issued August 2, 2026) |
 | **Owner** | [SYSTEM-OWNER], ISSO / System Owner |
 | **Implements** | SSP v2.18 **Appendix E.3** (Flaw Remediation Timeframes) |
 | **Satisfies** | 3.14.1, 3.4.3 · addresses **POA&M-025** |
@@ -170,6 +170,15 @@ SSH on the Mac still asks for a TOTP code. **FAIL** means it may ask for a key
 and password only: run `sudo bash ~/diwai/scripts/restore-mac-ssh-totp.sh` with a
 second session open, then run the step again. Record the result in the review log.
 
+### 4.8 Audit-event review (added 2026-10-23, `DIWAI-ORW-001`, 3.3.3)
+
+Done **at every monthly review**, after the updates are applied. Fifteen minutes.
+
+1. **VM:** `sudo auditctl -l | wc -l` (expect 113), `sudo auditctl -s` (`enabled 1`, `lost 0`), and the volume `df -h /var/log/audit`. **Mac:** `/etc/security/audit_control` flags (`lo,aa,ad,-ex,-fm,-fr,-fw`) and `expire-after`.
+2. **What changed this month?** New services, new accounts, new internet-facing ports, new privileged scripts. For each, ask: would an incident involving it leave a record? If not, add the rule (auditd or Wazuh) and say so.
+3. **Probe the change path** (once, then when a rule changes): create, edit and delete a harmless file under `/etc/security`; the Wazuh file-integrity alerts 554, 550 and 553 must appear, and `sudo` must have logged who did it.
+4. **Record one line in `DIWAI-PR-LOG`**: date, what was read, what was found, "no change needed" or what was changed. A review that is not recorded did not happen.
+
 ---
 
 ## 5. Record
@@ -224,6 +233,22 @@ own finding (3.14.1) and never converts an overdue critical into a compliant one
 
 ---
 
+### 6.2 A new vulnerability is reported: scan on demand (added 2026-10-23, `DIWAI-ORW-001` Tier A, 3.11.2 [c])
+
+The weekly scans are the **periodic** control. This section is the **triggered** one.
+
+**Trigger.** Any report that a vulnerability may affect a component in the SBOM, from any source: a vendor advisory or release note, a CISA or NVD notice, an alert from the Wazuh vulnerability-detection module, a new RLSA, or the advisory feed of the weekly scan itself.
+
+**Action, within one working day of learning of it:**
+
+1. Run both scans **now**, without waiting for the next weekly run. VM: `sudo systemctl start diwai-cve-scan.service`. Mac: `~/diwai/scripts/diwai-cve-scan-mac` (the same command the weekly launch agent `org.diwai.cve-scan-mac` runs).
+2. Read the new reports. A finding that is new since the last report is handled under §3 (timeframes) and, if PATCH-class CRITICAL, §6 and §6.1 (72 hours **from the timestamp of this scan report**).
+3. Record it in `DIWAI-PR-LOG`: date, what was reported and where, which scans ran, and what they found (including "nothing new").
+
+**What the trigger is not.** It is not a substitute for the weekly scan, and a clean on-demand scan is not evidence that a reported vulnerability is absent from software the scanner cannot see (Homebrew and third-party results are advisory, §4.3).
+
+---
+
 ## 7. Known gaps
 
 | # | Gap | Tracking |
@@ -242,6 +267,8 @@ own finding (3.14.1) and never converts an overdue critical into a compliant one
 
 | Version | Date | Author | Description |
 |:---|:---|:---|:---|
+| **1.5** | **2026-10-23** | **[SYSTEM-OWNER]** | **NEW §4.8: monthly audit-event review.** The assessment found no defined process for reviewing and updating what is logged (3.3.3). §4.8 defines it, ties it to the monthly patch review and says how to prove the change path is still logged. First run 2026-10-23 (`DIWAI-PR-LOG`). |
+| **1.4** | **2026-10-23** | **[SYSTEM-OWNER]** | **NEW §6.2: a scan is run on demand when a new vulnerability is reported.** The weekly scans were the only trigger, so objective 3.11.2 [c] ("scans are performed when new vulnerabilities are identified") had no stated mechanism. §6.2 names the trigger (any report from any source that may affect a component in the SBOM), the action (both scans within one working day), where the 72-hour clock starts for a new CRITICAL (the on-demand report's timestamp, §6.1) and the record to make. First exercised 2026-10-23 (`DIWAI-PR-LOG`). |
 | **1.3** | **2026-10-09** | **[SYSTEM-OWNER]** | **NEW §4.7: after every macOS update, run the mSCP fix and read the Mac SSH TOTP check.** A macOS update removed the Mac TOTP line on 2026-09-03 and nothing noticed for 36 days (`DIWAI-CR-2026-10-11`, finding 7). The mSCP fix script now ends with the TOTP check; the procedure requires it to be read and recorded. |
 | **1.2** | **2026-09-15** | **[SYSTEM-OWNER]** | **REVIEW CADENCE WEEKLY → MONTHLY, by owner decision, plus a mandatory review on return after any gap over 30 days.** The weekly cadence lapsed for five and a half weeks and was caught by automation, not the calendar. The system is worked in concentrated sessions and may sit unattended for weeks, but **its exposure does not pause** — webmail, mail and OpenVPN are internet-published continuously. The response is split: **detection stays daily and automated** with control-health alerting on actionable CRITICAL; **PATCH-class CRITICAL stays at 72 h from detection** (§6.1, unchanged); **the human review moves to monthly**. 3.14.1 requires timeframes to be defined *and met* — a monthly cadence that is met evidences the control better than a weekly one that is not. **Header version corrected 1.0 → 1.2**: the 1.1 entry below was recorded without bumping the header. SSP Appendix E.3 revised to match. **Outstanding:** a reminder to the owner (SMS preferred) is not yet wired, so the cadence currently depends on memory |
 | **1.1** | **2026-09-15** | **[SYSTEM-OWNER]** | **The 72-hour escalation clock now has a defined start (F-2026-09-04).** As issued, §6 required PATCH-class CRITICAL within 72 hours but never said from *what*, while §3 measured "within 7 days" from review — so the same event was both a breach and compliant depending on which row was read. §6.1 defines detection as the timestamp of the scan report that first lists the finding, states that §6 takes precedence over §3 for PATCH-class CRITICAL, and records that a lapsed review cadence does not pause the clock. This aligns the procedure with what `diwai-control-health` already measures. Raised while applying six Mac upgrades on 2026-09-15 (`CUI_Patch_Review_Log.md`) |

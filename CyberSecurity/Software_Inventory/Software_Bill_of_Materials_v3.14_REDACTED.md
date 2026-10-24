@@ -239,7 +239,7 @@ This Software Bill of Materials (SBOM) provides a comprehensive inventory of all
 | Volume | Device | Capacity / used | Encryption | Role |
 |:---|:---|:---|:---|:---|
 | `SecureMac` | USB SATA SSD, APFS (case-sensitive) | 499.9 GB / 395.5 GB | **FileVault** | Time Machine destination |
-| `CyberHygiene Project` | USB SATA SSD, APFS | 249.8 GB / 2.3 GB | **FileVault — encrypted 2026-09-15**, `DIWAI-CR-2026-09-09` C125 | Historical reference / publish-transfer volume; USBGuard UUID `FED67739-…` |
+| `CyberHygiene Project` | USB SATA SSD, APFS | 249.8 GB / 2.3 GB | **FileVault — encrypted 2026-09-15**, `DIWAI-CR-2026-09-09` C125 | Historical reference / publish-transfer volume; USBGuard UUID `[HW-UUID-REDACTED]` |
 
 **Total Packages:** macOS native  
 **Role:** Network Firewall/Router, AI Inference Host, Nextcloud (Private Cloud)  

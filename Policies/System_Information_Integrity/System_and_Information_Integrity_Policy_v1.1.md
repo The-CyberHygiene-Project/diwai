@@ -9,6 +9,8 @@
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon system changes
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
 **Next Review:** November 2, 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -224,8 +226,8 @@ Wazuh monitors these critical paths (12-hour scan interval):
 - **Low:** Weekly summary review
 
 **Review Schedule:**
-- **Daily:** ISSO reviews Wazuh dashboard for critical/high alerts
-- **Weekly:** Comprehensive review of all alerts and trends
+- **Each working day:** ISSO reads alert mail for critical/high alerts (`DIWAI-SCH-001` D1)
+- **Weekly:** Wazuh dashboard, audit log and accounts reviewed (W1)
 - **Monthly:** Statistical analysis and reporting to Owner/Principal
 - **Quarterly:** Monitoring effectiveness assessment
 
@@ -424,7 +426,7 @@ sudo ausearch -f /path/to/modified/file -ts recent
 
 | Role | Responsibilities |
 |------|------------------|
-| **ISSO ([SYSTEM-OWNER])** | Configure Wazuh rules and alerts; review dashboards daily; oversee vulnerability remediation; conduct integrity verifications; maintain documentation in `/backup/integrity-logs/`; respond to security alerts; coordinate incident response for integrity violations |
+| **ISSO ([SYSTEM-OWNER])** | Configure Wazuh rules and alerts; read alert mail each working day and review dashboards weekly; oversee vulnerability remediation; conduct integrity verifications; maintain documentation in `/backup/integrity-logs/`; respond to security alerts; coordinate incident response for integrity violations |
 | **Owner/Principal ([SYSTEM-OWNER])** | Approve critical remediation actions; review quarterly Wazuh reports; accept residual risks; authorize emergency patches; ensure policy compliance |
 | **Users/Contractors** | Report potential integrity issues immediately (unexpected file changes, suspicious behavior); comply with no-unauthorized-software rule; report malware detections; do not disable security tools |
 | **System Administrator (ISSO concurrent role)** | Apply security patches; configure security tools; maintain system baselines; execute OpenSCAP scans; manage Wazuh Manager |
@@ -472,9 +474,9 @@ sudo ausearch -f /path/to/modified/file -ts recent
 
 ## Section 2: System and Information Integrity Procedures
 
-### Procedure 1: Daily Wazuh Dashboard Review
+### Procedure 1: Wazuh Dashboard Review
 
-**Frequency:** Daily (weekday mornings)
+**Frequency:** Weekly; alert mail is read each working day (`DIWAI-SCH-001` D1, W1)
 
 **Process:**
 1. Access Wazuh dashboard: https://services.[DOMAIN.ORG]:443
@@ -492,7 +494,7 @@ sudo ausearch -f /path/to/modified/file -ts recent
    - CIS benchmark failures
    - Configuration drift
 5. Investigate any anomalies
-6. Document findings in `/backup/integrity-logs/daily-review-$(date +%Y%m%d).txt`
+6. Record the outcome (what was found, or that nothing was) in the obligations ledger (`DIWAI-SCH-001`)
 7. Create tickets for remediation actions
 
 **Time Required:** 15-30 minutes

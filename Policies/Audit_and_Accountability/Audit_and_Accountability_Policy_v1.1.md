@@ -8,6 +8,10 @@
 **Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
+
+> **Change (2026-10-24, `DIWAI-CR-2026-10-40`):** §3.2 item 3 (AU-11): the Wazuh index retention is stated as enforced (90 days, policy `wazuh-90day-retention`, verified 2026-10-24) and the Mac's 90 days added; the NAS archive expiry remains outstanding. The version number is unchanged.
 **Next Review:** December 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -104,15 +108,15 @@ This policy applies to:
 
 3. **Retention Period (AU-11):**
    - **Online retention (VM audit logs):** configured for `max_log_file = 64` MB × `num_logs = 100` ≈ **6.4 GB**, which at current volume supports well over 30 days. *Note: retention was raised on 2026-08-01 (`DIWAI-CR-2026-08-01` C12) from a prior configuration holding roughly one hour; audit history therefore begins 2026-08-01 and the 30-day depth accrues from that date.*
-   - **Centralized retention (Wazuh indexer):** **no automated retention policy is configured.** Verified 2026-08-04 — no ISM policy governs index deletion. Data accumulates rather than being retained for a defined period and then aged out. The previously stated "90 days" was not enforced by any mechanism.
+   - **Centralized retention (Wazuh indexer):** alert indices are deleted **90 days after creation** by the index lifecycle policy `wazuh-90day-retention`. Verified 2026-10-24: the policy is present and attached to all 85 alert indices. The policy store was lost in the 2026-09-25 host panic and the policy was rebuilt the same day from its deletion history; the definition is kept in `~/diwai/etc/wazuh-90day-retention.ism.json`. *(Superseded 2026-08-04 finding: no policy was then configured.)*
+   - **Mac audit records** are kept 90 days (`expire-after:90d`, set 2026-10-23, `DIWAI-CR-2026-10-39`; to be verified 2027-01-21).
    - **Archival retention:** encrypted audit archives are shipped to the NAS daily (`wazuh-log-archive`). **No automated expiry or verified one-year retention is in place**; the previously stated "1 year" was not enforced.
    - Extended retention for incidents under investigation
 
-   > **Both centralized and archival figures were unsubstantiated claims and are
-   > corrected rather than restated.** Defining and enforcing retention periods —
-   > an ISM policy on the indexer, and an expiry rule for the NAS archives — is
-   > outstanding work, tracked with the other recurring-obligation gaps under
-   > **POA&M-059**. Stating a retention period no mechanism enforces would be an
+   > **The archival figure was an unsubstantiated claim and is corrected rather
+   > than restated.** The indexer half is now enforced (above). An expiry rule for
+   > the NAS archives is outstanding work, tracked with the other
+   > recurring-obligation gaps under **POA&M-059**. Stating a retention period no mechanism enforces would be an
    > AU-11 claim that cannot be demonstrated.
 
 ### 3.3 Audit Monitoring and Review (AU-6, AU-6(1))
@@ -129,8 +133,7 @@ This policy applies to:
      - Account lockouts or disablements
 
 2. **Manual Review (AU-6):**
-   - Daily review of Wazuh alerts by System Administrator
-   - Weekly comprehensive audit log review
+   - Alert mail read each working day; Wazuh dashboard and audit log reviewed weekly (`DIWAI-SCH-001` D1, W1)
    - Monthly trend analysis for anomaly detection
    - Immediate review upon security incident
 
@@ -221,7 +224,7 @@ This policy applies to:
 
 - Configure and maintain audit logging systems
 - Monitor audit storage capacity
-- Perform daily alert review
+- Read alert mail each working day and review the dashboard weekly
 - Generate monthly audit reports
 - Protect audit logs from unauthorized access
 - Respond to audit processing failures

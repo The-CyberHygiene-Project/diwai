@@ -61,7 +61,7 @@ Review in this recommended order:
 #### 2.2 Personnel_Security_Policy.docx (25 minutes)
 **File:** `Personnel_Security_Policy.docx`
 
-- [ ] Verify TS clearance information is accurate
+- [PERSONNEL-SCREENING-NOTE-REDACTED]
 - [ ] Review contractor onboarding procedures (Section 2, Procedure 1)
 - [ ] Check 389-DS LDAP account provisioning commands
 - [ ] Review quarterly access review procedures
@@ -69,7 +69,7 @@ Review in this recommended order:
 - [ ] Review self-attestation form template (Appendix B)
 
 **Customization Needed:**
-- [ ] Verify TS clearance dates if you have them
+- [PERSONNEL-SCREENING-NOTE-REDACTED]
 - [ ] Confirm contractor screening requirements are appropriate
 
 ---
@@ -209,26 +209,8 @@ Implementation: Annual risk assessments, quarterly OpenSCAP scans, continuous Wa
 vulnerability monitoring. Risk register maintained. Remediation timelines: Critical 7 days,
 High 30 days, Medium 90 days.
 ```
-
-**Personnel Security (PS) - Section 3.9:**
-```
-Status: Implemented
-Evidence: Personnel Security Policy (TCC-PS-001)
-Location: /backup/personnel-security/policies/Personnel_Security_Policy.docx
-Implementation: Owner holds TS clearance exceeding CUI requirements. Contractor vetting
-procedures with 389-DS LDAP account provisioning. Quarterly access reviews. Emergency revocation
-procedures within 1 hour.
-```
-
-**Physical and Environmental Protection (PE) - Section 3.10:**
-```
-Status: Implemented
-Evidence: Physical and Media Protection Policy (TCC-PE-MP-001)
-Location: /backup/personnel-security/policies/Physical_and_Media_Protection_Policy.docx
-Implementation: Dedicated home office with locking server rack. Physical access limited to
-Owner (TS clearance holder). Environmental monitoring (UPS, HVAC, fire protection).
-Many controls N/A for single-occupant home office with documented justifications.
-```
+[PERSONNEL-SCREENING-NOTE-REDACTED] Contractor vetting procedures with 389-DS LDAP account provisioning. Quarterly access reviews. Emergency revocation procedures within 1 hour. ```
+ **Physical and Environmental Protection (PE) - Section 3.10:** ``` Status: Implemented Evidence: Physical and Media Protection Policy (TCC-PE-MP-001) Location: /backup/personnel-security/policies/Physical_and_Media_Protection_Policy.docx Implementation: Dedicated home office with locking server rack. [PERSONNEL-SCREENING-NOTE-REDACTED] Environmental monitoring (UPS, HVAC, fire protection). Many controls N/A for single-occupant home office with documented justifications. ```
 
 **Media Protection (MP) - Section 3.8:**
 ```

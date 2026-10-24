@@ -5,9 +5,13 @@
 **Document ID:** DIWAI-CMP-001
 **Editorial Correction (2026-08-01):** Document identifier changed from `TCC-CMP-001` to `DIWAI-CMP-001`; internal policy cross-references normalised to the `DIWAI-*` set. Identifier only — **no control content changed** and the version is deliberately not incremented. Aligns this document with the SSP citation set and the [DOMAIN.ORG] independence determination (SSP v2.12 corrected). See `DIWAI-EV-CM-2026-08-01`.
 **Technical Correction (2026-10-09):** the password policy line in the baseline table (section 3.5) corrected to the values in force: minimum length 16 and a 90-day expiry for interactive user accounts, with service, break-glass and reserved accounts exempt (`DIWAI-IAP-001`, `DIWAI-CR-2026-10-11`). No other change.
+
+**Technical Correction (2026-10-23):** the password policy line in the baseline table (section 3.5) updated to the three-year change interval of `DIWAI-IAP-001` section 3.3. `DIWAI-CR-2026-10-26`.
 **Version:** 1.1
 **Effective Date:** February 15, 2026
 **Review Schedule:** Annually
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
 **Next Review:** December 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -169,7 +173,7 @@ This policy applies to:
 | Firewall | Enabled, default-deny | `firewall-cmd --state` |
 | Auditd | Running, CUI profile | `systemctl status auditd` |
 | SSH | Key-based only, no root login | `/etc/ssh/sshd_config` |
-| Password Policy | 16-char min; 90-day expiry for interactive accounts | 389-DS LDAP policy; Mac `pwpolicy` |
+| Password Policy | 16-char min; change at least every 3 years (enforced for interactive accounts, tracked in the credential register for the rest) | 389-DS LDAP policy; Mac `pwpolicy`; VM `chage`, `pwquality`, `pwhistory` |
 | Session Lock | 15-minute timeout | `gsettings` or screen saver |
 
 ### 3.6 Least Functionality (CM-7)
@@ -230,7 +234,7 @@ This policy applies to:
 1. **Licensed Software Only:**
    - All software properly licensed
    - License tracking spreadsheet maintained
-   - Annual license compliance review
+   - Licenses are listed in the SBOM; no separate annual review (`DIWAI-SCH-001` A10)
 
 2. **Open Source Software:**
    - Only from trusted repositories (RHEL/Rocky official repos)
@@ -259,7 +263,7 @@ This policy applies to:
 3. **Monitoring:**
    - File integrity monitoring (Wazuh FIM) detects unauthorized installations
    - Package installation events logged via auditd
-   - Monthly review of installed software inventory
+   - Installed-software inventory checked quarterly with the SBOM (`DIWAI-SCH-001` Q6)
 
 ---
 

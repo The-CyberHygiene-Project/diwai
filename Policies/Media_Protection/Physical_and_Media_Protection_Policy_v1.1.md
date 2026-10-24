@@ -7,6 +7,13 @@
 **Version:** 1.1
 **Effective Date:** November 2, 2025
 **Review Schedule:** Annually or upon facility/infrastructure changes
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-30`):** recurring obligations in this policy were tailored to the schedule `DIWAI-SCH-001`, approved by the owner. Activities that are not performed here were removed or restated; the version number is unchanged.
+[PERSONNEL-SCREENING-NOTE-REDACTED] The version number is unchanged. *(Also 2026-10-24: the backup-media list no longer names ReaR images, which do not exist here, and states the Time Machine drive's actual encryption.)*
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-35`):** off-site equipment repair stated as not used (see Authorized Removal).
+
+> **Change (2026-10-23, `DIWAI-CR-2026-10-37`):** Media Sanitization (MP-6) rewritten for the media actually in use; log is `DIWAI-MSL-001`.
 **Next Review:** November 2, 2026
 **Owner:** [SYSTEM-OWNER], ISSO/System Owner
 **Distribution:** Authorized personnel only
@@ -62,8 +69,8 @@ This policy applies to:
 
 **Media:**
 - Internal storage — **FileVault** full-disk encryption on the Mac mini; **LUKS2** on the VM's virtual disks
-- External USB drives for backups (LUKS-encrypted)
-- Backup media (ReaR ISO images, offline backups)
+- External USB drive for backups: the Time Machine drive, encrypted with FileVault (APFS)
+- Backup media: the Time Machine drive, the encrypted Wazuh alert archive on the NAS, and on-demand VM image archives (`CUI_Backup_Procedures_v2.0.md`)
 - Removable media (if used for CUI transport)
 
 **Personnel:**
@@ -110,7 +117,7 @@ This policy applies to:
 - **Visitors** - NOT APPLICABLE: No visitors permitted in CUI processing area
 
 **Authorization Process:**
-- Owner/Principal: Permanent authorization based on Top Secret clearance and business ownership
+- Owner/Principal: Permanent authorization based on ownership and control of the company (`DIWAI-PS-001` sole-owner basis)
 - Contractors: Temporary authorization requires:
   - Executed NDA (per DIWAI-PS-001)
   - Business need justification
@@ -122,7 +129,7 @@ This policy applies to:
 - Physical access authorization list maintained in `/backup/physical-security/access-list.xlsx`
 - Quarterly review to ensure accuracy
 - Update within 24 hours of any personnel changes
-- Include: name, authorization level, effective dates, clearance/screening status
+- Include: name, authorization level, effective dates, screening status
 
 ### 3. Physical Access Control (PE-3)
 
@@ -183,7 +190,7 @@ This policy applies to:
 **Monitoring Methods:**
 - Physical access limited exclusively to Owner (single occupant)
 - Office door lock status verified before leaving residence
-- Server rack lock verified daily
+- Server rack lock and environment observed at the monthly physical attestation (`DIWAI-SCH-001` M7). **Support infrastructure (UPS, ventilation) is monitored by this direct observation; automated monitoring is not practical here (owner decision 2026-10-24).**
 - Home security system monitors office entry door (if configured)
 - Security camera (if deployed) monitors office entrance
 
@@ -372,8 +379,8 @@ sudo apctest
 - Media sanitization required before removal (if equipment contains CUI storage)
 
 **Authorized Removal:**
-- Backup media to offsite location (monthly rotation)
-- Equipment for repair (sanitized first, or never contained CUI)
+- Backup media to offsite location (not in effect; POA&M-050)
+- Equipment for repair: **not used.** Failed equipment is repaired by the owner or replaced; failed storage media is not returned to a vendor or any third party (`DIWAI-APP-001` fact F10). If that ever changes, the equipment is sanitized first and logged as described above
 - Equipment disposal (sanitized per MP-6)
 - Temporary relocation for emergency (fire, flood)
 
@@ -481,7 +488,7 @@ sudo apctest
 - **System Storage:** FileVault on the Mac mini; LUKS2 on the VM's virtual disks
 - **RAID Array:** NAS storage (nas.[DOMAIN.ORG]) with LUKS-encrypted volumes
 - **Backup USB Drives:** LUKS-encrypted, stored in locked location
-- **Offline Backups:** ReaR ISO images, encrypted, stored offsite (monthly rotation)
+- **Offline Backups:** encrypted; offsite rotation is not in effect (POA&M-050)
 
 **Access Procedures:**
 ```bash
@@ -561,7 +568,7 @@ Maintain inventory of all CUI media:
 - Owner transports personally (no shipping)
 - Locked container during transport (briefcase, locked bag)
 - Direct transport from home office to safe deposit box
-- Monthly rotation schedule documented
+- Offsite rotation is not in effect (POA&M-050)
 
 **Courier Requirements:**
 - Owner serves as courier (no third-party courier used)
@@ -577,52 +584,27 @@ Maintain inventory of all CUI media:
 
 ### 6. Media Sanitization (MP-6)
 
-**Sanitization Requirements:**
-Media must be sanitized before:
-- Reuse for non-CUI purposes
-- Removal from facility (e.g., for repair)
-- Disposal or destruction
-- Transfer to another party
+*Rewritten 2026-10-23 (`DIWAI-CR-2026-10-37`) for the media this system actually has. The previous text described `/dev/sdX`, `shred` and a `/backup` log path inherited from another system; `shred` and overwriting are not valid for solid-state storage.*
 
-**Sanitization Methods:**
+**When.** Media that has held CUI is sanitized or destroyed before it is **disposed of** or **reused for a non-CUI purpose**. Media is never sent to a vendor, a warranty service or any third party (`DIWAI-APP-001` fact F10); a failed device is sanitized or destroyed by the owner.
 
-**Method 1: Cryptographic Erase (Preferred for Encrypted Media):**
-```bash
-# LUKS encrypted media - destroy encryption key
-sudo cryptsetup luksErase /dev/sdX
-# This makes data permanently unrecoverable
-# Confirm action when prompted
-```
+**Rule of thumb.** CUI is stored only on encrypted media. Sanitizing encrypted media means destroying the key (cryptographic erase). Anything that cannot be erased is physically destroyed.
 
-**Method 2: Secure Overwrite (for unencrypted media):**
-```bash
-# Use shred utility (NIST SP 800-88 compliant)
-sudo shred -vfz -n 10 /dev/sdX
-# -v: verbose
-# -f: force (change permissions to allow writing)
-# -z: add final overwrite with zeros
-# -n 10: overwrite 10 times
-```
+| Media | Holds CUI? | Sanitize by | Verify |
+|:---|:---|:---|:---|
+| Mac internal SSD (FileVault) | Yes | Cryptographic erase: *Erase All Content and Settings* (destroys the volume key), then confirm the machine boots to Setup Assistant with no user data | Setup Assistant appears; no user volume mounts |
+| Services VM disk image (LUKS) | Yes | Delete the image file **and every copy** (Time Machine, NAS archive), and destroy the LUKS passphrase record (the sealed envelope) | Image absent from each location; the passphrase record destroyed and logged |
+| Time Machine drive, the encrypted CUI USB drive, other encrypted external drives | Yes | Cryptographic erase: erase the whole drive (`diskutil eraseDisk` on the drive, not a volume), which destroys the encryption key | The old volume cannot be mounted or unlocked; the drive shows as newly formatted |
+| IronKey hardware-encrypted USB | Yes | Device reset (destroys the key) or physical destruction | The device reports it is reset or unreadable |
+| NAS disks | Archives only | If the volume is confirmed encrypted, destroy its key; **otherwise physical destruction** (record which) | Volume gone; destruction photographed |
+| Paper (printed CUI, the sealed passphrase envelope) | Possible | Cross-cut shred or burn | Logged |
+| Any device that cannot be erased (failed, locked) | Possible | **Physical destruction:** remove the storage, drill through the platters or break the flash chips, separate the pieces | Photographed; logged |
 
-**Method 3: Physical Destruction (for high-sensitivity media):**
-- Remove drive from enclosure
-- Use drill to physically destroy platters (HDD) or chips (SSD)
-- Dispose of fragments in separate waste streams
-- Document destruction with photos if required for compliance
+**Never** rely on `shred`, `dd` or an overwrite for the solid-state media above. Overwriting is used only on the disposable test images in the annual exercise.
 
-**Sanitization Documentation:**
-- Log all sanitization activities in `/backup/physical-security/media-sanitization-log.txt`
-- Include: date, media description, serial number, sanitization method, performed by, verification method
-- Retain sanitization logs for 3 years
+**Log.** Every sanitization or destruction is entered in the Media Sanitization Log, `DIWAI-MSL-001`: date, media description and serial number, method, performed by, how it was verified. Kept 3 years. An empty log is stated as empty.
 
-**Sanitization Verification:**
-```bash
-# For shred verification - attempt to mount
-sudo mount /dev/sdX /mnt  # Should fail
-
-# For LUKS-erased media - attempt to open
-sudo cryptsetup luksOpen /dev/sdX test  # Should fail
-```
+**Exercise.** The method is exercised once a year on a disposable image (`scripts/media-sanitization-drill.sh`), with a positive control, and the result is filed (`DIWAI-SCH-001` A13).
 
 ### 7. Media Use (MP-7)
 
