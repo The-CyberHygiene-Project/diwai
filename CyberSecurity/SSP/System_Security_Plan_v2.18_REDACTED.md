@@ -81,6 +81,22 @@
 | **2.18 (amended 55)** | **10/23/2026** | **[SYSTEM-OWNER]** | **3.3.5 RECOVERED; OBJECTIVE-LEVEL 75 → 76/110 (ASSESSMENT REVISION 1.17); SPRS UNCHANGED.** `DIWAI-COR-001` v1.0 (approved 2026-10-23) defines audit correlation, review and reporting; exercised across sources (`DIWAI-EV-AU-2026-10-23-C`). Audit and Accountability is 7 of 9. Backup `.bak-20261023-am55`. |
 | **2.18 (amended 56)** | **10/23/2026** | **[SYSTEM-OWNER]** | **3.3.2 RECOVERED; OBJECTIVE-LEVEL 76 → 77/110 (ASSESSMENT REVISION 1.18); SPRS UNCHANGED.** The portal (Apache), webmail (Dovecot) and Nextcloud now bind to the directory as `svc-apache`, `svc-dovecot` and `svc-nextcloud` (read-only, no access to password hashes) instead of the owner's account; the personal bind was scrubbed from a stale Grafana file (`DIWAI-CR-2026-10-38`). The change caused two short faults, recorded as INC-008. Audit and Accountability is 8 of 9. Backup `.bak-20261023-am56`. |
 | **2.18 (amended 57)** | **10/23/2026** | **[SYSTEM-OWNER]** | **3.3.1 RECOVERED; OBJECTIVE-LEVEL 77 → 78/110 (ASSESSMENT REVISION 1.19); SPRS UNCHANGED.** Mac audit retention raised from 7 to 90 days (`DIWAI-CR-2026-10-39`); Appendix E.9 updated. Retention is configured now and accumulates over 90 days (verify 2027-01-21). **Audit and Accountability is 9 of 9.** Backup `.bak-20261023-am57`. |
+| **2.18 (amended 78)** | **10/25/2026** | **[SYSTEM-OWNER]** | **3.4.6 AND 3.4.7 RECOVERED; OBJECTIVE-LEVEL 97 → 99/110 (ASSESSMENT REVISION 1.36); SPRS UNCHANGED.** The Mac firewall allow-list (R4 step 2, `DIWAI-CR-2026-10-34`) has been loaded since 2026-10-24 17:33: only the services VM may connect to the Mac itself (ports 22 and 443); the VM and the NAS are the only hosts passed through to the internet; everything else is refused and logged. Nine tests passed with automatic revert. Configuration Management is now 9 of 9. 3.1.1 [f] stays partial. Appendix on the Mac firewall rules updated in `DIWAI-PORTS-001`. |
+| **2.18 (amended 77)** | **10/25/2026** | **[SYSTEM-OWNER]** | **WEBMAIL, MAIL-CLIENT PORTS AND VPN TAKEN OFF THE INTERNET (`DIWAI-CR-2026-10-51`); NO COUNT CHANGE (97/110); SPRS UNCHANGED.** Owner decision 2026-10-24 (choice B). Webmail answers only the CUI network; the mail address forwards port 25 only; OpenVPN is stopped and disabled and port 1194 is closed. Ten tests passed and the owner's phone could not open webmail from outside (the phone could not resolve names at all, so this shows non-reachability, not a 403). 3.5.3 stays partial because LAN logins are still password-only; 3.13.5 is unchanged because port 25 mail still ends on the same VM. §2.5.1, 3.1.14, 3.1.15 text and Appendix remote-access text updated. |
+| **2.18 (amended 76)** | **10/24/2026** | **[SYSTEM-OWNER]** | **CORRECTION TO AMENDMENT 75: NO SHARED SWITCH IS PROVEN.** The owner traced the cables: the Netgear switch is on this network and the HP switch is on the owner's other network. The device with hardware address `54:07:7d:16:9d:f3` is therefore this network's own switch asking for an address, not a foreign device. Amendment 75's reading (a shared, unconfigured switch) was wrong and is withdrawn; what remains is the NAS answering on a second address of the other network (POA&M-032). `DIWAI-EXT-001` now lists the Netgear switch as an authorized device. No count change (97/110). Backup `.bak-20261024-netgearfix`. |
+| **2.18 (amended 75)** | **10/24/2026** | **[SYSTEM-OWNER]** | **SHARED SWITCH FOUND; NO COUNT CHANGE (97/110); SPRS UNCHANGED.** The firewall capture showed a device of the owner's other network (a NETGEAR product) and a second NAS address on the CUI network's wire: the HP switch is shared and unconfigured, so the two networks share one broadcast domain. Recorded in §2.5.3 and `DIWAI-EXT-001`; the R4 allow-list is tightened so only the VM and the NAS pass through the Mac; separating the switch ports is open (POA&M-032). Backup `.bak-20261024-switch`. |
+| **2.18 (amended 74)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.8.5 RECOVERED; OBJECTIVE-LEVEL 96 → 97/110 (ASSESSMENT REVISION 1.33); SPRS UNCHANGED (`DIWAI-CR-2026-10-50`).** The owner confirmed fact F11 (no medium containing CUI leaves the controlled area) and approved Appendix E.19 (media access and transport). 3.8.5 [b], accountability during transport, is not applicable while F11 holds; `DIWAI-APP-001` v1.4. A dry-run custody record (`DIWAI-EV-MP-2026-10-24`) shows the E.7 procedure working with the controls in place. Media Protection is 8 of 9. Backup `.bak-20261024-cr50`. |
+| **2.18 (amended 73)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.5.10 RECOVERED ON THE OWNER'S CLARIFICATION AND A LIVE CHECK; OBJECTIVE-LEVEL 95 → 96/110 (ASSESSMENT REVISION 1.32); SPRS UNCHANGED (`DIWAI-CR-2026-10-49`, addendum).** The owner stated that NAS port 5000 is used only by people, never by scripts, with multifactor sign-in. A live probe confirmed port 5000 is plain HTTP and serves a page that redirects the browser to HTTPS on 5001 before any login form; the owner's description of port 5000 as HTTPS is corrected in Appendix E.18. The DSM API on 5000 still answers in the clear and is unused; that residual stays accepted (POA&M-066). Identification & Authentication is 9 of 11. Backup `.bak-20261024-cr49b`. |
+| **2.18 (amended 72)** | **10/24/2026** | **[SYSTEM-OWNER]** | **NAS PORT 5000 KEPT OPEN BY OWNER DECISION; 3.13.8 RECOVERED; OBJECTIVE-LEVEL 94 → 95/110 (ASSESSMENT REVISION 1.31); SPRS UNCHANGED (`DIWAI-CR-2026-10-49`).** The NAS serves other clients, so its management port 5000 stays open; the owner's position, that the information on the NAS is encrypted before it arrives and unreadable by others, matches the backup procedures and is recorded in Appendix E.18 with its limits. The NAS's directory bind was found already on LDAPS with its own scoped account (TLS 1.3). 3.5.10 stays partial for the cleartext password path on port 5000 alone. System & Communications Protection is 13 of 16. Backup `.bak-20261024-cr49`. |
+| **2.18 (amended 71)** | **10/24/2026** | **[SYSTEM-OWNER]** | **DEAD `monitor` VIRTUAL HOST REMOVED; NO COUNT CHANGE (94/110); SPRS UNCHANGED (`DIWAI-CR-2026-10-48`).** The `monitor.[DOMAIN.ORG]` virtual host proxied to a Grafana that was removed on 2026-08-04; nothing listens on its port. Removed, the web server reloaded, the other virtual hosts re-tested. Appendix E.15 no longer lists it. Backup `.bak-20261024-cr48`. |
+| **2.18 (amended 70)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.13.3, 3.1.4, 3.1.6 RECOVERED; OBJECTIVE-LEVEL 91 → 94/110 (ASSESSMENT REVISION 1.30); SPRS UNCHANGED (`DIWAI-CR-2026-10-47`).** On the owner's decisions of 2026-10-24: Appendix E.15 records how user and management functions are separated (3.13.3); separation of duties is not applicable on the fact that one individual has any access, with compensating controls (E.16, 3.1.4, `DIWAI-APP-001` v1.3); the nonsecurity functions are defined and privileged work is by `sudo` elevation (E.17, 3.1.6). A stale member (`uid=drilldbg61ff`) was removed from `cn=cui-users`. Access Control is 20 of 22, System & Communications Protection 12 of 16. Backup `.bak-20261024-cr47`. |
+| **2.18 (amended 69)** | **10/24/2026** | **[SYSTEM-OWNER]** | **VIRUSTOTAL LOOKUPS: CONTROLLED DOCUMENTS SKIPPED; NO COUNT CHANGE (91/110); SPRS UNCHANGED (`DIWAI-CR-2026-10-46`).** Bursts of file events from the hourly Mac scan exceeded the free API's 4 lookups a minute, so the integration failed on the later events (exit status 4). The wrapper now skips files under Nextcloud's group-folder data (the controlled documents, whose hash lookups were pointless and sent hashes to a third party); file-integrity alerts are unaffected. Backup `.bak-20261024-cr46`. |
+| **2.18 (amended 68)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.13.13 RECOVERED; OBJECTIVE-LEVEL 90 → 91/110 (ASSESSMENT REVISION 1.29); SPRS UNCHANGED (`DIWAI-CR-2026-10-45`).** Mobile code the system serves is now monitored: the Mac Wazuh agent checks Nextcloud's `apps`, `core` and `themes` (about 35,000 files; its configuration and group-folder data were already covered), and the weekly review (`DIWAI-SCH-001` v1.2, W1) has a mobile-code step. A test file raised rule 554 at the next hourly scan. Browser-side script execution stays unmonitored (stated in `DIWAI-MCP-001`). System & Communications Protection is 11 of 16. **Found:** the VirusTotal integration logged errors on file events at 10:14 today (not changed). Backup `.bak-20261024-cr45`. |
+| **2.18 (amended 67)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.13.13 [a] RECOVERED; NO COUNT CHANGE (90/110); SPRS UNCHANGED (ASSESSMENT REVISION 1.28).** The owner confirmed the three open entries of `DIWAI-MCP-001` (document macros disabled; no browser extensions for CUI work; no other browsing in the CUI profile). The requirement stays unmet at [b], monitoring: scripts in the browser and content-security-policy violations are not collected. Backup `.bak-20261024-mcp`. |
+| **2.18 (amended 66)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.6.1 RECOVERED; OBJECTIVE-LEVEL 89 → 90/110 (ASSESSMENT REVISION 1.27); SPRS UNCHANGED (`DIWAI-CR-2026-10-44`).** The owner approved `DIWAI-DET-001` (detection coverage statement) and `DIWAI-MCP-001` (mobile-code policy). DET-001 states what is watched, how the owner finds out, where detection failed in INC-003 to INC-008 and the blind spots that remain. MCP-001 awaits the owner's confirmation of three entries (macros, extensions, browsing) before 3.13.13 is re-determined. Incident Response is 3 of 3. Backup `.bak-20261024-cr44`. |
+| **2.18 (amended 65)** | **10/24/2026** | **[SYSTEM-OWNER]** | **APPENDIX E.5 CORRECTED; NO COUNT CHANGE (89/110); SPRS UNCHANGED.** The key-management table listed the directory superuser credential as "Overdue, POA&M-021"; that item was closed on 2026-08-02 when the credential was rotated, so the row now says so. The remaining open item under 3.13.10 is the VM's single LUKS keyslot with no off-rack escrow (POA&M-026, POA&M-049). The account table's Directory Manager row, which still said the NAS used it and that it was exposed, was corrected the same way. Backup `.bak-20261024-am65`. |
+| **2.18 (amended 64)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.5.7 AND 3.5.9 RECOVERED; OBJECTIVE-LEVEL 87 → 89/110 (ASSESSMENT REVISION 1.25); SPRS UNCHANGED (`DIWAI-CR-2026-10-43`).** The rule for change of characters is stated in the IA policy and Appendix E.4 (a new password must differ from the previous six). The directory setting `passwordMustChange` is on, and a forced change was proven on a disposable account; service-account binds were re-checked afterwards (no failures). Identification & Authentication is 8 of 11. Backup `.bak-20261024-cr43`. |
+| **2.18 (amended 63)** | **10/24/2026** | **[SYSTEM-OWNER]** | [PERSONNEL-SCREENING-NOTE-REDACTED] Policy backup-media wording corrected (no ReaR images; the Time Machine drive is FileVault-encrypted). Access Control is 18 of 22. Backup `.bak-20261024-am63`. |
 | **2.18 (amended 62)** | **10/24/2026** | **[SYSTEM-OWNER]** | **3.10.2, 3.10.6, 3.13.1 RECOVERED; OBJECTIVE-LEVEL 83 → 86/110 (ASSESSMENT REVISION 1.23); SPRS UNCHANGED (`DIWAI-CR-2026-10-42`).** On the owner's decisions of 2026-10-24: (a) §2.5.3 added, defining five key internal boundaries and their controls (3.13.1); (b) support infrastructure (UPS, ventilation) is monitored by the monthly observation, automated monitoring being impractical (3.10.2); (c) CUI is not handled outside the rack site, so enforcement at alternate work sites is not applicable (3.10.6, Appendix E.7). [PERSONNEL-SCREENING-NOTE-REDACTED] Physical Protection is 4 of 6, System & Communications Protection 10 of 16. Backup `.bak-20261024-am62`. |
 | **2.18 (amended 61)** | **10/24/2026** | **[SYSTEM-OWNER]** | **LIVE RE-WALK OF 3.10.2, 3.10.6, 3.13.1; NO COUNT CHANGE (83/110); SPRS UNCHANGED (ASSESSMENT REVISION 1.22).** 3.10.2 [a] (facility protection and monitoring) and 3.10.6 [a] (alternate-site safeguards defined, Appendix E.7) recovered; neither requirement is fully met. 3.13.1 [b] (key internal boundaries) needs an SSP statement; a draft was prepared from the live `pf` and `firewalld` rules and awaits the owner. Dashboard stale content corrected (`DIWAI-CR-2026-10-41`). Backup `.bak-20261024-am61`. |
 | **2.18 (amended 60)** | **10/24/2026** | **[SYSTEM-OWNER]** | **AU AND IR POLICY WORDING CORRECTED; NO COUNT CHANGE (83/110); SPRS UNCHANGED (`DIWAI-CR-2026-10-40`).** The Wazuh index retention is stated as enforced (90 days, verified 2026-10-24); the NAS archive expiry remains outstanding (POA&M-059). Recovery wording in the IR policy now points to the backup procedures instead of a regime that does not exist here. Backup `.bak-20261024-cr40`. |
@@ -160,7 +176,7 @@ The [DOMAIN.ORG] SecureMac Reference System is an Apple Silicon-based security r
 - Suricata 7.0.13 IDS operational on VM
 - nginx reverse proxy restricts AI interface (ai.[DOMAIN.ORG]) to LAN only — WAN excluded
 - USB Guard operational on both host (custom implementation) and VM (USBGuard)
-- OpenVPN server operational on VM
+- OpenVPN server installed on the VM, switched off since 2026-10-25 (`DIWAI-CR-2026-10-51`)
 - 389-DS LDAP directory operational; Apache dashboard with LDAP auth (securemac.[DOMAIN.ORG])
 - Login banner confirmed on VM; pf firewall on Mac host (WAN/LAN/MGMT segregation)
 - Time Machine backup auto-mount resolved — 17-day gap root cause corrected (05/15/2026)
@@ -271,9 +287,11 @@ Verified from `pfctl -s nat`, 2026-08-01:
 
 | Public address | Ports                        | Redirected to | Service                          |
 |:---------------|:-----------------------------|:--------------|:---------------------------------|
-| [WAN-IP-REDACTED]  | 80, 443                      | [LAN-IP-REDACTED]    | Webmail (`webmail.[DOMAIN.ORG]`)      |
-| [WAN-IP-REDACTED]  | 25, 465, 587, 993, 995, 4190 | [LAN-IP-REDACTED]    | Mail (`mail.[DOMAIN.ORG]`, MX target) |
-| [WAN-IP-REDACTED]  | 1194/udp                     | [LAN-IP-REDACTED]    | OpenVPN (`vpn.[DOMAIN.ORG]`)          |
+| [WAN-IP-REDACTED]  | 80, 443                      | [LAN-IP-REDACTED]    | Web address; webmail (`webmail.[DOMAIN.ORG]`) answers the CUI network only (403 from elsewhere) |
+| [WAN-IP-REDACTED]  | 25                           | [LAN-IP-REDACTED]    | Mail from other mail servers (`mail.[DOMAIN.ORG]`, MX target); 465, 587, 993, 995 not forwarded |
+| [WAN-IP-REDACTED]  | none                         | —             | OpenVPN (`vpn.[DOMAIN.ORG]`) switched off, not published |
+
+**Changed 2026-10-25 (`DIWAI-CR-2026-10-51`, owner decision 2026-10-24):** webmail, mail clients and the VPN are no longer reachable from the internet; they stay installed as future enhancements. Re-enabling is a recorded reversal of that change. Internet mail (port 25) is still published, so 3.13.5 is unchanged.
 | [WAN-IP-REDACTED]  | —                            | —             | NAT egress for [LAN-IP-REDACTED]/24      |
 
 `.148` is unassigned. The apex `[DOMAIN.ORG]` and `www` resolve to Cloudflare, not
@@ -348,7 +366,7 @@ The key internal boundaries are the points where traffic passes between parts of
 
 Monitoring at these boundaries: `pf` logs blocked and CUI-network traffic; Suricata watches network traffic on the VM; Wazuh collects from both hosts; the 33 control-health checks run every 15 minutes (§ monitoring).
 
-Known gaps: boundary 3 is open inside until the port baseline R4 is loaded; boundary 5 depends on POA&M-032 (documentation of the shared NAS). Approved by the owner 2026-10-24.
+Known gaps: boundary 3 is open inside until the port baseline R4 is loaded; boundary 5 depends on POA&M-032 (documentation of the shared NAS). **Added 2026-10-24, corrected the same day:** the CUI network's switch is a Netgear switch (owner traced the cables); an HP switch on the owner's other, separate network is not part of this system. The NAS also answers on a second address of that other network on this wire (POA&M-032); the R4 allow-list limits what passes through the Mac to the VM and the NAS, and the NAS's second address is not passed. Approved by the owner 2026-10-24.
 
 ### 2.6 Relationship to CyberInABox
 
@@ -645,7 +663,7 @@ DNS ([DOMAIN.ORG] zone):
 | 3.1.11  | Session termination                                      | IMPLEMENTED | SSH `ClientAliveCountMax` enforced; sessions terminate after the idle period. GUI sessions lock automatically.                                                                                                                                                                                                                                             |
 | 3.1.12  | Monitor/control remote access                            | IMPLEMENTED | All SSH sessions logged to rsyslog + Wazuh. Failed login attempts generate Wazuh alerts.                                                                                                                                                                                                                                                                 |
 | 3.1.13  | Cryptographic mechanisms for remote access               | IMPLEMENTED | FIPS-approved SSH ciphers on the VM (FIPS mode enforces cipher restriction). TLS 1.2/1.3 for all HTTPS services. nginx enforces TLSv1.2/1.3 with HSTS.                                                                                                                                                                                                   |
-| 3.1.14  | Route remote access via managed access control points    | IMPLEMENTED | All external access via the pf firewall (Mac host). VPN endpoint (vpn.[DOMAIN.ORG]) for remote administration on the VM.                                                                                                                                                                                                                                    |
+| 3.1.14  | Route remote access via managed access control points    | IMPLEMENTED | All external access via the pf firewall (Mac host). The VPN (vpn.[DOMAIN.ORG]) is switched off since 2026-10-25 (`DIWAI-CR-2026-10-51`); there is no remote way in until it is re-enabled by a recorded change.                                                                                                                                                                                                                                    |
 | 3.1.15  | Authorize remote access prior to connection              | IMPLEMENTED | SSH requires key-based authentication; no anonymous access. VPN requires client certificates.                                                                                                                                                                                                                                                            |
 | 3.1.16  | Authorize wireless access                                | N/A         | Wi-Fi (en1/MGMT) used for management only — never blocked, not in the CUI data path. No wireless APs in the CUI network.                                                                                                                                                                                                                                 |
 | 3.1.17  | Protect wireless access                                  | N/A         | As above.                                                                                                                                                                                                                                                                                                                                                |
@@ -972,7 +990,7 @@ evidence under this standard. A point claimed on such a basis is withheld until 
 | Figure | Basis | Current |
 |:---|:---|---:|
 | **SPRS score** | Evidence-strict capability: implemented **and** proven working (DoD Assessment Methodology weights) | **101/110** |
-| **Strict 800-171A objectives met** | Every assessment objective satisfied **or not applicable**, **including definition and documentation** (Control Family Status table below) | **86/110** |
+| **Strict 800-171A objectives met** | Every assessment objective satisfied **or not applicable**, **including definition and documentation** (Control Family Status table below) | **99/110** |
 
 They measure different properties and are not in conflict. The gap between them is **working controls
 that are not yet fully defined, enumerated or documented** — tracked under **POA&M-027** — and is the
@@ -1075,21 +1093,21 @@ only when **every** assessment objective is satisfied.
 
 | Family                                  | Total | Met | Not Met | Unverified |
 |:----------------------------------------|------:|----:|--------:|-----------:|
-| AC — Access Control                     |    22 |  17 |       5 |          0 |
+| AC — Access Control                     |    22 |  20 |       2 |          0 |
 | AT — Awareness & Training               |     3 |   3 |       0 |          0 |
 | AU — Audit & Accountability             |     9 |   9 |       0 |          0 |
-| CM — Configuration Management           |     9 |   7 |       2 |          0 |
-| IA — Identification & Authentication    |    11 |   6 |       5 |          0 |
-| IR — Incident Response                  |     3 |   2 |       1 |          0 |
+| CM — Configuration Management           |     9 |   9 |       0 |          0 |
+| IA — Identification & Authentication    |    11 |   9 |       2 |          0 |
+| IR — Incident Response                  |     3 |   3 |       0 |          0 |
 | MA — Maintenance                        |     6 |   6 |       0 |          0 |
-| MP — Media Protection                   |     9 |   7 |       2 |          0 |
+| MP — Media Protection                   |     9 |   8 |       1 |          0 |
 | PS — Personnel Security                 |     2 |   2 |       0 |          0 |
 | PE — Physical Protection                |     6 |   4 |       2 |          0 |
 | RA — Risk Assessment                    |     3 |   3 |       0 |          0 |
 | CA — Security Assessment                |     4 |   3 |       1 |          0 |
-| SC — System & Communications Protection |    16 |  10 |       6 |          0 |
+| SC — System & Communications Protection |    16 |  13 |       3 |          0 |
 | SI — System & Information Integrity     |     7 |   7 |       0 |          0 |
-| **TOTAL**                                   |   **110** |  **86** |      **24** |          **0** |
+| **TOTAL**                                   |   **110** |  **99** |      **11** |          **0** |
 
 **Revised 2026-10-23 (assessment revision 1.20): 78 → 81.** Access Control 13 → 16 of 22: **3.1.5, 3.1.8 and 3.1.10** re-determined on current evidence. SPRS unchanged (101/110).
 
@@ -1322,7 +1340,7 @@ a parameter, not merely to implement a capability; those definitions live here.
 | `sysadmin`                   | Mac host            | Interactive, **break-glass** | Administrative                                | Emergency recovery only. Used 2026-04-15 and 2026-05-15 during YubiKey PIV lockout recovery                                                      |
 | `root`                       | Both hosts          | System                   | Full                                          | No interactive login; `permitrootlogin no` on the VM                                                                                               |
 | `wazuh`                      | Both hosts          | Service                  | Scoped to agent/manager operation             | —                                                                                                                                                |
-| `cn=Directory Manager`       | 389-DS              | Directory superuser      | Full directory                                | **Currently used by the NAS for routine attribute reads — a least-privilege violation, POA&M-020.** Credential must be treated as exposed, POA&M-021 |
+| `cn=Directory Manager`       | 389-DS              | Directory superuser      | Full directory                                | Used only by the administrator from the directory's local socket; the NAS now binds as its own scoped account `svc-nas` (checked 2026-10-23, `DIWAI-EV-AC-2026-10-23`). Credential rotated 2026-08-02 (POA&M-021, closed) |
 | Per-daemon system accounts | Both hosts          | Service                  | Least privilege                               | `mysql`, `dirsrv`, `postfix`, `dovecot`, `suricata`, `_www` etc.                                                                                             |
 
 **Groups governing access:** `cn=admins` (SecureMac Admin dashboard),
@@ -1362,7 +1380,7 @@ automated control-health check, not by the calendar.
 
 The revision reflects how the system is actually operated: **it is worked in
 concentrated sessions and may sit unattended for weeks.** What does *not* pause is
-exposure — webmail, mail and OpenVPN are internet-published continuously and the VM
+exposure — mail (port 25) is internet-published continuously (webmail and OpenVPN were until 2026-10-25, `DIWAI-CR-2026-10-51`) and the VM
 runs whether or not the operator is present. The response is therefore split:
 
 - **Detection stays continuous and automated** — daily scans on both hosts, with
@@ -1409,6 +1427,8 @@ review costs time, not availability.
 | Identifier reuse prohibited for       | **Indefinitely** — identifiers are never reissued                  |
 | Accounts disabled after inactivity of | **90 days.** **Directory (389-DS): ENFORCED 2026-09-13** — Account Policy Plugin, `accountInactivityLimit 7776000`, proven by refusal (`DIWAI-CR-2026-09-08`). **Mac local accounts: ENFORCED** by the daily job `diwai-inactivity-enforce` (90 days idle, warning from 80 days, `sysadmin` break-glass exempt by owner direction 2026-09-13; retested 2026-10-19 after its confirmation check was corrected, `DIWAI-CR-2026-10-17`). **VM local accounts: ENFORCED** by the daily job `diwai-inactivity-enforce-vm` (04:25; 90 days idle, warning from 80 days; `root` exempt as the console-only break-glass; at most one account disabled per run; does nothing if the clock is not synchronized; confirmed by reading the account's expiry back; proven 2026-10-19 by PAM refusing a disposable account, `DIWAI-CR-2026-10-18`; monitored by control-health check 16). Never-logged-in directory entries are not yet covered. The 3.5.6 point was **awarded 2026-10-22** on the owner's decision: both hosts were covered (the condition set on 2026-10-19) and the first scheduled runs were observed on 2026-10-20, -21 and -22; no real account has yet aged out; **POA&M-076**. Constraint: the `sysadmin` break-glass account                                                        |
 | Password reuse prohibited for         | **6 generations**: directory `passwordInHistory: 6` (enforced from 2026-08-01); Mac `diwai.password.history`; **VM local accounts `pam_pwhistory remember = 6`** (enabled 2026-10-23, `DIWAI-CR-2026-10-25`) |
+| Change of characters (3.5.7 [b])      | A new password must differ from each of the previous six (the history rule above); no further character-difference rule. Stated 2026-10-24 (`DIWAI-CR-2026-10-43`) |
+| Temporary passwords (3.5.9)           | Must be changed at first login. **Directory: ENFORCED 2026-10-24** (`passwordMustChange` on; an administrator-set password returns "unwilling to perform" with the password-expired control until the user changes it; proven on a disposable account). Service accounts are unaffected (own policy, binds re-checked) |
 | Account lockout threshold             | **3 failed attempts** (`passwordMaxFailure: 3`)                      |
 | Lockout duration                      | **3600 s**, auto-clearing (`passwordUnlock: on`)                     |
 | Account lockout, VM operating system (PAM faillock) | **3 failed attempts within 300 s; locked 900 s** (`/etc/security/faillock.conf`; `DIWAI-CR-2026-10-11`) |
@@ -1424,7 +1444,7 @@ review costs time, not availability.
 | LUKS volume key (VM)     | Install time               | Single keyslot, passphrase only                             | Never rotated       | **NONE — POA&M-026**  |
 | FileVault (Mac)          | Install time               | Secure Enclave                                              | —                   | Recovery key      |
 | SSH host + user keys     | `ssh-keygen`                 | `/etc/ssh`, `~/.ssh`                                            | On compromise       | None              |
-| 389-DS Directory Manager | Install time               | Directory config                                            | **Overdue — POA&M-021** | None              |
+| 389-DS Directory Manager | Install time               | Directory config                                            | Rotated 2026-08-02 (POA&M-021, closed); on exposure thereafter | None              |
 | Wazuh agent keys         | `manage_agents`              | `/var/ossec/etc/client.keys`                                  | On re-enrolment     | Backed up         |
 
 **Procedure (added 2026-10-23, 3.13.10).** *Generation:* keys are generated on the host that uses them with the platform tool (certbot, `ssh-keygen`, the Secure Enclave, `manage_agents`, `cryptsetup`). *Storage:* in the locations in the table, readable by root or the owning service only, and never committed to a repository. *Rotation:* TLS certificates automatically about every 60 days; SSH keys on compromise or when a device is retired; the directory superuser credential on exposure; Wazuh agent keys on re-enrolment. *Escrow:* as in the table, with the LUKS passphrase as the exception below. *Destruction:* a retired key is removed from every location in the table and the end of its use is confirmed; destroying a drive's key is the way to sanitize it (3.8.3).
@@ -1506,7 +1526,7 @@ Established in v2.15; previously no visitor or physical-access log existed.
 
 #### E.11 Remote Access: Permitted Types and Authorized Privileged Commands (3.1.12, 3.1.15)
 
-**Permitted remote access (published):** OpenVPN (`vpn.[DOMAIN.ORG]`, client certificate), HTTPS webmail, and mail (SMTP on port 25 for inbound mail, submission on 465 and 587, IMAPS 993, POP3S 995, ManageSieve 4190; §2.5.1). **Not published:** SSH and every administrative interface; SSH is reached from the LAN or through the VPN, with a public key and a TOTP code (E.1, `DIWAI-CR-2026-08-12`, `-08-17`).
+**Permitted remote access (published):** mail from other servers (SMTP on port 25; §2.5.1). **Switched off since 2026-10-25 (`DIWAI-CR-2026-10-51`):** OpenVPN, internet access to webmail, and mail-client ports 465, 587, 993, 995 (future enabled enhancements). **Not published:** SSH and every administrative interface; SSH is reached from the LAN or through the VPN, with a public key and a TOTP code (E.1, `DIWAI-CR-2026-08-12`, `-08-17`).
 
 **Privileged commands authorized for remote execution:** (1) administration by the owner over SSH with `sudo`, all commands; (2) two automation keys with a **forced command** and no shell: the dashboard-figures key (read-only figures) and the archive-push key (`scp` to one destination). **Security-relevant information accessible remotely:** the Wazuh dashboard and the SecureMac dashboard (LAN, directory `cn=admins` group), and the logs, over SSH.
 
@@ -1526,5 +1546,57 @@ The Mac's Wi-Fi interface (`en1`) is an **authorized break-glass uplink** that g
 **Security impact.** Before any change to either host, its security impact is analysed and written in the change record (a "Security analysis" or "Risks" section, as in `DIWAI-CR-2026-09-05` §3, `-10-21` §3 and `-10-23` §4), together with a backup, a rollback and a verification. A change without that section is not made.
 
 **Diagnostic and test media.** Any diagnostic or test program, and any media that carries one, is checked before use: scanned with YARA and VirusTotal, assessed by Gatekeeper on the Mac, allowed by USBGuard (allow-listed devices only) and by fapolicyd on the VM.
+
+
+#### E.15 Separation of User Functionality from System Management Functionality (3.13.3)
+
+**User functionality** is what people do with the data: Nextcloud (the CUI repository, on the Mac), webmail (`webmail`, on the VM), the AI chat and the document libraries (loopback services on the Mac). Access is by the group `cn=cui-users`.
+
+**Management functionality** is what administers the system: the admin portal (`securemac`), the directory manager interface (`ldap`), the SIEM dashboard (`wazuh`), SSH to either host, and the directory's own tools. Access is by the group `cn=admins`, by source network, or by SSH key plus TOTP.
+
+**How they are separated**
+
+| Separation | By what |
+|:---|:---|
+| Different interfaces | Each function has its own host name and virtual host; management is not reachable through a user URL |
+| Network | The directory manager and the SIEM dashboard accept only the CUI network ([LAN-IP-REDACTED]/24) and the host itself; they are not published to the internet. The SIEM dashboard and its indexer listen on loopback only |
+| Authorization | The admin portal requires `cn=admins`; the user services require `cn=cui-users`. The two groups are different |
+| Remote administration | SSH to the VM needs key plus TOTP; to the Mac, key, password and TOTP; Cockpit is disabled |
+| Service identities | The services bind to the directory as their own scoped accounts (`svc-apache`, `svc-dovecot`, `svc-nextcloud`, `svc-nas`, `DIWAI-CR-2026-10-38`), not as a person's account; the directory superuser is used only from the host's local socket |
+| Host split | The user repository (Nextcloud) runs on the Mac and the management portal and SIEM on the VM, so the two are not on one operating system instance |
+
+**Limits, stated.** One person holds both roles (owner and administrator), so the separation is of interfaces, networks and authorization, not of people. The VM carries both webmail (user) and the management virtual hosts. The Mac carries the Nextcloud repository and the host administration.
+
+The stale `uid=drilldbg61ff` member of `cn=cui-users` was removed on 2026-10-24 (`DIWAI-CR-2026-10-47`); no other group member lacks an entry. Approved by the owner 2026-10-24.
+
+#### E.16 Separation of Duties: Not Applicable on a Stated Fact (3.1.4)
+
+The organization has one individual with any access to the system, so there is no second individual to separate duties from. Compensating controls remain in force: every change is described, approved by the owner and only then run; privileged actions are logged on both hosts; every change is recorded in a signed change record; an outside reviewer can be asked. If a second individual is given any access, the requirement applies in full and the determination is re-walked that day (`DIWAI-APP-001` v1.3). Owner decision 2026-10-24.
+
+#### E.17 Nonsecurity Functions and the Role Rule (3.1.6)
+
+**Nonsecurity functions** are the everyday tasks that need no administrative power: reading and writing email (webmail and the mail client), web browsing, working with documents and spreadsheets, using the AI chat and document libraries, and reading dashboards.
+
+**Rule.** Those tasks run in the owner's ordinary session without administrative power. Any privileged action (installing or changing software, changing configuration, controlling a service, reading protected files) is done by elevating with `sudo`, which asks for the password: on the Mac again after 5 minutes in a terminal, on the VM again after 2 minutes (read 2026-10-24). A separate daily account is not used (owner decision 2026-10-24).
+
+**Temporary exception, recorded.** From 2026-10-23 to 2026-10-26 13:33 (Mac) and 13:36 (VM) the owner granted passwordless `sudo` for a maintenance round (`DIWAI-CR-2026-10-23`, extended 2026-10-24). The password rule resumes when it ends; the first check after it ends is on 2026-10-26.
+
+
+#### E.18 NAS Management Port 5000 and Protection of CUI on the NAS (3.13.8, 3.5.10)
+
+The Synology NAS is shared infrastructure that serves other clients, so its HTTP management port (5000) stays open; closing it is not possible without breaking them (owner decision 2026-10-24, option A of the POA&M-066 options). The basis is the owner's consistent position that **the information on the NAS is encrypted by its owner before it arrives and is not readable by anyone else**, which matches what was verified: the Wazuh alert archives are FIPS-encrypted before the push and the VM image archive is a LUKS image (`CUI_Backup_Procedures_v2.0.md` §4, §5), and the rule is that any writer of CUI to the NAS encrypts first.
+
+Consequences stated: (1) no CUI reaches the NAS in the clear, so a cleartext management session on port 5000 exposes no CUI; (2) none of this system's components uses port 5000: administration uses HTTPS on 5001, files move over SMB, SSH on the NAS is disabled, and the NAS's directory bind uses LDAPS (TLS 1.3, read from the directory log 2026-10-24); (3) the DSM API requires multifactor authentication for the accounts that use it (owner statement). **Port 5000, as read on 2026-10-24:** it is plain HTTP, not HTTPS (HTTPS to port 5000 fails). A browser that opens it receives a page whose script sends it to `https://<NAS>:5001` before any login form appears, so a person's password goes over HTTPS on 5001; the owner states port 5000 is used only by people, never by scripts, and that sign-in requires multifactor authentication. **Residual risk, accepted by the owner:** the DSM web API on port 5000 still answers in the clear, so a deliberately written script could send a password unencrypted on the local network; none exists, and the port is not published to the internet. The NAS's other shares were not inspected for this statement.
+
+
+#### E.19 Media Containing CUI: Access and Transport (3.8.5)
+
+**Access to media:** every medium that holds CUI is encrypted (FileVault on the two attached drives, LUKS on the VM disk and its image archives, FIPS-encrypted alert archives on the NAS) and sits in the locked cabinet (PE layer 4); the keys are not on the media.
+
+**Transport:** **no medium containing CUI is transported outside the controlled area** (owner statement 2026-10-24). The attached drives are fixed storage (§2.5.0). A drive that is retired leaves only after its key is destroyed (3.8.3).
+
+**If that ever changes** (a drive must travel, for a restore test elsewhere, for example): before it leaves, the owner authorizes it in writing; the drive must be encrypted and locked; the custody record of Appendix E.7 is opened (date out, custodian, encryption state, destination); on return the record is closed with the verification done. This is the same procedure E.7 defines for alternate work sites.
+
+Owner confirmation of the fact F11 and approval: 2026-10-24. A dry-run custody record is `DIWAI-EV-MP-2026-10-24`.
 
 ---

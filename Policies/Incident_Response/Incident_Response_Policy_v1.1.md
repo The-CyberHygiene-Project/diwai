@@ -34,6 +34,8 @@ segment, so severing the WAN does not isolate them. Controls described by
 **function** rather than product where practical, so a future substitution does
 not silently invalidate the text. Raised as **POA&M-058**; no control changed.
 
+**Change note 2026-10-25 (`DIWAI-CR-2026-10-53`, owner approved):** Step 3.3 checked the directory with `ipactl status`, a FreeIPA command not present here; it now uses `systemctl status dirsrv@diwai`. Version unchanged.
+
 
 ## 1. Incident Response Policy
 
@@ -299,7 +301,7 @@ Restore with `CUI_Backup_Procedures_v2.0.md` §6: the Mac host and individual fi
 **Step 3.3** - Verify System Integrity:
 ```bash
 # Verify 389-DS LDAP services
-sudo ipactl status
+sudo systemctl status dirsrv@diwai
 
 # Verify Wazuh Manager
 sudo systemctl status wazuh-manager

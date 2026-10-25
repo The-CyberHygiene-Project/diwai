@@ -44,6 +44,8 @@ Workstation provisions are retained and scoped for adopting deployments.
 Raised as **POA&M-058**; no control changed.
 
 
+**Change note 2026-10-25 (`DIWAI-CR-2026-10-53`, owner approved):** the media list described LUKS-encrypted RAID volumes and LUKS backup USB drives. It now records what is in use: FileVault on the Mac and the Time Machine drive, LUKS2 on the VM, folder-level AES-256 on the NAS. Version unchanged.
+
 ## Purpose
 
 This combined policy establishes requirements for physical and environmental protection of facilities and equipment, as well as media protection for [DOMAIN.ORG]'s SecureMac Reference System #2. It ensures that physical access to CUI systems is controlled, environmental threats are mitigated, and media containing CUI is properly protected, transported, sanitized, and disposed of. The policy aligns with NIST SP 800-171 Revision 2 (PE-1 through PE-20 and MP-1 through MP-8) and supports CMMC Level 2 compliance for systems administration and AI research operations.
@@ -481,13 +483,13 @@ sudo apctest
 - All media access restricted to Owner/Principal only
 - No shared media or cloud storage for CUI
 - Physical media stored in locked office
-- Digital media encrypted (LUKS) and access controlled via 389-DS LDAP
+- Digital media encrypted (FileVault on the Mac and the backup drive, LUKS2 on the VM, folder encryption on the NAS) and access controlled via 389-DS LDAP
 - Backup media stored in locked server rack or locked safe
 
 **Media Types:**
 - **System Storage:** FileVault on the Mac mini; LUKS2 on the VM's virtual disks
-- **RAID Array:** NAS storage (nas.[DOMAIN.ORG]) with LUKS-encrypted volumes
-- **Backup USB Drives:** LUKS-encrypted, stored in locked location
+- **NAS:** Synology 8-bay NAS (nas.[DOMAIN.ORG]) with folder-level AES-256 encryption (not FIPS-validated; data from the VM arrives pre-encrypted by FIPS-validated OpenSSL; SSP Component 3)
+- **Backup drive:** the Time Machine SSD, FileVault-encrypted, stored in the locked rack or locked safe
 - **Offline Backups:** encrypted; offsite rotation is not in effect (POA&M-050)
 
 **Access Procedures:**
