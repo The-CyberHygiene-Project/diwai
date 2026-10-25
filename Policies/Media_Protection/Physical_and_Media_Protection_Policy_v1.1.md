@@ -46,6 +46,8 @@ Raised as **POA&M-058**; no control changed.
 
 **Change note 2026-10-25 (`DIWAI-CR-2026-10-53`, owner approved):** the media list described LUKS-encrypted RAID volumes and LUKS backup USB drives. It now records what is in use: FileVault on the Mac and the Time Machine drive, LUKS2 on the VM, folder-level AES-256 on the NAS. Version unchanged.
 
+**Marking rule, 2026-10-25 (owner decision; SSP Appendix E.20):** every item carrying the purple "CUI AUTHORIZED / Controlled Asset" label, and every medium kept with it, is limited to the people authorised for the system and kept in the locked cabinet; it is not copied, lent, shown or removed for anyone else, and nothing on it leaves the system without the owner's written authorization.
+
 ## Purpose
 
 This combined policy establishes requirements for physical and environmental protection of facilities and equipment, as well as media protection for [DOMAIN.ORG]'s SecureMac Reference System #2. It ensures that physical access to CUI systems is controlled, environmental threats are mitigated, and media containing CUI is properly protected, transported, sanitized, and disposed of. The policy aligns with NIST SP 800-171 Revision 2 (PE-1 through PE-20 and MP-1 through MP-8) and supports CMMC Level 2 compliance for systems administration and AI research operations.
@@ -148,7 +150,7 @@ This policy applies to:
 
 **Access Control Measures:**
 - Office door locked whenever Owner is not present
-- Key control: Keys maintained by Owner only (no spare keys distributed)
+- Key control: Keys are held by the Owner; rack keys (six) are in the study, and a spare study key is in a kitchen drawer available to the owner's household (two people). See `DIWAI-INV-PAD-001` §5 for the owner's acceptance of this
 - Server rack locked (separate key from office door)
 - Alarm system active when residence unoccupied
 - No signage indicating CUI processing or government contractor status
