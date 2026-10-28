@@ -81,6 +81,15 @@
 | **2.18 (amended 55)** | **10/23/2026** | **[SYSTEM-OWNER]** | **3.3.5 RECOVERED; OBJECTIVE-LEVEL 75 → 76/110 (ASSESSMENT REVISION 1.17); SPRS UNCHANGED.** `DIWAI-COR-001` v1.0 (approved 2026-10-23) defines audit correlation, review and reporting; exercised across sources (`DIWAI-EV-AU-2026-10-23-C`). Audit and Accountability is 7 of 9. Backup `.bak-20261023-am55`. |
 | **2.18 (amended 56)** | **10/23/2026** | **[SYSTEM-OWNER]** | **3.3.2 RECOVERED; OBJECTIVE-LEVEL 76 → 77/110 (ASSESSMENT REVISION 1.18); SPRS UNCHANGED.** The portal (Apache), webmail (Dovecot) and Nextcloud now bind to the directory as `svc-apache`, `svc-dovecot` and `svc-nextcloud` (read-only, no access to password hashes) instead of the owner's account; the personal bind was scrubbed from a stale Grafana file (`DIWAI-CR-2026-10-38`). The change caused two short faults, recorded as INC-008. Audit and Accountability is 8 of 9. Backup `.bak-20261023-am56`. |
 | **2.18 (amended 57)** | **10/23/2026** | **[SYSTEM-OWNER]** | **3.3.1 RECOVERED; OBJECTIVE-LEVEL 77 → 78/110 (ASSESSMENT REVISION 1.19); SPRS UNCHANGED.** Mac audit retention raised from 7 to 90 days (`DIWAI-CR-2026-10-39`); Appendix E.9 updated. Retention is configured now and accumulates over 90 days (verify 2027-01-21). **Audit and Accountability is 9 of 9.** Backup `.bak-20261023-am57`. |
+| **2.18 (amended 91)** | **10/28/2026** | **[SYSTEM-OWNER]** | **3.5.3 RECOVERED; OBJECTIVE-LEVEL 104 → 105/110 (ASSESSMENT REVISION 1.47); SPRS UNCHANGED.** [c] and [d] are satisfied as owner-accepted exemptions (Appendix E.25, `DIWAI-CR-2026-10-63`): webmail is password-only and reachable from the CUI network only; three non-interactive VM-to-Mac jobs use a key alone, each restricted to the VM's address and a forced command. Identification and Authentication is now 10 of 11. |
+| **2.18 (amended 90)** | **10/28/2026** | **[SYSTEM-OWNER]** | **3.1.1 RECOVERED; OBJECTIVE-LEVEL 103 → 104/110 (ASSESSMENT REVISION 1.46); SPRS UNCHANGED.** [f] (system access limited to authorised devices) is satisfied as an owner-accepted risk: the network has no port-level device control, but every port of the switch is inside the locked rack (Appendix E.24, `DIWAI-CR-2026-10-62`). Access Control is now 22 of 22. |
+| **2.18 (amended 89)** | **10/28/2026** | **[SYSTEM-OWNER]** | **MAIL PORT 25 CLOSED TO THE INTERNET (`DIWAI-CR-2026-10-61`); NO COUNT CHANGE CLAIMED (103/110); SPRS UNCHANGED.** Inbound mail never arrived (zero port-25 packets in three watches and an outside SMTP test that timed out); the residential circuit is the likely cause. The redirect and the WAN pass rule were removed; nothing is forwarded from the internet. The not-applicable reading of 3.13.5 and 3.13.2 [b] waits on the owner's decision about a relay or an upgraded account. |
+| **2.18 (amended 88)** | **10/26/2026** | **[SYSTEM-OWNER]** | **PORT 25: PURPOSE AND ADOPTER GUIDANCE RECORDED; NO COUNT CHANGE (103/110); SPRS UNCHANGED.** Owner statement: the mail service is for a business email address aligned with the domain, set up for FIPS-validated encryption, and carries the alert mail forwarded to Gmail; a business that prefers an external email provider should block port 25 (Appendix E.22). |
+| **2.18 (amended 87)** | **10/26/2026** | **[SYSTEM-OWNER]** | **WEB (80, 443) TAKEN OFF THE INTERNET (`DIWAI-CR-2026-10-60`); NO COUNT CHANGE (103/110); SPRS UNCHANGED.** The pf counters showed no connection to ports 80, 443 or 25 over about 26 hours, and the web logs show no outside visitors. The owner decided that 80 and 443 stay closed until a legitimate use exists; port 25 stays published for inbound and outbound mail. The one publicly accessible component is now the mail server (Postfix), which still shares the VM with the directory, so 3.13.5 and 3.13.2 [b] stay partial. Ten tests passed. |
+| **2.18 (amended 86)** | **10/26/2026** | **[SYSTEM-OWNER]** | **MAIL-CLIENT PORTS CLOSED ON THE VM (`DIWAI-CR-2026-10-59`); NO COUNT CHANGE (103/110); SPRS UNCHANGED.** IMAPS 993, SMTPS 465 and submission 587 are removed from the VM firewall zone; only webmail, on the VM itself, uses them. Mail from other servers (port 25) is unchanged. 3.5.3 [d] narrows to the webmail login (password-only on the CUI network). Ten tests passed. |
+| **2.18 (amended 85)** | **10/26/2026** | **[SYSTEM-OWNER]** | **CONSOLE LOGON MFA EXEMPTION ACCEPTED (3.5.3 [b]); NO COUNT CHANGE (103/110); SPRS UNCHANGED.** The owner decided against YubiKey console pairing (large, fragile, lockout risk) and accepted single-factor console logon on both hosts as an exemption (new Appendix E.23). The 2026-10-27 pairing is cancelled. 3.5.3 stays partial: [c] and [d] (webmail and mail-client logins, two key-only VM-to-Mac jobs) are still open. |
+| **2.18 (amended 84)** | **10/26/2026** | **[SYSTEM-OWNER]** | **3.1.3 RECOVERED; OBJECTIVE-LEVEL 102 → 103/110 (ASSESSMENT REVISION 1.42); SPRS UNCHANGED.** New Appendix E.22 states the CUI flows, their authorisation and enforcement, and the owner-accepted limit (an authorised user can copy CUI out; no data-loss-prevention tool). The 3.1.3 row in section 4 is replaced. Access Control is now 21 of 22. |
+| **2.18 (amended 83)** | **10/26/2026** | **[SYSTEM-OWNER]** | **3.13.10 RECOVERED; OBJECTIVE-LEVEL 101 → 102/110 (ASSESSMENT REVISION 1.41); SPRS UNCHANGED.** Owner choice B: the single-copy LUKS passphrase is an accepted risk (new Appendix E.5A); no off-site copy. POA&M-026 and -049 remain open. System and Communications is now 14 of 16. 3.13.2 stays partial (owner choice D) until 3.13.5 is addressed. |
 | **2.18 (amended 82)** | **10/25/2026** | **[SYSTEM-OWNER]** | **CONTINUITY AND END-OF-LIFE STATEMENT; NO COUNT CHANGE (101/110); SPRS UNCHANGED.** Appendix E.21 and `DIWAI-INV-PAD-001` now record the designee path to the break-glass envelope, the rule that both credentials change after the envelope is opened, and the owner's statement that, if the owner has died, the non-CUI is archived and the system is wiped. |
 | **2.18 (amended 81)** | **10/25/2026** | **[SYSTEM-OWNER]** | **3.10.5 RECOVERED; OBJECTIVE-LEVEL 100 → 101/110 (ASSESSMENT REVISION 1.40); SPRS UNCHANGED.** The physical access device inventory is complete (`DIWAI-INV-PAD-001` v1.0). The owner accepted two access paths in writing (Appendix E.21): the alarm technician's unchanged service code, and rack keys in an unlocked drawer in the locked study with a household-accessible spare study key. Physical Protection is now 5 of 6. The PE/MP policy's "no spare keys distributed" line is corrected. |
 | **2.18 (amended 80)** | **10/25/2026** | **[SYSTEM-OWNER]** | **3.8.4 RECOVERED; OBJECTIVE-LEVEL 99 → 100/110 (ASSESSMENT REVISION 1.38); SPRS UNCHANGED.** Owner chose the written marking rule (2026-10-25): new Appendix E.20 states that every labelled item is limited to the authorised users and kept in the locked cabinet. Media Protection is now 9 of 9. |
@@ -291,8 +300,8 @@ Verified from `pfctl -s nat`, 2026-08-01:
 
 | Public address | Ports                        | Redirected to | Service                          |
 |:---------------|:-----------------------------|:--------------|:---------------------------------|
-| [WAN-IP-REDACTED]  | 80, 443                      | [LAN-IP-REDACTED]    | Web address; webmail (`webmail.[DOMAIN.ORG]`) answers the CUI network only (403 from elsewhere) |
-| [WAN-IP-REDACTED]  | 25                           | [LAN-IP-REDACTED]    | Mail from other mail servers (`mail.[DOMAIN.ORG]`, MX target); 465, 587, 993, 995 not forwarded |
+| [WAN-IP-REDACTED]  | none                         | —             | Web address, **not published since 2026-10-26** (`DIWAI-CR-2026-10-60`): no legitimate use; webmail and the admin portal answer the CUI network only |
+| [WAN-IP-REDACTED]  | none                         | —             | Mail address, **not published since 2026-10-28** (`DIWAI-CR-2026-10-61`): inbound port 25 never arrived on the residential circuit; the VM still takes mail on port 25 from the CUI network only |
 | [WAN-IP-REDACTED]  | none                         | —             | OpenVPN (`vpn.[DOMAIN.ORG]`) switched off, not published |
 
 **Changed 2026-10-25 (`DIWAI-CR-2026-10-51`, owner decision 2026-10-24):** webmail, mail clients and the VPN are no longer reachable from the internet; they stay installed as future enhancements. Re-enabling is a recorded reversal of that change. Internet mail (port 25) is still published, so 3.13.5 is unchanged.
@@ -656,7 +665,7 @@ DNS ([DOMAIN.ORG] zone):
 |:--------|:---------------------------------------------------------|:------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 3.1.1   | Limit access to authorized users                         | IMPLEMENTED | 389-DS LDAP directory (dc=diwai,dc=org) manages user identities for VM services. macOS account management for the Mac host. SSH key-based access only. nginx proxy restricts the AI and Nextcloud interfaces to LAN-authorized users. Nextcloud authenticates against 389-DS over LDAPS and enforces TOTP 2FA on every login (see 3.5.3).                |
 | 3.1.2   | Limit access to authorized functions                     | IMPLEMENTED | 389-DS group-based RBAC (cn=admins group required for dashboard access). Nextcloud groupfolder access is group-restricted (cn=cui-users for the CUI groupfolder; cn=users for Operations/AI-Knowledge-Base). sudo on the VM for privileged operations. macOS standard user + sudo for host admin. fapolicyd enforces application whitelisting on the VM. |
-| 3.1.3   | Control flow of CUI                                      | IMPLEMENTED | pf firewall (Mac host) enforces WAN/LAN/MGMT boundaries. firewalld on the VM restricts inter-service traffic. nginx proxies the AI interface — no direct WAN exposure. TLS/SSH for all data in transit.                                                                                                                                                  |
+| 3.1.3   | Control flow of CUI                                      | IMPLEMENTED | Flows, authorisations and enforcement are stated in Appendix E.22: the Mac firewall allow-list (only the VM and the NAS pass through to the internet; only the VM may reach the Mac), firewalld on the VM, folder permissions and TOTP on the CUI repository, USBGuard on removable media, the release rule (E.19, E.20) and the redaction gate. TLS/SSH for all data in transit.                                                                                                                                                  |
 | 3.1.4   | Separation of duties                                     | N/A         | Single-person organization. Separation enforced via audit logging, the break-glass account, and external review processes.                                                                                                                                                                                                                               |
 | 3.1.5   | Least privilege                                          | IMPLEMENTED | Named user ([USERNAME]) with sudo elevation for privileged operations; sudo asks for the password except for three read-only diagnostic scripts on the VM and two on the Mac (`DIWAI-CR-2026-10-21`, `-10-22`). No service accounts hold unnecessary privileges. fapolicyd limits application execution on the VM.                                                                                                                                                                                  |
 | 3.1.6   | Non-privileged accounts                                  | IMPLEMENTED | Administrative tasks require explicit sudo. No direct root SSH. All elevated actions logged.                                                                                                                                                                                                                                                             |
@@ -994,7 +1003,7 @@ evidence under this standard. A point claimed on such a basis is withheld until 
 | Figure | Basis | Current |
 |:---|:---|---:|
 | **SPRS score** | Evidence-strict capability: implemented **and** proven working (DoD Assessment Methodology weights) | **101/110** |
-| **Strict 800-171A objectives met** | Every assessment objective satisfied **or not applicable**, **including definition and documentation** (Control Family Status table below) | **101/110** |
+| **Strict 800-171A objectives met** | Every assessment objective satisfied **or not applicable**, **including definition and documentation** (Control Family Status table below) | **105/110** |
 
 They measure different properties and are not in conflict. The gap between them is **working controls
 that are not yet fully defined, enumerated or documented** — tracked under **POA&M-027** — and is the
@@ -1097,11 +1106,11 @@ only when **every** assessment objective is satisfied.
 
 | Family                                  | Total | Met | Not Met | Unverified |
 |:----------------------------------------|------:|----:|--------:|-----------:|
-| AC — Access Control                     |    22 |  20 |       2 |          0 |
+| AC — Access Control                     |    22 |  22 |       0 |          0 |
 | AT — Awareness & Training               |     3 |   3 |       0 |          0 |
 | AU — Audit & Accountability             |     9 |   9 |       0 |          0 |
 | CM — Configuration Management           |     9 |   9 |       0 |          0 |
-| IA — Identification & Authentication    |    11 |   9 |       2 |          0 |
+| IA — Identification & Authentication    |    11 |  10 |       1 |          0 |
 | IR — Incident Response                  |     3 |   3 |       0 |          0 |
 | MA — Maintenance                        |     6 |   6 |       0 |          0 |
 | MP — Media Protection                   |     9 |   9 |       0 |          0 |
@@ -1109,9 +1118,9 @@ only when **every** assessment objective is satisfied.
 | PE — Physical Protection                |     6 |   5 |       1 |          0 |
 | RA — Risk Assessment                    |     3 |   3 |       0 |          0 |
 | CA — Security Assessment                |     4 |   3 |       1 |          0 |
-| SC — System & Communications Protection |    16 |  13 |       3 |          0 |
+| SC — System & Communications Protection |    16 |  14 |       2 |          0 |
 | SI — System & Information Integrity     |     7 |   7 |       0 |          0 |
-| **TOTAL**                                   |   **110** |  **101** |      **9** |          **0** |
+| **TOTAL**                                   |   **110** |  **105** |      **5** |          **0** |
 
 **Revised 2026-10-23 (assessment revision 1.20): 78 → 81.** Access Control 13 → 16 of 22: **3.1.5, 3.1.8 and 3.1.10** re-determined on current evidence. SPRS unchanged (101/110).
 
@@ -1606,6 +1615,60 @@ Owner confirmation of the fact F11 and approval: 2026-10-24. A dry-run custody r
 #### E.20 Marking of Media and Distribution Limitation (3.8.4)
 
 **Marking rule (owner decision 2026-10-25):** every item that carries a purple "CUI AUTHORIZED / Controlled Asset" label (`DIWAI-A-001` to `-006` today; register in `DIWAI-EV-MP-2026-10-25`), and every medium or device kept with it, is limited to the people authorised for the system (the `cui-users` group and the system owner). It is kept in the locked cabinet. It is not to be copied, lent, shown or removed for anyone else, and nothing on it is released outside the system without the owner's written authorization (Appendix E.19 for transport). The label means exactly this; it carries no separate printed limitation. A new item joins the rule when it gets a label, and the register is updated the same day.
+
+#### E.22 CUI Information Flows (3.1.3)
+
+This states where CUI may go, who authorises it, and what enforces it. The only authorised user is the owner (`cui-users`); the household, the alarm company and every external service are not authorised to receive CUI.
+
+| # | Flow | Authorised by | Enforced by |
+|:--|:---|:---|:---|
+| 1 | Upload and download in the Nextcloud CUI group folder, from the CUI network only | `cui-users` (the owner), with TOTP | Folder permissions, `files_accesscontrol` rules, `twofactor_totp`; not published to the internet |
+| 2 | CUI by mail. **Hypothetical:** the mail service (not webmail) is available, so a document containing CUI could arrive. To be in policy it must be encrypted (FIPS-validated). Inbound on port 25; clients on the CUI network | The owner | Encryption of the message or attachment is the rule; TLS on the connection; webmail answers the CUI network only (`DIWAI-CR-2026-10-51`); **direct mail-client logins (IMAPS 993, SMTPS 465, submission 587) are closed to the network on the VM since 2026-10-26** (`DIWAI-CR-2026-10-59`); webmail reaches them on the VM itself |
+| 3 | Mac to the Time Machine drive (full host backup, including the VM disk) | Automatic, owner-configured | FileVault on the drive; USBGuard allows only the listed drives |
+| 4 | VM alert archives to the NAS, daily | Automatic, owner-configured | Encrypted with FIPS-validated OpenSSL before transfer; the VM may reach the Mac only on ports 22 and 443 (`DIWAI-CR-2026-10-34`) |
+| 5 | VM disk image to the NAS, on demand | The owner | LUKS-encrypted image; only the VM and the NAS are passed through the Mac firewall |
+| 6 | Local AI reading CUI-marked documents | The owner | Loopback services only, not reachable from the network (`DIWAI-PORTS-001`) |
+| 2A | **Government-approved transfer sites** (for example DoD SAFE), the expected common way to exchange CUI outside the company, when a contract names them | The owner, under the contract | The site is the Government's own; used from the owner's browser on the Mac; nothing is left on it by the owner beyond the transfer the contract requires |
+| 7 | **Release outside the system** (anything leaving the controlled area) | **The owner's written authorization** (E.19); public repository: owner approval before each publish | Redaction gate that refuses on a residual leak; labels and the marking rule (E.20) |
+| 8 | External services (updates, rules, time, certificates, DNS, hash lookups, alert mail) | Listed in `DIWAI-EXT-001` | None receives CUI (EXT-001 §2); VirusTotal receives hashes only; alerts carry no CUI |
+
+**Why port 25 stays published (owner, 2026-10-26):** the mail service is intended for a business email address aligned with the system's domain name, and it is set up for FIPS-validated encryption. It also carries the system's own alert mail, which is forwarded to the owner's Gmail account (`DIWAI-EXT-001`). **Inbound delivery was not yet proven on 2026-10-26** (`DIWAI-CR-2026-10-60` §2B): outbound works; two inbound tests produced no connection on port 25, and the ISP is suspected of filtering it. **Adopter guidance:** a business that prefers an external email provider should block port 25; the system then publishes nothing, and 3.13.5 would no longer apply (a recorded change, as for the web ports).
+
+**Where flows end:** all CUI is stored inside the boundary: the Mac, the VM, the NAS and the Time Machine drive. The authorised sources and destinations are the rows above; any other destination needs the owner's written approval and an entry here first.
+
+**Owner-accepted limit (2026-10-26):** a person authorised to read CUI can copy it out. There is no data-loss-prevention tool, and the Mac host itself may reach the internet; limiting that access would also limit permitted uses. **The control is procedural:** CUI leaves only by the routes in rows 2, 2A and 7 (an approved transfer site, or encrypted mail, with the owner's authorization), never by an ad-hoc route. What also limits it: one authorised user, removable media blocked except the listed drives, only the VM and NAS passed through to the internet by the Mac firewall, and the release rule. A DLP product is judged disproportionate for a home-based single-operator office.
+
+#### E.23 Console Logon: Owner-Accepted Exemption from MFA (3.5.3 [b])
+
+Local logon at the consoles of the Mac mini and the services VM is single-factor (a password). **The owner accepted this as an exemption on 2026-10-26** and decided not to pair the YubiKey for console login, having found that setup a large and fragile undertaking with a real risk of locking out a machine in a rack.
+
+**Why the owner judges it proportionate:** the consoles are the machines' own keyboard and screen, in a locked study with the machines in a locked rack (E.21; `DIWAI-PE-LOG-001`); the VM runs as a virtual machine on the Mac, so its console is reached only from a logged-in Mac session; every network path to a privileged account has a second factor (SSH to the VM: key and TOTP; SSH to the Mac: key, password and TOTP); a break-glass account exists (E.21); and the password policy and lockout apply (3 failures, 60 minutes).
+
+**What it leaves open, stated plainly:** anyone who gets into the locked study, opens the rack and learns the password can log in locally. The YubiKey in the Mac is used only for repair approvals (FIDO2 with PIN and touch), not for login. The exemption is revisited at the annual review, and withdrawn if the Mac's console ever stops being in a locked room.
+
+#### E.24 Device Access to the Network: Owner-Accepted Limit (3.1.1 [f])
+
+The CUI network does not control which devices may connect to it: the switch has no port-level control (no port security, no network access control). **The owner accepted this on 2026-10-28.** Every device found on the wire is listed (`DIWAI-EXT-001`), the Mac firewall passes through only the VM and the NAS (R4, `DIWAI-CR-2026-10-34`), and every service on the network still requires a credential.
+
+**Why the owner judges it proportionate:** the switch and everything cabled to it are inside the locked rack in the locked study; the owner confirmed no wall jack, access point or other cable run connects to the switch from outside the rack. A device can join the network only by someone opening the rack, which is logged (`DIWAI-PE-LOG-001`) and protected as described in E.21.
+
+**What it leaves open, stated plainly:** someone who gets into the study, opens the rack and plugs in a device can reach the VM and the NAS directly on the wire, subject to their credentials. Revisited at the annual review, and withdrawn if any port of the switch is ever reachable from outside the rack (for example a wall jack or wireless access point).
+
+#### E.25 Network Logon Without a Second Factor: Owner-Accepted Exemptions (3.5.3 [c] and [d])
+
+Two kinds of network logon on the CUI network use one factor. **The owner accepted both on 2026-10-28.**
+
+**1. Webmail ([d]).** Webmail (Roundcube on the services VM) takes a directory username and password only. It is reachable from the CUI network only; it is not published to the internet (`DIWAI-CR-2026-10-51`, `DIWAI-CR-2026-10-60`). Direct mail-client logins are closed (`DIWAI-CR-2026-10-59`). The password policy (minimum length, history, lockout) applies to the account.
+
+**2. Three key-only jobs from the VM to the Mac ([c]).** The nightly Wazuh log archive, the certificate push and the dashboard figures log in from the VM's address with a dedicated key and no second factor (`DIWAI-CR-2026-08-17` §3.2). They are non-interactive and cannot present a code. Each key on the Mac is restricted to the VM's address and a forced command (checked 2026-10-28), and these jobs are the only exemption to the Mac's key-plus-password-plus-TOTP rule. The exemption is by source address, so it applies to any key presented from the VM; the owner's interactive key is not held on the VM.
+
+**Why the owner judges this proportionate:** the whole CUI network is one wired segment inside a locked rack in a locked study (E.21, E.24); there is no remote path to either logon; every other network path to a privileged account (SSH to the VM, SSH to the Mac) has a second factor, and the Nextcloud CUI repository enforces TOTP. Adding a code to webmail would add another authenticator for a mail reader reachable only from inside the house; a single sign-on solution is planned for the dc2 appliance, not for this system.
+
+**What it leaves open, stated plainly:** someone on the LAN who learns a webmail password can read that user's mail without a second factor; a job key stolen from the VM could be used from the VM's address only, for its forced command. Revisited at the annual review, and withdrawn if webmail is ever published beyond the CUI network or a job key loses its address or command restriction.
+
+#### E.5A Single-Copy LUKS Passphrase: Owner-Accepted Risk (3.13.10)
+
+The VM's LUKS passphrase has one keyslot and one written copy, held with the sysadmin break-glass credential in one envelope in the rack's storage drawer (`DIWAI-INV-PAD-001`, items 7 and 9). **The owner accepted this in writing on 2026-10-26 (choice B):** no second copy is held off-site. The consequence, stated plainly: if the rack and its contents are lost or cannot be opened, the encrypted VM volume cannot be recovered; the Time Machine copies of the VM disk sit under the same rack. The designee path for the envelope is in E.21. POA&M-026 and POA&M-049 were closed as risk accepted on 2026-10-26 (POA&M amendment 20). The owner's judgement is that an off-site second copy is disproportionate for a home-based, single-operator office, and none is planned. The accepted risk is revisited at the annual review.
 
 #### E.21 Physical Access Devices (3.10.5)
 
