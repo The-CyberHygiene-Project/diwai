@@ -12,6 +12,7 @@ Public, redacted documentation for the **[DOMAIN.ORG] SecureMac Reference System
 | `CyberSecurity/Software_Inventory/` | Software Bill of Materials (current version only) |
 | `CyberSecurity/Change_Records/` | Change records for the local-AI tooling (October 2026) |
 | `CyberSecurity/Testing/` | Test results for that tooling |
+| `CyberSecurity/Evidence/`, `CyberSecurity/Assessment_Records/` | Redacted example evidence notes and the August 2026 sweep session record |
 | `CyberSecurity/Admin_Portal/` | The administrator's portal: overview, and the design of the Control-Health Alerts page (November 2026) |
 | `CyberSecurity/Design_Notes/` | Design notes for work in progress, such as diagnosis and repair of failing checks with a local AI (tiers of commands, approvals; see also the Automated_Compliance repository) |
 | `Policies/`, `Procedures/` | The system's policies and procedures |
